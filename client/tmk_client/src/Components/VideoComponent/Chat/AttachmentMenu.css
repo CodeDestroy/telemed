@@ -1,0 +1,44 @@
+.attachment-menu {
+  position: relative;
+}
+
+.menu-button {
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dropdown-toggle {
+  height: 100%!important;
+}
+
+.menu-options {
+  position: absolute;
+  top: -250%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.menu-option {
+  padding: 10px 20px;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+}
+
+.menu-option:last-child {
+  border-bottom: none;
+}
+
+.menu-option:hover {
+  background-color: #e0e0e0;
+}
+/* #dropdown-basic-button {
+  background-color: #fff;
+  border-color: red;
+} */
