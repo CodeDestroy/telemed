@@ -50,6 +50,13 @@ module.exports = class Database {
     userRoleId: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    avatar: {
+      type: DataTypes.STRING,
+      defaultValue: 'http://localhost/images/defaultAvatar.png'
+    },
+    email: {
+      type: DataTypes.STRING,
     }
   }, {
     timestamps: false
@@ -171,6 +178,9 @@ module.exports = class Database {
       type: DataTypes.DATE,
       allowNull: false
     },
+    meetingEnd:  {
+      type: DataTypes.DATE
+    }
   })
 
   this.models.Messages = this.sequelize.define('message', {
@@ -207,13 +217,25 @@ module.exports = class Database {
     }
   })
 
+  this.models.Url = this.sequelize.define('url', {
+    originalUrl: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    shortUrl: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    }
+  })
+
   }
 
   defineAssociations() {
     /* const { Users, UsersRoles, Teachers, Students, ClassLevels, Classes, StudentsMarks, ClassLesons, Lessons, Modules } = this.models; */
     /* Classes.hasOne(Students, { foreignKey: 'classId'})
     Students.belongsTo(Classes, { foreignKey: 'classId' }); */
-    const { Users, UsersRoles, Doctors, Admins, Patients, Tokens, Rooms, Messages, Files } = this.models;
+    const { Users, UsersRoles, Doctors, Admins, Patients, Tokens, Rooms, Messages, Files, Url } = this.models;
 
     UsersRoles.hasMany(Users, {foreignKey: 'userRoleId'});
     Users.belongsTo(UsersRoles, {foreignKey: 'userRoleId'})
@@ -247,7 +269,8 @@ module.exports = class Database {
     }
     else {
       await this.sequelize.sync(type);
-      
+
+      const adminRole = await this.models.UsersRoles.create({roleName: 'Администратор', accessLevel: '3'})
       const doctorRole = await this.models.UsersRoles.create({roleName: 'Врач', accessLevel: '2'})
       const patientRole = await this.models.UsersRoles.create({roleName: 'Пациент', accessLevel: '1'})
 
@@ -258,10 +281,10 @@ module.exports = class Database {
       const testDoctor = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Тестов', firstName: 'Тест', patronomicName: 'Тестович', birthDate: new Date(), info: 'Тестовый доктор'})
       
       const testUserPatient = await this.models.Users.create({login: 'test1', password: hashPassword, userRoleId: doctorRole.id})
-      const testPatien = await this.models.Doctors.create({userId: testUserPatient.id, secondName: 'Пациентов', firstName: 'Пациент', patronomicName: 'Пациентович', birthDate: new Date(), info: 'Тестовый пациент'})
+      const testPatient = await this.models.Doctors.create({userId: testUserPatient.id, secondName: 'Пациентов', firstName: 'Пациент', patronomicName: 'Пациентович', birthDate: new Date(), info: 'Тестовый пациент'})
       
       
-      const room = await this.models.Rooms.create({roomName: '7', meetingStart: new Date()})
+      const room = await this.models.Rooms.create({roomName: 'sometestroomname', meetingStart: new Date()})
     }
     
     console.log('All models were synchronized successfully.');

@@ -7,6 +7,8 @@ class UserDto {
             login: user.login,
             password: user.password,
             accessLevel: user_role.accessLevel,
+            avatar: user.avatar,
+            email: user.email,
             //payload2
             roleName: user_role.roleName,
             secondName: person.secondName,

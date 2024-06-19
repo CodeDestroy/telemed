@@ -33,13 +33,19 @@ function Index() {
       joinRoom(roomId)
     }
     socket.on('room:joined', (joined, roomName, user) => {
+      if (!joined)  {
+        window.location.href='/'; 
+        return
+      
+      }
       console.log(`joined: ${joined} room: ${roomName}`)
     })
     socket.on('user:logined', (bool, user) => {
       console.log(user)
       if (!bool) {
-        window.location.href=''; 
-        return
+        console.log(bool, user)
+        /* window.location.href='/';  */
+        /* return */
       }
       store.setAuth(true)
       store.setUser(user) 

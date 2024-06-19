@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Context } from '..';
 import { observer } from 'mobx-react-lite';
+import mainUtil from '../Utils/mainUtil';
 const Header = () => {
     const {store} = React.useContext(Context)
+    
+    useEffect(() => {
+        console.log(store.user)
+    }, [store])
     const handleLogout = async () => {
         await store.logout()
         store.checkAuth()
@@ -50,15 +55,30 @@ const Header = () => {
                     </div>
                 </div>
                 <div className="person">
-                    <a href="#" className="person--photo" style={{backgroundImage: "url(/assets/img/person-detail.png"}}></a>
+                    <a href="#" className="person--photo" style={{backgroundImage: mainUtil.isUrl(store.user.avatar) ? `url(${store.user.avatar})` : store.user.avatar}}></a>
                     <a href="#" className="person--name">
-                        Иванова  Екатерина Александровна 
+                        {store?.user?.admin ? 
+                            store.user.admin.secondName + ' ' + store.user.admin.firstName + ' ' + store.user.admin.patronomicName
+                            :
+                            ''
+                        }
+                        {store?.user?.doctor ? 
+                            store.user.doctor.secondName + ' ' + store.user.doctor.firstName + ' ' + store.user.doctor.patronomicName
+                            :
+                            ''
+                        }
+                        {store?.user?.patient ? 
+                            store.user.patient.secondName + ' ' + store.user.patient.firstName + ' ' + store.user.patient.patronomicName
+                            :
+                            ''
+                        }
+                        {/* Иванова  Екатерина Александровна  */}
                     </a>
                     <a onClick={handleLogout} className="person--logout">
                         Выход
                     </a>
                 </div>
-                <a href="#" className="button-primary">Записаться на приём</a>
+                {/* <a href="#" className="button-primary">Записаться на приём</a> */}
                 <div className="mobile-menu-icon">
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fillRule="evenodd" clipRule="evenodd" d="M0 14.0007C0 13.3563 0.696445 12.834 1.55555 12.834L26.4444 12.834C27.3036 12.834 28 13.3563 28 14.0007C28 14.645 27.3036 15.1673 26.4444 15.1673L1.55555 15.1673C0.696445 15.1673 0 14.645 0 14.0007Z" fill="#D30D15"/>

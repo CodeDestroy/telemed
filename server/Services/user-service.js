@@ -180,7 +180,6 @@ class UserService {
             if (!isPassEquals) {
                 return ApiError.AuthError(`Неверный пароль`)
             }
-            /* console.log(user.users_role.accessLevel) */
             switch (user.users_role.accessLevel) {
                 case 1: 
                     let patient = await database.models.Patients.findOne({
@@ -190,9 +189,8 @@ class UserService {
                     })
                     
                     const userDtoPatient = await UserDto.deserialize(user, user.users_role, patient)
-                   /*  console.log({...userDtoPatient}) */
                     const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
-                    console.log(tokensPatient)
+                    /* console.log(tokensPatient) */
                     await tokenService.saveToken(user.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
@@ -205,7 +203,7 @@ class UserService {
                     })
                     
                     const userDto = await UserDto.deserialize(user, user.users_role, doctor)
-                    console.log({...userDto})
+                    /* console.log({...userDto}) */
                     const tokens = await tokenService.generateTokens({...userDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)

@@ -34,8 +34,8 @@ const SendForm = ({roomID, token}) => {
         })
 
         socket.on('message:returnAll', (allMessages, length) => {
-            for (const messageDto of allMessages) {
-                addComponent(messageDto.message, messageDto.files, messageDto.user)
+            for (const message of allMessages) {
+                addComponent(message.message, message.files, message.user)
             }
         })
 
@@ -85,8 +85,8 @@ const SendForm = ({roomID, token}) => {
 
     return (
         <>
-            <Container>
-                <div className="row clearfix">
+            <Container className="msg-container-wrapper">
+                <div className="row clearfix mb-0">
                     <div className="chat-app mt-5 msg-cont">
                         <div className="chat">
                             <div className="chat-history message-container">

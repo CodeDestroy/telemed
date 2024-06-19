@@ -1,17 +1,26 @@
-import React, { useEffect, useLayoutEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { JitsiMeeting } from '@jitsi/react-sdk'
 import { useSearchParams } from 'react-router-dom';
+import ConferenceProtocol from '../Modals/ConferenceProtocol'
+import ConferenceService from '../../Services/ConferenceService';
+import mainUtil from '../../Utils/mainUtil';
+import { Context } from '../..';
+import { observer } from 'mobx-react-lite';
+
 function Jitsi(props) {
+    const {store} = React.useContext(Context)
     const roomName = props.room
     const domain = 'mczr-tmk.ru'
 
     const jwt = props.token
+    let localId = 0;
+    const JitsiRef = useRef(null)
 
-   /*  useLayoutEffect(() => {
-        socket.on('user:registered', (bool, user) => {
-            
-        })
-    }, []) */
+    /* const [avatar, setAvatar] = useState('http://distant-assistant.ru:80') */
+    const [showProtocolModal, setProtocolModalShow] = useState(false);
+
+    const handleProtocolModalClose = () => setProtocolModalShow(false);
+    const handleProtocolModalShow = () => setProtocolModalShow(true);
 
     //andrey moder true
     //http://localhost:3000/room/sometestroomname?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsibmFtZSI6IkFuZHJleSBUZXN0IE5ldyIsImlkIjoiQW5kcmV5QGdtYWlsLmNvbSIsImVtYWlsIjoidXNlckBnbWFpbC5jb20iLCJzZWNvbmROYW1lIjoiTm92aWNoaWtoaW4iLCJwYXRyb25vbWljTmFtZSI6IkV2Z2VuaWV2aWNoIiwiYmlydGhEYXRlIjoxMDAyMzE5MDk1fX0sIm5iZiI6MTY4MjMxOTA5NSwiYXVkIjoiaml0c2kiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsImV4cCI6MTc3NTM0OTYzNCwibW9kZXJhdG9yIjp0cnVlfQ.JJlQ8CNzi5kVC95oArJCxIaPGqWtYrViQME8yxrwNzo
@@ -49,9 +58,128 @@ function Jitsi(props) {
     //moderator 1
     //http://localhost:3000/room/sometestroomname?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9zdGVhbXVzZXJpbWFnZXMtYS5ha2FtYWloZC5uZXQvdWdjLzIyMDQwMDkyMDY0Nzk3MDcwNjkvMDI5MTY4QTdDNDQ5MDJBNDVDQzdBMDFENEEzQTY4MzQ3NkQxNjUxOS8_aW13PTYzNyZpbWg9MzU4JmltYT1maXQmaW1wb2xpY3k9TGV0dGVyYm94JmltY29sb3I9JTIzMDAwMDAwJmxldHRlcmJveD10cnVlIiwibmFtZSI6ItCi0LXRgdGC0L7QsiDQotC10YHRgiIsImVtYWlsIjoibW9kZXJhdG9yQGV4YW1wbGUuY29tIiwiaWQiOiIxIn19LCJuYmYiOjE2ODIzMTkwOTUsImV4cCI6MTc3NTM0OTYzNCwiYXVkIjoiYjMyNjVhZTM1YTFiMzRkMWEzNjA3MzhjYWY4ZDBmOTYzZWUyOWZiMDljMGY1MmYwNzkzNDVjN2NjMjQ1NzlkMyIsImlzcyI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJzdWIiOiJtY3pyLXRtay5ydSIsInJvb20iOiIqIiwibW9kZXJhdG9yIjp0cnVlfQ.2vHd4nvTpbl4H6qbuOafzVRSkJqSxDa7dihvA1-fAzo
     
+
+    //Андрей Евгеньевич
+    //http://localhost:3000/room/sometestroomname?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9zdGVhbXVzZXJpbWFnZXMtYS5ha2FtYWloZC5uZXQvdWdjLzIyMDQwMDkyMDY0Nzk3MDcwNjkvMDI5MTY4QTdDNDQ5MDJBNDVDQzdBMDFENEEzQTY4MzQ3NkQxNjUxOS8_aW13PTYzNyZpbWg9MzU4JmltYT1maXQmaW1wb2xpY3k9TGV0dGVyYm94JmltY29sb3I9JTIzMDAwMDAwJmxldHRlcmJveD10cnVlIiwibmFtZSI6ItCd0L7QstC40YfQuNGF0LjQvSDQkNC90LTRgNC10Lkg0JXQstCz0LXQvdGM0LXQstC40YciLCJlbWFpbCI6Im1vZGVyYXRvckBleGFtcGxlLmNvbSIsImlkIjoiMSJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6dHJ1ZX0.uIKhf6HKv7RzlaY1gYajoaRw4T4ee85_170xyVOa0E4
+    
+    //Андрей без авы
+    //http://localhost:3000/room/sometestroomname?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiIiwibmFtZSI6ItCd0L7QstC40YfQuNGF0LjQvSDQkNC90LTRgNC10Lkg0JXQstCz0LXQvdGM0LXQstC40YciLCJlbWFpbCI6Im1vZGVyYXRvckBleGFtcGxlLmNvbSIsImlkIjoiMSJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6dHJ1ZX0.QxXEiZnHSaLrVCRBmHlcy-VpDTTVaKBgfqL27kvu6IY
+
+    //пациент 2
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly93d3cuZnJlZWljb25zcG5nLmNvbS90aHVtYnMvcGF0aWVudC1pY29uL3BhdGllbnQtaWNvbi1wbmctMjEucG5nIiwibmFtZSI6ItCf0LDRhtC40LXQvdGC0L7QsiDQn9Cw0YbQuNC10L3RgiIsImVtYWlsIjoibW9kZXJhdG9yQGV4YW1wbGUuY29tIiwiaWQiOiIyIn19LCJuYmYiOjE2ODIzMTkwOTUsImV4cCI6MTc3NTM0OTYzNCwiYXVkIjoiYjMyNjVhZTM1YTFiMzRkMWEzNjA3MzhjYWY4ZDBmOTYzZWUyOWZiMDljMGY1MmYwNzkzNDVjN2NjMjQ1NzlkMyIsImlzcyI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJzdWIiOiJtY3pyLXRtay5ydSIsInJvb20iOiIqIiwibW9kZXJhdG9yIjp0cnVlfQ.AnY0cxFg6y0hjOpz-sdn5BF3v80uSfgQQnD4Je_FiuE
+
+
+    //пользователь 
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9lNy5wbmdlZ2cuY29tL3BuZ2ltYWdlcy84NC8xNjUvcG5nLWNsaXBhcnQtdW5pdGVkLXN0YXRlcy1hdmF0YXItb3JnYW5pemF0aW9uLWluZm9ybWF0aW9uLXVzZXItYXZhdGFyLXNlcnZpY2UtY29tcHV0ZXItd2FsbHBhcGVyLnBuZyIsIm5hbWUiOiLQn9C-0LvRjNC30L7QstCw0YLQtdC70YwiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpZCI6IjMifX0sIm5iZiI6MTY4MjMxOTA5NSwiZXhwIjoxNzc1MzQ5NjM0LCJhdWQiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwiaXNzIjoiYjMyNjVhZTM1YTFiMzRkMWEzNjA3MzhjYWY4ZDBmOTYzZWUyOWZiMDljMGY1MmYwNzkzNDVjN2NjMjQ1NzlkMyIsInN1YiI6Im1jenItdG1rLnJ1Iiwicm9vbSI6IioiLCJtb2RlcmF0b3IiOmZhbHNlfQ.oyM4hkUyvcIT-nBgYKIYf2ShM3aeCqhyRGtf7J5gPDQ
+
+    //пользоваетль 2
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9lNy5wbmdlZ2cuY29tL3BuZ2ltYWdlcy84NC8xNjUvcG5nLWNsaXBhcnQtdW5pdGVkLXN0YXRlcy1hdmF0YXItb3JnYW5pemF0aW9uLWluZm9ybWF0aW9uLXVzZXItYXZhdGFyLXNlcnZpY2UtY29tcHV0ZXItd2FsbHBhcGVyLnBuZyIsIm5hbWUiOiLQn9C-0LvRjNC30L7QstCw0YLQtdC70YwgMiIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImlkIjoiNCJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6ZmFsc2V9.km07xLmp0tleYj8oWSibr9PaH8MEm44hVY5JXEldnmI
+
+    //пользоваетль 3
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9lNy5wbmdlZ2cuY29tL3BuZ2ltYWdlcy84NC8xNjUvcG5nLWNsaXBhcnQtdW5pdGVkLXN0YXRlcy1hdmF0YXItb3JnYW5pemF0aW9uLWluZm9ybWF0aW9uLXVzZXItYXZhdGFyLXNlcnZpY2UtY29tcHV0ZXItd2FsbHBhcGVyLnBuZyIsIm5hbWUiOiLQn9C-0LvRjNC30L7QstCw0YLQtdC70YwgMyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImlkIjoiNSJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6ZmFsc2V9.USO1e1Um1uw0r2gZk9zDpqHXe6tPQfgLto1CwxBXb7A
+
+    //пользователь 4
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9lNy5wbmdlZ2cuY29tL3BuZ2ltYWdlcy84NC8xNjUvcG5nLWNsaXBhcnQtdW5pdGVkLXN0YXRlcy1hdmF0YXItb3JnYW5pemF0aW9uLWluZm9ybWF0aW9uLXVzZXItYXZhdGFyLXNlcnZpY2UtY29tcHV0ZXItd2FsbHBhcGVyLnBuZyIsIm5hbWUiOiLQn9C-0LvRjNC30L7QstCw0YLQtdC70YwgNCIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImlkIjoiNiJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6ZmFsc2V9.a4oFfNiIK7h5CAgmdhiHwlK6ycWNfrNYXmkTBbqetvM
+    
+    //Астахов Георгий Васильевич
+    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZXh0Ijp7InVzZXIiOnsiYXZhdGFyIjoiaHR0cHM6Ly9lNy5wbmdlZ2cuY29tL3BuZ2ltYWdlcy84NC8xNjUvcG5nLWNsaXBhcnQtdW5pdGVkLXN0YXRlcy1hdmF0YXItb3JnYW5pemF0aW9uLWluZm9ybWF0aW9uLXVzZXItYXZhdGFyLXNlcnZpY2UtY29tcHV0ZXItd2FsbHBhcGVyLnBuZyIsIm5hbWUiOiLQkNGB0YLQsNGF0L7QsiDQk9C10L7RgNCz0LjQuSDQktCw0YHQuNC70YzQtdCy0LjRhyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsImlkIjoiNyJ9fSwibmJmIjoxNjgyMzE5MDk1LCJleHAiOjE3NzUzNDk2MzQsImF1ZCI6ImIzMjY1YWUzNWExYjM0ZDFhMzYwNzM4Y2FmOGQwZjk2M2VlMjlmYjA5YzBmNTJmMDc5MzQ1YzdjYzI0NTc5ZDMiLCJpc3MiOiJiMzI2NWFlMzVhMWIzNGQxYTM2MDczOGNhZjhkMGY5NjNlZTI5ZmIwOWMwZjUyZjA3OTM0NWM3Y2MyNDU3OWQzIiwic3ViIjoibWN6ci10bWsucnUiLCJyb29tIjoiKiIsIm1vZGVyYXRvciI6ZmFsc2V9.UKNGR-RraQpT8Qfcuy3qE_nw43ubIQPKEiCXIVuByes
+    
+    //новый домен
+    //https://distant-assistant.ru:9443/room/sometestroomname?token=
+    //https://distant-assistant.ru:9443/room/newroom?token=
+    //https://distant-assistant.ru:9443/room/room?token=
+
+    /* useEffect(async () => {
+        if (!await mainUtil.isUrl(store.user.avatar) && store.user) {
+            
+            console.log(avatar + `${store.user.avatar}`)
+            setAvatar(avatar + `${store.user.avatar}`)
+        }
+    }, []); */
+
+    const onConferenceCreatedTimestamp = (nativeEvent) => {
+        /* Conference terminated event */
+        /* console.log(nativeEvent); */
+      
+    }
+
+    const onConferenceJoined = async (nativeEvent) => {
+        try {
+            /* console.log(nativeEvent); */
+            
+            //const result = await ConferenceService.joinConference(nativeEvent); !!!!!!!!!!!!!!
+            
+            
+            /* console.log('result:')
+            console.log(result.data)
+            console.log(`joined by id: ${result.data.data.id}`) */
+
+            //localId = result.data.data.id !!!!!!!!!!!!!!
+
+            /* result.then((data) => {
+                console.log('result:')
+                console.log(data)
+                
+                console.log(`joined by id: ${nativeEvent.id}`)
+            }) */
+            
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    const onParticipantLeft = (nativeEvent) => {
+        try {
+            /* console.log(nativeEvent, localId) */
+           /*  const result = await ConferenceService.leaveConference({...nativeEvent, roomName}); */
+        }
+        catch (e) {
+            console.log(e)
+        }
+        /* console.log(nativeEvent) */
+    }
+    const onParticipantJoined = (nativeEvent) => {
+        /* console.log(nativeEvent) */
+    }
+    const handleEndCall = async (event) => {
+        /* console.log(event)
+        console.log('Ending call for localId: ',  localId) */
+        try {
+            
+            const nativeEvent = { id: localId, roomName: roomName}
+            //const result = await ConferenceService.leaveConference(nativeEvent);!!!!!!!!!!!!!
+            /* JitsiRef.current.style.display = 'none' */
+           // console.log('Call ended successfully: ', nativeEvent, ' ', result.data); !!!!!!!!
+            /* window.location = '/' */
+            handleProtocolModalShow()
+            /* result.then((data) => {
+                JitsiRef.current.style.display = 'none'
+                console.log('Call ended successfully: ', nativeEvent, ' ', data);
+                handleProtocolModalShow()
+            }) */
+            /* const response = await fetch('https://your-server-endpoint.com/end-call', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: 'Call ended' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json(); */
+            
+        } catch (error) {
+            console.error('Error ending call:', error);
+        }
+    };
     return (
-        <div>
+        <div ref={JitsiRef}>
             <JitsiMeeting
+                /* avatarUrl={avatar} */
                 domain = { domain }
                 roomName = { roomName }
                 jwt = { jwt }
@@ -76,9 +204,9 @@ function Jitsi(props) {
                     SHOW_JITSI_WATERMARK: false,
                     SHOW_WATERMARK_FOR_GUESTS: false,
                     SHOW_CHROME_EXTENSION_BANNER: false,
-                    /* TOOLBAR_BUTTONS: ["microphone", "camera", "desktop", 'fullscreen', 'chat', 'hangup'], */
+
                     TOOLBAR_BUTTONS: ['microphone', 'camera', 'desktop', 'fullscreen',
-                    'fodeviceselection', 'recording', 'security',
+                    'fodeviceselection', 'recording', 'hangup',
                      
                     'videoquality', 'filmstrip', 
                     'tileview', 'videobackgroundblur', 'download', 'participants-pane', 'pip', 'speakerstats',
@@ -99,19 +227,40 @@ function Jitsi(props) {
                     ], */
                 }}
                 
-                
-                /* userInfo = {{
-                    
-                }}, */
                 displayName = {'YOUR_USERNAME'}
-                onApiReady = { (externalApi) => {
-                   // const waterMarks = document.getElementsByClassName('watermark')
-                } }
-                getIFrameRef = { (iframeRef) => { iframeRef.style.height = '800px'; } }
+                onApiReady={(externalApi) => {
+                    /* console.log(externalApi); */
+
+                    // Добавляем обработчик события завершения конференции
+                    externalApi.on('videoConferenceLeft', (event) => {
+                        handleEndCall(event);
+                    });
+                    externalApi.on('videoConferenceJoined', (event) => {
+                        onConferenceJoined(event);
+                    })
+                    externalApi.on('conferenceCreatedTimestamp', (event) => {
+                        onConferenceCreatedTimestamp(event);
+                    })
+                    externalApi.on('participantLeft', (event) => {
+                        onParticipantLeft(event);
+                    })
+                    externalApi.on('participantJoined', (event) => {
+                        onParticipantJoined(event);
+                    })
+                    
+                    
+                }}
+                getIFrameRef = { (iframeRef) => { iframeRef.style.height = '40vh'; iframeRef.style.position = 'absolute'; iframeRef.style.width = '100%' } }
                 containerStyles = {{display: 'flex', flex: 1}}
             />
+            
+        <ConferenceProtocol 
+            show={showProtocolModal} 
+            onHide={handleProtocolModalClose}
+        />
         </div>
+        
     )
 }
 
-export default Jitsi
+export default observer(Jitsi)

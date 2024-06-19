@@ -74,10 +74,10 @@
 .msg-cont {
   border-color: #dc3545;
   border-radius: .25rem;
-      border: 0.25em outset red;
-          background: #fff;
+  border: 0.25em outset red;
+  background: #fff;
   transition: .5s;
-  margin-bottom: 30px;
+  /* margin-bottom: 30px; */
   border-radius: .55rem;
   position: relative;
   width: 100%;
@@ -292,7 +292,7 @@
   background-color:  red!important;
 }
 .message-container {
-  height: 80vh;
+  height: 35vh;
   overflow-y:auto; 
   overflow-x: hidden;
 }
@@ -350,4 +350,12 @@
   font-weight: 100; 
   border-radius: 1rem; 
   padding: 2rem;
+}
+
+.msg-container-wrapper{
+  position: absolute;
+  top: 52vh;
+  margin: 0px auto;
+  left: 0;
+  right: 0;
 }
