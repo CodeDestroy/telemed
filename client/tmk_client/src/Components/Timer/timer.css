@@ -1,0 +1,22 @@
+.white-stroke {
+    -webkit-text-stroke: 1px white;
+    color: black;
+    font-weight: 500;
+}
+
+.black-stroke {
+    -webkit-text-stroke: 1px black;
+    color: white;
+    font-weight: 500;
+}
+
+.red-stroke {
+    -webkit-text-stroke: 1px #d30d15;
+    color: white;
+    font-weight: 500;
+}
+
+.timer-fullscreen {
+    top: 12vh!important;
+    z-index: 4!important;
+}

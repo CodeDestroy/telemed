@@ -1,0 +1,19 @@
+.testBtn:fullscreen {
+    display: block; /* Отображаем модалку в полноэкранном режиме */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+.testBtn {
+    display: block;
+}
+
+.fullscreen {
+    width: 100vw!important;
+    height: 100dvh !important;
+    z-index: 3!important;
+}

@@ -6,9 +6,9 @@ const UserManager = require("../Utils/UserManager");
 let map = new Map();
 const database = require('../Database/setDatabase');
 const MessageDto = require('../Dtos/MessageDto');
-
+const rooms = require('../Utils/RoomManager')
 const httpSocket = async (httpServer, [cors]) => {
-    const ioHTTP = new Server(httpServer, { cors: cors } );
+    const ioHTTP = new Server(httpServer, { cors: cors, maxHttpBufferSize: 1e8 } );
     ioHTTP.on('connection', async (socket) => {
 
         ioConnections.push(socket);
@@ -187,6 +187,11 @@ const httpSocket = async (httpServer, [cors]) => {
             });
             socket.leave(room.id);
         });
+
+        /* socket.on('timer:start', async (nativeEvent) => {
+            console.log(nativeEvent)
+        }) */
+
         socket.on('disconnect', function (data) {
             ioConnections.splice(ioConnections.indexOf(socket), 1);
         });
@@ -215,7 +220,7 @@ const httpSocket = async (httpServer, [cors]) => {
 }
 
 const httpsSocket = async (httpsServer, [cors]) => {
-    const io = new Server(httpsServer, {cors: {origin: [process.env.CLIENT_URL]}});
+    const io = new Server(httpsServer, {cors: cors, maxHttpBufferSize: 1e8});
     io.on('connection', async (socket) => {
 
         ioConnections.push(socket);
@@ -394,9 +399,20 @@ const httpsSocket = async (httpsServer, [cors]) => {
             });
             socket.leave(room.id);
         });
+
+        /* socket.on('timer:start', async (conferenceEvent) => {
+            console.log(conferenceEvent)
+            const userList = rooms.getUsersInRoom(conferenceEvent.roomName)
+            const room = await database.models.Rooms.findOne({
+                where: {
+                    roomName: conferenceEvent.roomName
+                }
+            });
+
+        })
         socket.on('disconnect', function (data) {
             ioConnections.splice(ioConnections.indexOf(socket), 1);
-        });
+        }); */
 
         socket.on('leave', async (roomId) => {
             const room = await database.models.Rooms.findOne({

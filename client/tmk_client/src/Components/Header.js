@@ -6,7 +6,7 @@ const Header = () => {
     const {store} = React.useContext(Context)
     
     useEffect(() => {
-        console.log(store.user)
+        /* console.log(store.user) */
     }, [store])
     const handleLogout = async () => {
         await store.logout()

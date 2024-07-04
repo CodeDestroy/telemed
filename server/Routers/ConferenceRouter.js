@@ -4,5 +4,5 @@ const ConferenceController = require('../Controllers/ConferenceContorller');
 
 router.post('/join', ConferenceController.join)
 router.post('/leave', ConferenceController.leave)
-
+router.post('/participantJoined', ConferenceController.participantJoined)
 module.exports = router;

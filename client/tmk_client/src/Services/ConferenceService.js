@@ -8,6 +8,10 @@ class ConferenceService {
     static async leaveConference  (conferenceEvent)  {
         return await $api.post("/api/conference/leave", {conferenceEvent});
     }
+
+    static async participantJoined (conferenceEvent)  {
+        return await  $api.post("/api/conference/participantJoined",  {conferenceEvent});
+    }
 }
 
 export default ConferenceService;

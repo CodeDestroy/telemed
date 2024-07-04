@@ -1,6 +1,6 @@
 import React from 'react';
-import './AttachmentMenu.css'; // Стили, которые мы добавим позже
-import Dropdown from 'react-bootstrap/Dropdown'
+import './AttachmentMenu.css';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const CustomToggle = React.forwardRef(({ children, onClick, className }, ref) => (
   <button 
@@ -15,29 +15,30 @@ const CustomToggle = React.forwardRef(({ children, onClick, className }, ref) =>
     aria-expanded="false" 
     style={{borderColor: "red", borderTopLeftRadius: '0', borderBottomLeftRadius: '0'}}
   >
-                           
+    {children}
   </button>
 ));
 
 const AttachmentMenu = ({ selectFile, className }) => {
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      selectFile(file)
+      selectFile(file);
+      console.log(file);
     }
   };
 
   const getAcceptType = (type) => {
     if (type === 'photo') {
-      return 'image/*'; // Только изображения
+      return 'image/*';
     }
-    return '*'; // Все файлы
+    return '*';
   };
+
   return (
     <Dropdown>
       <Dropdown.Toggle as={CustomToggle} className={className} id="dropdown-custom-components">
-        
+        {/* <span role="img" aria-label="attachment">📎</span> */}
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
@@ -47,12 +48,10 @@ const AttachmentMenu = ({ selectFile, className }) => {
             id={`attachment-image`}
             className="attachment-input"
             onChange={handleFileChange}
-            accept={getAcceptType('photo')} // Используем тип
+            accept={getAcceptType('photo')}
           />
           <label htmlFor={`attachment-image`} className="attachment-label dropdown-item">
-            <span role="img" aria-label="attachment">
-              Фото
-            </span>
+            <span role="img" aria-label="attachment">Фото</span>
           </label>
         </Dropdown.Item>
         <Dropdown.Item as="button" style={{padding: '0'}}>
@@ -61,17 +60,14 @@ const AttachmentMenu = ({ selectFile, className }) => {
             id={`attachment-*`}
             className="attachment-input"
             onChange={handleFileChange}
-            accept={getAcceptType('*')} // Используем тип
+            accept={getAcceptType('*')}
           />
           <label htmlFor={`attachment-*`} className="attachment-label dropdown-item">
-            <span role="img" aria-label="attachment-*">
-              Файл
-            </span>
+            <span role="img" aria-label="attachment">Файл</span>
           </label>
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
-   
   );
 };
 

@@ -11,7 +11,7 @@ class RoomManager {
     // Метод для добавления комнаты
     addRoom(roomName) {
         if (!this.rooms.has(roomName)) {
-            this.rooms.set(roomName, { users: [] }); 
+            this.rooms.set(roomName, { users: [], started: 0 }); 
         }
         return roomName;
     }
@@ -22,11 +22,12 @@ class RoomManager {
     }
 
     // Метод для добавления пользователя в комнату
-    addUserToRoom(roomName, user) {
+    addUserToRoom(roomName, user, time = 0) {
         if (this.rooms.has(roomName)) {
-            this.rooms.get(roomName).users.push(user);
+            if (!this.rooms.get(roomName).users.includes(user))
+                this.rooms.get(roomName).users.push(user);
         } else {
-            this.rooms.set(roomName, { users: [user] });
+            this.rooms.set(roomName, { users: [user], started: time });
         }
     }
 
@@ -58,6 +59,26 @@ class RoomManager {
         }
         return [];
     }
+
+    getStartedTimeInRoom(roomName) {
+        if (this.rooms.has(roomName)) {
+            return this.rooms.get(roomName).started;
+        }
+        return 0;
+    }
+
+    setStartedTimeInRoom(roomName, time)  {
+        if (this.rooms.has(roomName)) {
+            this.rooms.get(roomName).started = time;
+        }
+    }
+
+    /* getDurationInRoom(roomName)  {
+        if (this.rooms.has(roomName)) {
+            return (this.rooms.get(roomName).started - Date.now());
+        }
+        return 0;
+    } */
 }
 
 const instance = new RoomManager();
