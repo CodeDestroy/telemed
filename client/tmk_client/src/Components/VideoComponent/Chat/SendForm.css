@@ -72,6 +72,8 @@
 }
 
 .msg-cont {
+  padding-left: 0;
+  padding-right: 0;
   border-color: #dc3545;
   border-radius: .25rem;
   border: 0.25em outset red;
@@ -358,4 +360,10 @@
   margin: 0px auto;
   left: 0;
   right: 0;
+}
+
+.msg-container-wrapper-modal {
+  padding: 0!important;
+  margin: 0!important;
+  
 }

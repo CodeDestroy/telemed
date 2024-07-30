@@ -1,90 +1,35 @@
-import React, { useContext, useEffect, useState, useRef, useLayoutEffect, useCallback } from "react";
-import socket from '../../../socket';
-import { Context } from "../../..";
+import React, {useRef} from "react";
 import Container from "react-bootstrap/Container";
-import { MessageObj, ChildComponent } from './MessageObj';
+import { MessageObj } from './MessageObj';
 import './SendForm.css';
 import SendImg from '../../../Assets/img/send.svg';
 import AttachmentMenu from './AttachmentMenu';
 
-const SendForm = ({ roomID, token }) => {
-    const { store } = useContext(Context);
-    const [roomId, setRoomId] = useState();
-    const [message, setMessage] = useState('');
-    const [numChildren, setNumChildren] = useState(0);
-    const [children, setChildren] = useState([]);
-    const [dataPosts, setData] = useState([]);
-    const [file, setFile] = useState(null);
-    const messagesEndRef = useRef(null);
-
-    const addComponent = useCallback((message, files, user) => {
-        children.push(<ChildComponent key={message.id} message={message} files={files} user={user} />);
-        setData(children);
-        setNumChildren((count) => count + 1);
-    }, [children]);
-
-    useLayoutEffect(() => {
-        socket.on('room:joined', (state, roomId) => {
-            children.length = 0;
-            setData([]);
-            setRoomId(roomId);
-        });
-
-        socket.on('message:returnAll', (allMessages, length) => {
-            for (const message of allMessages) {
-                addComponent(message.message, message.files, message.user);
-            }
-        });
-
-        socket.on('message:return', (message, user, file, count) => {
-            addComponent(message, file, user);
-        });
-    }, [addComponent, children]);
-
-    useEffect(() => {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }, [numChildren]);
-
-    useEffect(() => {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }, [dataPosts]);
-
-    const sendMessage = (message, files) => {
-        if (files) {
-            let name = files.name;
-            let type = files.type;
-            socket.emit('message:upload', message, files, name, type, roomId, store.user.id);
-        } else {
-            socket.emit('message:upload', message, null, null, null, roomId, store.user.id);
-        }
-        setMessage('');
-        setFile(null);
-    };
-
-    const handleAttachmentSelect = (file) => {
-        setFile(file);
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            if (message.length > 0)
-                sendMessage(message, file);
-            else
-                sendMessage('', file);
-        }
-    };
-
+const SendForm = ({
+    message,
+    setMessage,
+    dataPosts,
+    messagesEndRef,
+    handleKeyDown,
+    sendMessage,
+    file,
+    handleAttachmentSelect,
+    setFile,
+    store,
+    containerClass
+}) => {
     return (
         <>
-            <Container className="msg-container-wrapper" id='chatContainer'>
+            <Container className={containerClass} id='chatContainer'>
                 <div className="row clearfix mb-0">
                     <div className="chat-app mt-5 msg-cont">
                         <div className="chat">
                             <div className="chat-history message-container">
                                 <ul className="m-b-0">
-                                    {dataPosts && store.user.id ? <><MessageObj key={1} addComponent={addComponent} children={dataPosts}></MessageObj></> : ''}
-                                    <div ref={messagesEndRef} />
+                                    {dataPosts && store.user.id ? <MessageObj key={1} addComponent={() => {}} children={dataPosts}></MessageObj> : ''}
+                                    
                                 </ul>
+                                <div ref={messagesEndRef}></div>
                             </div>
                             <div className="chat-message clearfix">
                                 <div className="input-group mb-0 dropup" style={{ height: '4.5em' }}>

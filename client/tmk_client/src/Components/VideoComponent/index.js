@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import Header from '../Header';
 import { observer } from 'mobx-react-lite';
 import Timer from '../Timer';
+import ModalChat from './Chat/ModalChat'
 
 function Index() {
   const {roomId} = useParams();
@@ -47,8 +48,9 @@ function Index() {
       console.log(`joined: ${joined} room: ${roomName}`)
     })
     socket.on('user:logined', (bool, user) => {
+      console.log(bool, user)
       if (!bool) {
-/*         console.log(bool, user) */
+        /* console.log(bool, user) */
         /* window.location.href='/';  */
         /* return */
       }
@@ -113,7 +115,11 @@ function Index() {
     }
   }
 
+  const [modalChatShow, setModalChatShow] = React.useState(false);
   
+  const hadleOpenModalChat = () => {
+    setModalChatShow(true)
+  }
   /* const time = new Date();
   time.setSeconds(time.getSeconds() + 600); */ // 10 minutes timer
   return (
@@ -121,9 +127,10 @@ function Index() {
       <Header/>
       <div id='container-for-selector'>
 
-        <Jitsi room={roomId} token={jwt} onFullScreen={handleFullScreen} onJoin={handleConferenceJoin} onLeave={handleConferenceLeave} timerSeconds={totalSeconds}/>
+        <Jitsi openModalChat={hadleOpenModalChat} room={roomId} token={jwt} onFullScreen={handleFullScreen} onJoin={handleConferenceJoin} onLeave={handleConferenceLeave} timerSeconds={totalSeconds}/>
         <Timer time={totalSeconds} offsetTimestamp={totalSeconds} run={isTimerRunning}/*  onUpdateTotalSeconds={handleUpdateTotalSeconds} *//>
-        <Chat roomId={roomId} token={jwt}/>
+        <Chat roomId={roomId} token={jwt}  show={modalChatShow} onHide={() => setModalChatShow(false)}/>
+        {/* <ModalChat show={modalChatShow} onHide={() => setModalChatShow(false)} roomId={roomId} token={jwt}/> */}
       </div>
       
     </>

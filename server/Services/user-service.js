@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs')
 const database = require('../Database/setDatabase');
 const ApiError = require('../Errors/api-error');
 const UserDto = require('../Dtos/UserDto');
-
+const {Op} = require('sequelize')
 
 class UserService {
     
@@ -157,6 +157,43 @@ class UserService {
         }
     } */
 
+
+    async createUser (roleId, login, password, avatar, email, phone  ) {
+        try {
+            
+            const candidate = await database.models.Users.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            login: login,
+                        },
+                        {
+                            phone: phone,
+                        }
+                    ]
+                    
+                },
+            })
+            
+            if (candidate) {
+                throw ApiError.BadRequest(`Пользователь ${login} уже существует`)
+            }
+
+            const pass_to_hash = password.valueOf();
+            const hashPassword = await bcrypt.hash(pass_to_hash, 8);
+            const newUser = await database.models.Users.create({
+                login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email, avatar
+            })
+
+            return newUser
+        }
+        catch (e) {
+            console.log(e)
+        }
+            
+
+    }
+
     //login
     async login(login, password) {
         try {
@@ -170,11 +207,14 @@ class UserService {
                     required: true
                 }]
             })
+            /* console.log(user) */
 
             if (!user) {
                 return ApiError.AuthError(`Пользователь ${login} не найден`)
             }
-
+            if (!user.confirmed) {
+                return ApiError.AuthError(`Подтвердите регистрацию`)
+            }
             const isPassEquals = await bcrypt.compare(password, user.password);
             //if not
             if (!isPassEquals) {
@@ -208,11 +248,22 @@ class UserService {
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: userDto } 
-                    break;
+                case 3:
+                    let admin = await database.models.Admins.findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    
+                    const userDtoAdmin = await UserDto.deserialize(user, user.users_role, admin)
+                    /* console.log({...userDtoAdmin}) */
+                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensAdmin, user: userDtoAdmin } 
                 default: 
-                    break;
+                    return ApiError.AuthError(`Ошибка авторизации`)
             }
-            return user
 
         }
         catch (e) {
@@ -233,6 +284,7 @@ class UserService {
                 throw ApiError.UnauthorizedError();
             }
             const userData = await tokenService.validateRefreshToken(refreshToken);
+            
             const tokenFromDb = await tokenService.findToken(refreshToken);
             if (!userData || !tokenFromDb) {
                 console.log('не валидный токен или нет в БД')
@@ -249,7 +301,16 @@ class UserService {
             })
             switch (user.users_role.accessLevel) {
                 case 1: 
-                    break;
+                    let patient = await database.models.Patients.findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    const userDtoPatient = await UserDto.deserialize(user, user.users_role, patient)
+                    const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    await tokenService.saveToken(userDtoPatient.id, tokensPatient.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensPatient, user: userDtoPatient } 
                 case 2:
                     let doctor = await database.models.Doctors.findOne({
                         where: {
@@ -263,9 +324,50 @@ class UserService {
                     //send answer (user and tokens)
                     return { ...tokens, user: userDto } 
                 case 3:
+                    let admin = await database.models.Admins.findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    const userDtoAdmin = await UserDto.deserialize(user, user.users_role, admin)
+                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensAdmin, user: userDtoAdmin } 
                 default: 
+                
                     return [] 
             }         
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    async checkPhone (phone) {
+        try {
+            const user = await database.models.Users.findOne({
+                where: {
+                    login: phone,
+                    phone: phone
+                },
+                include: [
+                    {
+                        model: database.models.Doctors,
+                        required: false
+                    },{
+                        model: database.models.Admins,
+                        required: false
+                    },{
+                        model: database.models.Doctors,
+                        required: true
+                    },
+
+                ]
+            })
+            if (user) 
+                return user
+            else return null
         }
         catch (e) {
             console.log(e)

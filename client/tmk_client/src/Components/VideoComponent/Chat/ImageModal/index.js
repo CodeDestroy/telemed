@@ -1,15 +1,17 @@
 import React from 'react'
 import Modal from "react-bootstrap/Modal";
-
+import './ImageModal.css'
 function Index(props) {
     const [file] = React.useState(props.file)
     const [message] = React.useState(props.message)
     return (
       <Modal
         {...props}
-        size="lg"
+        /* size="lg" */
+        dialogClassName="modal-90w"
         aria-labelledby="contained-modal-title-vcenter"
         centered
+        fullscreen={false}
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">

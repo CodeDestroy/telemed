@@ -1,0 +1,40 @@
+import React from 'react';
+import { Typography, MenuItem } from '@mui/material';
+import adminLocations from '../../../../../Locations/AdminLocations';
+
+function AdminItems() {
+    const handleAdminDashboard = () => {
+        window.location.href = adminLocations.dashboard;
+    };
+
+    const handleDoctorManagement = () => {
+        window.location.href = adminLocations.doctorManagement;
+    };
+
+    const handlePatientManagement = () => {
+        window.location.href = adminLocations.patientManagement;
+    };
+
+    const handleSlotsManagement = () => {
+        window.location.href = adminLocations.slotsManagement;
+    }
+
+    return (
+        <>
+            <MenuItem onClick={handleAdminDashboard}>
+                <Typography textAlign="center">Панель администратора</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleDoctorManagement}>
+                <Typography textAlign="center">Управление врачами</Typography>
+            </MenuItem>
+            <MenuItem onClick={handlePatientManagement}>
+                <Typography textAlign="center">Управление пациентами</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleSlotsManagement}>
+                <Typography textAlign="center">Управление слотами</Typography>
+            </MenuItem>
+        </>
+    );
+}
+
+export default AdminItems;

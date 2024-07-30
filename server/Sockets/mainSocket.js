@@ -1,6 +1,8 @@
 
 const { Server } = require("socket.io");
 var jwt = require('jsonwebtoken');
+var fs = require('fs');
+const { writeFile } = require("fs");
 const bcrypt = require('bcryptjs');
 const UserManager = require("../Utils/UserManager");
 let map = new Map();
@@ -153,10 +155,11 @@ const httpSocket = async (httpServer, [cors]) => {
             socket.emit('room:joined', true, room.id);
             socket.emit('message:returnAll', arr, arr.length);
         });
-
+        //socket.emit('message:upload', message, files, name, type, roomId, store.user.id);
         socket.on('message:upload', async (text, file, name, type, roomId, userId) => {
             let i = 0;
             const files_created = [];
+            console.log(`text: ${text} roomId: ${roomId} userId: ${userId}` )
             let room = await database.models.Rooms.findByPk(roomId);
             console.log(text)
             const message = await database.models.Messages.create({ text: text, roomId: room.id, userId });

@@ -23,8 +23,11 @@ const mainRouter = require('./Routers/MainRouter')
 const authRouter = require('./Routers/AuthRouter');
 const conferenceRouter = require('./Routers/ConferenceRouter')
 const shortUrlRouter = require('./Routers/ShortUrlRouter')
+const integrationRouter = require('./Routers/IntegrationRouter')
+const doctorRouter = require('./Routers/DoctorRouter')
 const { start } = require('./start');
-
+const adminRouter = require('./Routers/AdminRouter')
+const AuthMiddleware = require('./middleware/AuthMiddleware')
 app.use(cookieParser());
 app.use(cors({
   credentials: true,
@@ -40,6 +43,9 @@ app.use('/short', shortUrlRouter)
 app.use('/api', mainRouter);
 app.use('/api', authRouter);
 app.use('/api/conference', conferenceRouter)
+app.use('/api/integration', integrationRouter)
+app.use('/api/doctor', AuthMiddleware, doctorRouter)
+app.use('/api/admin', AuthMiddleware, adminRouter)
 ioConnections = [];
 
 start();

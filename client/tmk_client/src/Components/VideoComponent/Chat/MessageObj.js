@@ -19,7 +19,7 @@ const ChildComponent = ({message, files, user}) => {
 
     if (store.user)
     return (
-        <>
+
             <li className="clearfix" key={`${Date.now()}_${message.id}`}>
                 <div key={`div_${Date.now()}_${message.id}`} className={`message-data ${parseInt(user.id) === parseInt(store.user.id) ? 'text-right' : '' }`} >
                     <span key={`span_${Date.now()}_${message.id}`} className="message-data-time">
@@ -50,7 +50,7 @@ const ChildComponent = ({message, files, user}) => {
                             switch (file.type.substring(0, file.type.search('/'))) {
                                 case 'image' :
                                     return (
-                                    <>
+                                    <div key={`imageFileBlock_${Date.now()}_${file.id}`}>
                                         <br/>
                                         <img alt="" onClick={() => setModalShow(true)} id={file.id} key={file.id + '-' + Date.now()} className='message-img' src={`http://localhost:80${file.path}`}></img>
                                         <ImageModal 
@@ -60,7 +60,7 @@ const ChildComponent = ({message, files, user}) => {
                                             file={file}
                                             message={message}
                                         />
-                                    </>)
+                                    </div>)
                                 default:
                                     return  <Stack style={{fontSize: '13pt'}} direction="horizontal" key={file.id + '-' + Date.now()} gap={2}>
                                                 
@@ -76,7 +76,7 @@ const ChildComponent = ({message, files, user}) => {
                 </div>
                 
             </li>
-        </>
+
     )
   }
 

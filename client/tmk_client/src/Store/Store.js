@@ -34,14 +34,27 @@ export default class Store {
         this.setLoading(true)
         try {
             const response = await AuthService.login(login, password);   
-            localStorage.setItem('token', response.data.accessToken);
-            /* const user = await UserDto.deserialize(response.data.user) */
-            this.setUser(response.data.user);
-            this.setAuth(true);
-            return response
+            if (response.status === 200) {
+
+                this.setUser(response.data.user);
+                localStorage.setItem('token', response.data.accessToken);
+                this.setAuth(true);
+                this.setLoading(false)
+                return response
+            }
+            else {
+                this.setLoading(false)
+                const res = {response: {
+                    data: 'Неизвестная ошибка'
+                }}
+                this.setError('Неизвестная ошибка')
+                return res
+            }
+            
         }
         catch (e) {
-            this.setError(e)
+            this.setError(e.response.data)
+            
             return (e)
         }
         finally {
@@ -50,17 +63,27 @@ export default class Store {
     }
 
 
-   /*  async registration (login, password, User_name, User_surname, User_patronomic, Doctor_id){
+    async registrationByCode (phone, code){
+        this.setLoading(true)
         try {
-            const response = await AuthService.registrarion(login, password, User_name, User_surname, User_patronomic, Doctor_id);
+            const response = await AuthService.confirmEmail(phone.trim(), code.trim())
+            this.setUser(response.data.user);
+            /* const response = await AuthService.registrarion(login, password, User_name, User_surname, User_patronomic, Doctor_id); */
             localStorage.setItem('token', response.data.accessToken);
+            
             this.setAuth(true);
-            this.setUser(await userDto.deserialize(response.data.user));
+            this.setLoading(false)
+            return response
         }
         catch (e) {
             console.log(e)
+            this.setError(e.response.data)
+            return (e)
         }
-    } */
+        finally {
+            this.setLoading(false)
+        }
+    }
 
     async logout (){
         try {
@@ -84,7 +107,7 @@ export default class Store {
             this.setLoading(false)
         }
         catch(e) {
-            this.setError(e)
+            this.setError(e.response.data)
             console.log(e)
         }
         finally {
@@ -106,7 +129,7 @@ export default class Store {
         catch (e){
             this.setUser({});
             this.setAuth(false);
-            this.setError(e)
+            this.setError(e.response.data)
             localStorage.removeItem('token');
             console.log(e)
             return false

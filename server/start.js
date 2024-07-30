@@ -1,20 +1,28 @@
 const http = require("http");
-var fs = require('fs');
+
 const { Server } = require("socket.io");
 const database = require('./Database/setDatabase');
-const { writeFile } = require("fs");
+
 var https = require('https');
 
 const UrlManager = require('./Utils/UrlManager');
 const ApiError = require('./Errors/api-error');
 const { app, HTTP_PORT, HOST } = require('.');
-const {httpSocket, httpsSocket} = require('./Sockets/mainSocket')
+const {httpSocket, httpsSocket} = require('./Sockets/mainSocket');
+const healthyChildApi = require("./Api/healthyChildApi");
 /* var options = {
     key: fs.readFileSync('./keys1/privkey.pem'),
     cert: fs.readFileSync('./keys1/fullchain.pem')
   }; */
 const start = async () => {
     try {
+        /* const testData = await healthyChildApi.getOnlineSched() 
+        console.log(testData)*/
+        /* const testOnlineClient = await healthyChildApi.getOnlineClientInfo('ff607cfb-eab5-11ee-a02d-00155d014d04')
+        6827ea0a-3dd6-11ef-a030-00155d014d04
+        const testOnlineRequestInfo = await healthyChildApi.getOnlineRequestInfo('ac8de4a8-3dd6-11ef-a030-00155d014d04')
+        const testOnlineRequestInfo = await healthyChildApi.getOnlineRequestInfo('6827ea0a-3dd6-11ef-a030-00155d014d04')
+        console.log(testOnlineRequestInfo) */
         await database.sync({ force: true });
         /* const httpsServer = https.createServer(options, app); */
         const httpServer = http.createServer(app);

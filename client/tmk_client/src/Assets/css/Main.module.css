@@ -172,7 +172,7 @@ ul li {
     list-style-type: disc
 }
 
-.text-right {
+.textRight {
     text-align: right
 }
 
@@ -195,9 +195,9 @@ h1 {
     }
 }
 
-html {
+/* html {
     font-size: 10px
-}
+} */
 
 *,
 *::after,
@@ -249,11 +249,11 @@ button {
     display: flex
 }
 
-.align-center {
+.alignCenter {
     align-items: center
 }
 
-.flex-row {
+.flexRow {
     display: flex
 }
 
@@ -263,22 +263,22 @@ button {
     margin: 0 1.7rem 2.7rem 0
 }
 
-.full-screen {
+.fullScreen {
     position: relative
 }
 
-.full-screen p:last-child {
+.fullScreen p:last-child {
     margin-bottom: 0
 }
 
-.full-screen--content,
-.full-screen--image {
+.fullScreenContent,
+.fullScreenImage {
     flex: 0 0 50%;
     max-width: 50%;
     min-height: 100vh
 }
 
-.full-screen--content {
+.fullScreenContent {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -288,13 +288,13 @@ button {
     z-index: 1
 }
 
-.full-screen--content .button-primary {
+.fullScreenContent .buttonPrimary {
     display: block;
     width: 100%;
     margin-top: 3rem
 }
 
-.full-screen--image {
+.fullScreenImage {
     display: block;
     position: absolute;
     top: 0;
@@ -307,11 +307,11 @@ button {
 }
 
 @media screen and (max-width: 992px) {
-    .full-screen--image {
+    .fullScreenImage {
         display: none
     }
 
-    .full-screen--content {
+    .fullScreenContent {
         flex: 0 0 100%;
         max-width: 100%;
         min-height: calc(100vh - 10.9rem);
@@ -323,18 +323,18 @@ button {
 }
 
 @media screen and (max-width: 440px) {
-    .full-screen--content .button-primary {
+    .fullScreenContent .buttonPrimary {
         display: block;
         width: 100%;
         margin-top: 1rem
     }
 }
 
-.button-group {
+.buttonGroup {
     display: flex
 }
 
-.button-primary {
+.buttonPrimary {
     display: inline-block;
     padding: 1.7rem 1.5rem;
     border: none;
@@ -351,7 +351,7 @@ button {
     cursor: pointer;
     transition: opacity .15s ease-in;
 }
-.button-telegram {
+.buttonTelegram {
     display: inline-block;
     padding: 1.7rem 0rem;
     border: none;
@@ -369,12 +369,12 @@ button {
     transition: opacity .15s ease-in;
 }
 
-.button-primary:hover {
+.buttonPrimary:hover {
     opacity: .8;
     text-decoration: none
 }
 
-.button-lightgray {
+.buttonLightgray {
     display: inline-block;
     padding: 1.7rem 2rem;
     border: none;
@@ -391,11 +391,11 @@ button {
     transition: opacity .15s ease-in
 }
 
-.button-lightgray:hover {
+.buttonLightgray:hover {
     opacity: .8
 }
 
-.button-lightgray.bordered {
+.buttonLightgray.bordered {
     padding: 1.6rem 2rem;
     border: 1px solid #d30d15
 }
@@ -424,20 +424,20 @@ button {
     background: #d30d15
 }
 
-.button-primary:hover,
-.button-lightgray:hover {
+.buttonPrimary:hover,
+.buttonLightgray:hover {
     text-decoration: none
 }
 
 @media screen and (max-width: 992px)and (min-width: 400px) {
 
-    .button-primary,
-    .button-lightgray {
+    .buttonPrimary,
+    .buttonLightgray {
         padding: 1.4rem 2rem
     }
 
-    .button-primary.bordered,
-    .button-lightgray.bordered {
+    .buttonPrimary.bordered,
+    .buttonLightgray.bordered {
         padding: 1.3rem 2rem
     }
 }
@@ -487,7 +487,7 @@ button {
     }
 }
 
-.navigation-item {
+.navigationItem {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -501,23 +501,23 @@ button {
     cursor: pointer
 }
 
-.navigation-item.swiper-button-disabled {
+.navigationItem.swiper-button-disabled {
     display: none
 }
 
-.navigation-item svg circle {
+.navigationItem svg circle {
     transition: fill .15s ease-in
 }
 
-.navigation-item:hover svg circle {
+.navigationItem:hover svg circle {
     fill: #d30d15
 }
 
-.navigation-next {
+.navigationNext {
     right: 0
 }
 
-.navigation-prev {
+.navigationPrev {
     left: 0
 }
 
@@ -528,18 +528,18 @@ button {
     margin-bottom: 3.4rem
 }
 
-.split .block-title {
+.split .blockTitle {
     margin: 0;
     flex-grow: 1;
     padding-right: 2rem
 }
 
-.split--link {
+.splitLink {
     color: inherit;
     font-size: 1.2rem
 }
 
-.split--link.primary {
+.splitLink.primary {
     color: #d30d15
 }
 
@@ -552,12 +552,12 @@ button {
         flex-wrap: wrap
     }
 
-    .split .block-title {
+    .split .blockTitle {
         flex: 0 0 100%;
         margin-bottom: 1rem
     }
 
-    .split--link {
+    .splitLink {
         flex: 0 0 100%;
         max-width: 100%;
         text-align: left
@@ -568,7 +568,7 @@ button {
     }
 }
 
-.block-title {
+.blockTitle {
     font-size: 1.4rem;
     margin: 3rem 0 3.4rem;
     text-transform: uppercase;
@@ -919,7 +919,7 @@ button {
     background-color: #e3e3e3 !important
 }
 
-.bottom-menu {
+.bottomMenu {
     display: none;
     position: fixed;
     bottom: 0;
@@ -931,13 +931,13 @@ button {
     transition: transform .15s ease-in
 }
 
-.bottom-menu .button-primary {
+.bottomMenu .buttonPrimary {
     display: block;
     width: 100%;
     border-radius: 0
 }
 
-.bottom-menu--list {
+.bottomMenuList {
     display: flex;
     padding-top: 1rem;
     padding-bottom: .3rem;
@@ -945,7 +945,7 @@ button {
     margin: 0 -0.5rem
 }
 
-.bottom-menu--list a {
+.bottomMenuList a {
     display: block;
     flex: 0 0 20%;
     max-width: 20%;
@@ -957,7 +957,7 @@ button {
     text-transform: uppercase
 }
 
-.bottom-menu--list a .icon {
+.bottomMenuList a .icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -966,31 +966,31 @@ button {
     margin-bottom: 1.4rem
 }
 
-.bottom-menu--list a svg {
+.bottomMenuList a svg {
     max-width: 100%;
     max-height: 100%
 }
 
-.bottom-menu.show {
+.bottomMenu.show {
     transform: translateY(0)
 }
 
 @media screen and (max-width: 992px) {
-    .bottom-menu {
+    .bottomMenu {
         display: block
     }
 }
 
 @media screen and (max-width: 450px) {
-    .bottom-menu .container {
+    .bottomMenu .container {
         padding: 0 1.5rem
     }
 
-    .bottom-menu--list a {
+    .bottomMenuList a {
         font-size: 1rem
     }
 
-    .bottom-menu--list a .icon {
+    .bottomMenuList a .icon {
         height: 2rem
     }
 }
@@ -1286,35 +1286,35 @@ button {
     }
 }
 
-.form-group {
+.formGroup {
     margin-bottom: 1.8rem;
     position: relative
 }
 
-.form-group label {
+.formGroup label {
     display: block;
     color: #7e7e7e
 }
 
-.form-group:focus-within label {
+.formGroup:focus-within label {
     top: .65rem
 }
 
-.form-group--description {
+.formGroup--description {
     font-size: 1.1rem;
     line-height: 2em;
     color: #7e7e7e
 }
 
 @media screen and (max-width: 992px) {
-    .form-group--description {
+    .formGroup--description {
         font-size: 1.4rem;
         line-height: 1.6em;
         margin-top: 1.6rem
     }
 }
 
-.form-group select {
+.formGroup select {
     position: absolute;
     z-index: -1
 }
@@ -1370,7 +1370,7 @@ button {
     margin-left: 1.7rem
 }
 
-.form-input,
+.formInput,
 .form-textarea {
     display: block;
     width: 100%;
@@ -1387,76 +1387,76 @@ button {
     transition: border .3s ease-in
 }
 
-.form-input:hover,
-.form-input:focus,
-.form-input:focus-visible,
+.formInput:hover,
+.formInput:focus,
+.formInput:focus-visible,
 .form-textarea:hover,
 .form-textarea:focus,
 .form-textarea:focus-visible {
     border-color: #7e7e7e
 }
 
-.form-input:hover+.form-label+.form-clear svg path,
-.form-input:focus+.form-label+.form-clear svg path,
-.form-input:focus-visible+.form-label+.form-clear svg path,
-.form-textarea:hover+.form-label+.form-clear svg path,
-.form-textarea:focus+.form-label+.form-clear svg path,
-.form-textarea:focus-visible+.form-label+.form-clear svg path {
+.formInput:hover+.formLabel+.formClear svg path,
+.formInput:focus+.formLabel+.formClear svg path,
+.formInput:focus-visible+.formLabel+.formClear svg path,
+.form-textarea:hover+.formLabel+.formClear svg path,
+.form-textarea:focus+.formLabel+.formClear svg path,
+.form-textarea:focus-visible+.formLabel+.formClear svg path {
     stroke: #000
 }
 
-.form-input:not(:-ms-input-placeholder)+.form-label,
-.form-textarea:not(:-ms-input-placeholder)+.form-label {
+.formInput:not(:-ms-input-placeholder)+.formLabel,
+.form-textarea:not(:-ms-input-placeholder)+.formLabel {
     top: .65rem
 }
 
-.form-input:not(:placeholder-shown)+.form-label,
-.form-textarea:not(:placeholder-shown)+.form-label {
+.formInput:not(:placeholder-shown)+.formLabel,
+.form-textarea:not(:placeholder-shown)+.formLabel {
     top: .65rem
 }
 
-.form-input:not(:-ms-input-placeholder)+.form-label+.form-clear,
-.form-textarea:not(:-ms-input-placeholder)+.form-label+.form-clear {
+.formInput:not(:-ms-input-placeholder)+.formLabel+.formClear,
+.form-textarea:not(:-ms-input-placeholder)+.formLabel+.formClear {
     opacity: 1;
     z-index: 0
 }
 
-.form-input:not(:placeholder-shown)+.form-label+.form-clear,
-.form-textarea:not(:placeholder-shown)+.form-label+.form-clear {
+.formInput:not(:placeholder-shown)+.formLabel+.formClear,
+.form-textarea:not(:placeholder-shown)+.formLabel+.formClear {
     opacity: 1;
     z-index: 0
 }
 
-.form-input:-ms-input-placeholder,
+.formInput:-ms-input-placeholder,
 .form-textarea:-ms-input-placeholder {
     color: rgba(0, 0, 0, 0);
     -ms-transition: color .15s ease-in;
     transition: color .15s ease-in
 }
 
-.form-input::placeholder,
+.formInput::placeholder,
 .form-textarea::placeholder {
     color: rgba(0, 0, 0, 0);
     transition: color .15s ease-in
 }
 
-.form-input:focus:-ms-input-placeholder,
+.formInput:focus:-ms-input-placeholder,
 .form-textarea:focus:-ms-input-placeholder {
     color: #7e7e7e
 }
 
-.form-input:focus::placeholder,
+.formInput:focus::placeholder,
 .form-textarea:focus::placeholder {
     color: #7e7e7e
 }
 
-.form-input.error,
+.formInput.error,
 .form-textarea.error {
     border-color: #d30d15;
     background: rgba(211, 13, 21, .1)
 }
 
-.form-clear {
+.formClear {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1471,17 +1471,17 @@ button {
     transition: opacity .3s ease-in
 }
 
-.form-clear svg {
+.formClear svg {
     width: 9px;
     height: 9px
 }
 
-.form-clear svg path {
+.formClear svg path {
     stroke: #7e7e7e;
     transition: stroke .15s ease-in
 }
 
-.form-label {
+.formLabel {
     display: block;
     max-width: calc(100% - 5.1rem);
     position: absolute;
@@ -1504,7 +1504,7 @@ button {
     }
 }
 
-.form-description {
+.formDescription {
     margin-bottom: 3.3rem
 }
 
@@ -1522,7 +1522,7 @@ button {
 }
 
 @media screen and (max-width: 992px) {
-    .form-row .form-label {
+    .form-row .formLabel {
         font-size: 1.4rem
     }
 }
@@ -1539,27 +1539,27 @@ button {
     }
 }
 
-.form-title {
+.formTitle {
     font-size: 3.2rem;
     line-height: 1.25em;
     font-weight: 700;
     margin-bottom: 3.5rem
 }
 
-.form-checkbox {
+.formCheckbox {
     padding-left: 22px;
     margin-bottom: 1.8rem;
     position: relative
 }
 
-.form-checkbox--label {
+.formCheckboxLabel {
     color: #7e7e7e;
     font-size: 1.2rem;
     line-height: 1.56em;
     cursor: pointer
 }
 
-.form-checkbox--label::before {
+.formCheckboxLabel::before {
     content: "";
     display: block;
     position: absolute;
@@ -1570,7 +1570,7 @@ button {
     background: #d9d9d9
 }
 
-.form-checkbox--label::after {
+.formCheckboxLabel::after {
     content: "";
     display: block;
     width: 15px;
@@ -1586,7 +1586,7 @@ button {
     transition: opacity .15s ease-in
 }
 
-.form-checkbox input {
+.formCheckbox input {
     position: absolute;
     z-index: -1;
     width: 0;
@@ -1599,20 +1599,20 @@ button {
     opacity: 0
 }
 
-.form-checkbox input:checked+.form-checkbox--label::after {
+.formCheckbox input:checked+.formCheckboxLabel::after {
     opacity: 1
 }
 
-.form-checkbox input.error+.form-checkbox--label::before {
+.formCheckbox input.error+.formCheckboxLabel::before {
     background: rgba(211, 13, 21, .1)
 }
 
-.form-checkbox .form-error {
+.formCheckbox .form-error {
     margin-left: -2.2rem
 }
 
 @media screen and (max-width: 992px)and (min-width: 400px) {
-    .form-checkbox--label {
+    .formCheckboxLabel {
         font-size: 1.6rem
     }
 }
@@ -1625,29 +1625,29 @@ button {
 
 @media screen and (max-width: 992px)and (min-width: 400px) {
 
-    .form-input,
+    .formInput,
     .form-textarea {
         padding: 1.9rem 3.5rem .75rem 1.6rem
     }
 
-    .form-input:not(:-ms-input-placeholder)+.form-label,
-    .form-textarea:not(:-ms-input-placeholder)+.form-label {
+    .formInput:not(:-ms-input-placeholder)+.formLabel,
+    .form-textarea:not(:-ms-input-placeholder)+.formLabel {
         font-size: 1.4rem;
         top: .25rem
     }
 
-    .form-input:not(:placeholder-shown)+.form-label,
-    .form-textarea:not(:placeholder-shown)+.form-label {
+    .formInput:not(:placeholder-shown)+.formLabel,
+    .form-textarea:not(:placeholder-shown)+.formLabel {
         font-size: 1.4rem;
         top: .25rem
     }
 
-    .form-group:focus-within label {
+    .formGroup:focus-within label {
         font-size: 1.4rem;
         top: .25rem
     }
 
-    .form-label {
+    .formLabel {
         top: 1.5rem
     }
 }
@@ -1686,7 +1686,7 @@ button {
 }
 
 @media screen and (max-width: 400px) {
-    .form-title {
+    .formTitle {
         font-size: 2.7rem
     }
 
@@ -1726,43 +1726,43 @@ button {
     line-height: inherit
 }
 
-.auth-form,
+.authForm,
 .restore-form,
-.register-form {
+.registerForm {
     padding-top: 37.3%;
     margin-bottom: auto
 }
 
-.auth-form .button-primary,
-.restore-form .button-primary,
-.register-form .button-primary {
+.authForm .buttonPrimary,
+.restore-form .buttonPrimary,
+.registerForm .buttonPrimary {
     margin: 2.6rem 0
 }
 
 @media screen and (max-width: 992px) {
 
-    .auth-form,
+    .authForm,
     .restore-form,
-    .register-form {
+    .registerForm {
         padding-top: 0
     }
 }
 
 .restore-form .recall,
-.register-form .recall {
+.registerForm .recall {
     cursor: pointer;
     margin-top: 2rem
 }
 
 .restore-form .recall:hover,
-.register-form .recall:hover {
+.registerForm .recall:hover {
     text-decoration: underline
 }
 
 @media screen and (max-width: 992px) {
 
     .restore-form .recall,
-    .register-form .recall {
+    .registerForm .recall {
         font-size: 1.4rem
     }
 }
@@ -1770,7 +1770,7 @@ button {
 @media screen and (max-width: 440px) {
 
     .restore-form .recall,
-    .register-form .recall {
+    .registerForm .recall {
         margin-top: 1rem
     }
 }
@@ -1778,52 +1778,52 @@ button {
 @media screen and (max-width: 479px) {
 
     .restore-form .form-row .col,
-    .register-form .form-row .col {
+    .registerForm .form-row .col {
         max-width: 100%
     }
 }
 
-.register-form.step-3 {
+.registerForm.step3 {
     margin-top: auto;
     padding-top: 2.6rem
 }
 
-.register-form.step-3 .form-checkbox {
+.registerForm.step3 .formCheckbox {
     margin-top: 2.5rem;
     margin-bottom: 2.2rem
 }
 
-.register-form.step-3 .button-group {
+.registerForm.step3 .buttonGroup {
     margin-bottom: 2.2rem
 }
 
-.register-form.step-3 .button-lightgray {
+.registerForm.step3 .buttonLightgray {
     margin-right: 1.6rem;
     flex: 1 1 180px
 }
 
-.register-form.step-3 .button-primary {
+.registerForm.step3 .buttonPrimary {
     margin: 0;
     flex: 1 1 275px
 }
 
 @media screen and (max-width: 992px) {
-    .register-form.step-3 {
+    .registerForm.step3 {
         margin-top: 0;
         padding-top: 0
     }
 
-    .register-form.step-3 .button-lightgray {
+    .registerForm.step3 .buttonLightgray {
         flex: 0 0 calc(50% - .8rem);
         max-width: calc(50% - .8rem)
     }
 
-    .register-form.step-3 .button-primary {
+    .registerForm.step3 .buttonPrimary {
         flex: 0 0 calc(50% - .8rem);
         max-width: calc(50% - .8rem)
     }
 
-    .register-form.step-3 .button-group {
+    .registerForm.step3 .buttonGroup {
         margin-bottom: 6rem
     }
 }
@@ -1869,12 +1869,12 @@ header .notifications svg path {
     stroke: #7e7e7e
 }
 
-header .notifications-icon {
+header .notificationsIcon {
     width: 100%;
     height: 100%
 }
 
-header .notifications--count {
+header .notificationsCount {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1894,7 +1894,7 @@ header .notifications.new svg path {
     stroke: #d30d15
 }
 
-header .notifications-content {
+header .notificationsContent {
     display: none;
     position: absolute;
     top: 3.5rem;
@@ -1902,11 +1902,11 @@ header .notifications-content {
     z-index: 100
 }
 
-header .notifications-content.show {
+header .notificationsContent.show {
     display: block
 }
 
-header .notifications-content::before {
+header .notificationsContent::before {
     content: "";
     display: block;
     position: fixed;
@@ -1917,7 +1917,7 @@ header .notifications-content::before {
     background: rgba(0, 0, 0, .4)
 }
 
-header .notifications-content--inner {
+header .notificationsContentInner {
     position: relative;
     width: 37.3rem;
     padding: 2.5rem 5.9rem 2.7rem 3.2rem;
@@ -1928,7 +1928,7 @@ header .notifications-content--inner {
     background: #f5f5f5
 }
 
-header .notifications-content--close {
+header .notificationsContentClose {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1939,20 +1939,20 @@ header .notifications-content--close {
     height: 2rem
 }
 
-header .notifications-content--close svg {
+header .notificationsContentClose svg {
     max-width: 100%;
     max-height: 100%
 }
 
-header .notifications-content--item {
+header .notificationsContentItem {
     margin-bottom: 3.3rem
 }
 
-header .notifications-content--item:last-child {
+header .notificationsContentItem:last-child {
     margin-bottom: 0
 }
 
-header .notifications-content a {
+header .notificationsContent a {
     font-weight: 700;
     color: #000
 }
@@ -1964,7 +1964,7 @@ header .person {
     margin-left: 4.1rem
 }
 
-header .person--photo {
+header .personPhoto {
     width: 4.2rem;
     height: 4.2rem;
     border: 3px solid #d30d15;
@@ -1974,23 +1974,23 @@ header .person--photo {
     background-position: 50% 50%
 }
 
-header .person--name {
+header .personName {
     font-weight: 700;
     margin: 0 1.5rem;
     color: inherit
 }
 
-header .person--logout {
+header .personLogout {
     color: #7e7e7e
 }
 
-header .person--logout::before {
+header .personLogout::before {
     content: "|";
     display: inline-block;
     margin-right: 1.9rem
 }
 
-header .button-primary {
+header .buttonPrimary {
     margin-left: 2rem
 }
 
@@ -1999,7 +1999,7 @@ header .button-primary {
         background: #fff
     }
 
-    header .button-primary {
+    header .buttonPrimary {
         display: none
     }
 }
@@ -2009,8 +2009,8 @@ header .button-primary {
         padding-top: 4.4rem
     }
 
-    header .person--name,
-    header .person--logout {
+    header .personName,
+    header .personLogout {
         display: none
     }
 
@@ -2018,31 +2018,31 @@ header .button-primary {
         position: relative
     }
 
-    header .notifications-content {
+    header .notificationsContent {
         position: fixed;
         top: 0;
         left: 0;
         right: 0
     }
 
-    header .notifications-content a {
+    header .notificationsContent a {
         color: #d30d15
     }
 
-    header .notifications-content--inner {
+    header .notificationsContentInner {
         padding: 4.5rem 3rem 4.6rem;
         width: 100%;
         border-radius: 0
     }
 
-    header .notifications-content--close {
+    header .notificationsContentClose {
         width: 1.7rem;
         height: 1.7rem;
         top: 2.5rem;
         right: 1.6rem
     }
 
-    header .notifications-content--close svg {
+    header .notificationsContentClose svg {
         width: 100%;
         height: auto
     }
@@ -2058,7 +2058,7 @@ header .button-primary {
         margin-left: 2.5rem
     }
 
-    header .person--photo {
+    header .personPhoto {
         width: 3rem;
         height: 3rem
     }
@@ -2095,28 +2095,28 @@ header .button-primary {
     }
 }
 
-.side-bar {
+.sideBar {
     flex: 0 0 19.6rem;
     max-width: 19.6rem;
     padding-right: 1.6rem
 }
 
-.side-bar--menu {
+.sideBarMenu {
     padding: 0;
     margin: 0 0 7.4rem
 }
 
-.side-bar--menu ul {
+.sideBarMenu ul {
     padding: 0;
     margin: 0
 }
 
-.side-bar--menu li {
+.sideBarMenu li {
     list-style-type: none;
     margin-bottom: .8rem
 }
 
-.side-bar--menu li a {
+.sideBarMenu li a {
     display: block;
     font-size: inherit;
     line-height: 1.25em;
@@ -2126,60 +2126,60 @@ header .button-primary {
     border-radius: .8rem
 }
 
-.side-bar--menu li a:hover {
+.sideBarMenu li a:hover {
     text-decoration: none
 }
 
-.side-bar--menu li.selected a {
+.sideBarMenu li.selected a {
     font-weight: 700;
     color: #fff;
     background-color: #d30d15
 }
 
-.side-bar--social {
+.sideBarSocial {
     margin-bottom: 2.5rem
 }
 
-.side-bar--social__title {
+.sideBarSocialTitle {
     font-weight: 700;
     line-height: 1.64em;
     margin-bottom: 1.7rem
 }
 
-.side-bar--social__list {
+.sideBarSocialList {
     display: flex;
     flex-wrap: wrap
 }
 
-.side-bar--social__list a {
+.sideBarSocialList a {
     display: block;
     width: 2.6rem;
     height: 2.6rem;
     margin-right: 1rem
 }
 
-.side-bar--social__list a img {
+.sideBarSocialList a img {
     max-width: 100%;
     max-height: 100%
 }
 
-.side-bar .button-telegram {
+.sideBar .buttonTelegram {
     display: block;
     width: 74%;
 }
 
-.side-content {
+.sideContent {
     position: relative;
     flex: 0 0 calc(100% - 19.6rem);
     max-width: calc(100% - 19.6rem)
 }
 
 @media screen and (max-width: 1240px) {
-    .side-bar {
+    .sideBar {
         display: none
     }
 
-    .side-content {
+    .sideContent {
         flex: 0 0 100%;
         max-width: 100%;
         padding-left: 0
@@ -2200,7 +2200,7 @@ header .button-primary {
     align-items: stretch
 }
 
-.articles--item {
+.articlesItem {
     display: block;
     height: 100%;
     text-decoration: none;
@@ -2211,11 +2211,11 @@ header .button-primary {
     background: #f5f5f5
 }
 
-.articles--item:hover {
+.articlesItem:hover {
     text-decoration: none
 }
 
-.articles--item__image {
+.articlesItemImage {
     display: block;
     width: 100%;
     height: 10rem;
@@ -2224,20 +2224,20 @@ header .button-primary {
     background-repeat: no-repeat
 }
 
-.articles--item__title {
+.articlesItemTitle {
     padding: .6rem 1.3rem .85rem;
     margin-bottom: 0
 }
 
-.articles .navigation-next {
+.articles .navigationNext {
     right: -1.1rem
 }
 
-.articles .navigation-prev {
+.articles .navigationPrev {
     left: -1.1rem
 }
 
-.articles .block-title {
+.articles .blockTitle {
     display: none;
     margin-top: 0;
     margin-bottom: 3.1rem
@@ -2250,7 +2250,7 @@ header .button-primary {
         margin-right: -3rem
     }
 
-    .articles .block-title {
+    .articles .blockTitle {
         display: block
     }
 
@@ -2258,7 +2258,7 @@ header .button-primary {
         width: 17.6rem
     }
 
-    .articles .navigation-item {
+    .articles .navigationItem {
         display: none
     }
 }
@@ -2268,11 +2268,11 @@ header .button-primary {
         width: 12.3rem
     }
 
-    .articles--item__image {
+    .articlesItemImage {
         height: 6.9rem
     }
 
-    .articles--item__title {
+    .articlesItemTitle {
         font-size: 1.2rem;
         padding: .5rem .8rem .5rem
     }
@@ -2282,7 +2282,7 @@ header .button-primary {
     margin-bottom: 3rem
 }
 
-.row-list--item {
+.rowListItem {
     display: flex;
     align-items: center;
     min-height: 7.3rem;
@@ -2294,64 +2294,64 @@ header .button-primary {
     position: relative
 }
 
-.row-list--item:last-child {
+.rowListItem:last-child {
     margin-bottom: 0
 }
 
-.row-list--item p {
+.rowListItem p {
     margin-bottom: 0
 }
 
-.row-list--item .date {
+.rowListItem .date {
     flex: 0 0 10rem;
     padding-right: 1.5rem
 }
 
-.row-list--item .title {
+.rowListItem .title {
     flex-grow: 1;
     line-height: 1.2em
 }
 
-.row-list--item .doctor,
-.row-list--item .address,
-.row-list--item .pacient {
+.rowListItem .doctor,
+.rowListItem .address,
+.rowListItem .pacient {
     margin-left: 3.5rem;
     overflow-wrap: anywhere
 }
 
-.row-list--item .doctor {
+.rowListItem .doctor {
     flex: 1 0 14.3rem;
     max-width: 14.3rem;
     margin-left: 1.1rem
 }
 
-.row-list--item .address {
+.rowListItem .address {
     flex: 1 0 12.5rem;
     max-width: 12.5rem;
     margin-left: 1.5rem
 }
 
-.row-list--item .pacient {
+.rowListItem .pacient {
     flex: 0 0 15.4rem;
     max-width: 15.4rem;
     padding-left: 1rem;
     margin-left: auto
 }
 
-.row-list--item .status {
+.rowListItem .status {
     color: #7e7e7e;
     flex: 0 0 12.8rem;
     text-align: right;
     margin-left: 1.7rem
 }
 
-.row-list--item .status.finish {
+.rowListItem .status.finish {
     color: #7e7e7e;
     padding-right: 3.7rem;
     position: relative
 }
 
-.row-list--item .status.finish svg {
+.rowListItem .status.finish svg {
     max-width: 2rem;
     max-height: 2rem;
     position: absolute;
@@ -2360,11 +2360,11 @@ header .button-primary {
     transform: translateY(-50%)
 }
 
-.row-list--item .status.in-work svg {
+.rowListItem .status.in-work svg {
     display: none
 }
 
-.row-list--item .cancel {
+.rowListItem .cancel {
     color: #d30d15;
     font-weight: 700;
     cursor: pointer;
@@ -2372,50 +2372,50 @@ header .button-primary {
     margin-left: 1.7rem
 }
 
-.row-list--item.analysis .pacient {
+.rowListItem.analysis .pacient {
     flex: 0 0 15.4rem;
     padding-left: 1rem;
     margin-left: auto
 }
 
-.row-list--item.analysis .status {
+.rowListItem.analysis .status {
     flex: 0 0 13.5rem;
     max-width: 13.5rem;
     padding-left: 1rem;
     margin-left: .7rem
 }
 
-.row-list--item.analysis.finish {
+.rowListItem.analysis.finish {
     background: #fcdfe1;
     border: none
 }
 
-.row-list--item.reception.finish {
+.rowListItem.reception.finish {
     background: #d8ece9;
     border: none
 }
 
-.row-list--item.reception .pacient {
+.rowListItem.reception .pacient {
     flex: 1 0 15.4rem
 }
 
-.row-list .buttons {
+.rowList .buttons {
     margin-top: 8.2rem;
     justify-content: space-between
 }
 
-.row-list .buttons .button-primary,
-.row-list .buttons .button-lightgray {
+.rowList .buttons .buttonPrimary,
+.rowList .buttons .buttonLightgray {
     padding-left: 3.4rem;
     padding-right: 3.4rem
 }
 
-.row .button-lightgray {
+.row .buttonLightgray {
     margin-top: 1.2rem
 }
 
 @media screen and (max-width: 992px) {
-    .row-list--item {
+    .rowListItem {
         font-size: 1.4rem;
         flex-wrap: wrap;
         margin-right: -3rem;
@@ -2424,45 +2424,45 @@ header .button-primary {
         padding-left: 3rem
     }
 
-    .row-list--item .title {
+    .rowListItem .title {
         font-size: 1.8rem;
         flex: 0 0 100%;
         max-width: 100%;
         padding-bottom: 1.1rem
     }
 
-    .row-list--item .date {
+    .rowListItem .date {
         order: 1;
         padding-right: 3rem
     }
 
-    .row-list--item .pacient {
+    .rowListItem .pacient {
         margin-left: 0;
         padding-left: 0;
         margin-right: auto
     }
 
-    .row-list--item .address {
+    .rowListItem .address {
         display: none
     }
 
-    .row-list--item .pacient,
-    .row-list--item .status,
-    .row-list--item .cancel {
+    .rowListItem .pacient,
+    .rowListItem .status,
+    .rowListItem .cancel {
         order: 2
     }
 
-    .row-list--item.analysis .pacient {
+    .rowListItem.analysis .pacient {
         padding-left: 0;
         margin-left: 0
     }
 
-    .row-list .buttons {
+    .rowList .buttons {
         margin-top: 4.1rem
     }
 
-    .row-list .buttons .button-primary,
-    .row-list .buttons .button-lightgray {
+    .rowList .buttons .buttonPrimary,
+    .rowList .buttons .buttonLightgray {
         font-size: 1.4rem;
         padding: 1.7rem 2rem;
         margin-right: 0;
@@ -2472,11 +2472,11 @@ header .button-primary {
 }
 
 @media screen and (max-width: 992px)and (min-width: 400px) {
-    .row-list--item.reception .title {
+    .rowListItem.reception .title {
         padding-right: 35%
     }
 
-    .row-list--item.reception .doctor {
+    .rowListItem.reception .doctor {
         position: absolute;
         right: 3rem;
         top: 3rem;
@@ -2489,36 +2489,36 @@ header .button-primary {
 
 @media screen and (max-width: 600px) {
 
-    .row-list--item.analysis .status,
-    .row-list--item .status {
+    .rowListItem.analysis .status,
+    .rowListItem .status {
         flex: 0 0 auto;
         font-size: 0;
         padding-left: 0;
         margin-left: 1.5rem
     }
 
-    .row-list--item.analysis .status.finish,
-    .row-list--item .status.finish {
+    .rowListItem.analysis .status.finish,
+    .rowListItem .status.finish {
         padding-right: 0
     }
 
-    .row-list--item.analysis .status.finish svg,
-    .row-list--item .status.finish svg {
+    .rowListItem.analysis .status.finish svg,
+    .rowListItem .status.finish svg {
         position: relative;
         top: 0;
         transform: none
     }
 
-    .row-list--item.analysis .status.status.in-work svg,
-    .row-list--item .status.status.in-work svg {
+    .rowListItem.analysis .status.status.in-work svg,
+    .rowListItem .status.status.in-work svg {
         display: block
     }
 
-    .row-list .buttons {
+    .rowList .buttons {
         flex-wrap: wrap
     }
 
-    .row-list .buttons .col {
+    .rowList .buttons .col {
         flex: 0 0 100%;
         max-width: 100%;
         margin-bottom: 1rem
@@ -2526,7 +2526,7 @@ header .button-primary {
 }
 
 @media screen and (max-width: 479px) {
-    .row-list--item .cancel {
+    .rowListItem .cancel {
         flex: 0 0 100%;
         max-width: 100%;
         margin-left: 0;
@@ -2536,23 +2536,23 @@ header .button-primary {
 }
 
 @media screen and (max-width: 400px) {
-    .row-list--item .title {
+    .rowListItem .title {
         font-size: 1.4rem
     }
 
-    .row-list--item .date {
+    .rowListItem .date {
         flex: 0 0 100%;
         max-width: 100%;
         padding-right: 0;
         margin-bottom: .5rem
     }
 
-    .row-list--item .pacient {
+    .rowListItem .pacient {
         flex: 0 0 calc(100% - 4rem);
         max-width: calc(100% - 4rem)
     }
 
-    .row-list--item.reception .doctor {
+    .rowListItem.reception .doctor {
         flex: 0 0 100%;
         max-width: 100%;
         order: 2;
@@ -2659,7 +2659,7 @@ header .button-primary {
     max-width: 2rem
 }
 
-.filter .button-primary {
+.filter .buttonPrimary {
     display: none
 }
 
@@ -2736,7 +2736,7 @@ header .button-primary {
         display: block
     }
 
-    .filter .button-primary {
+    .filter .buttonPrimary {
         display: block;
         width: 100%;
         margin-top: 2rem
@@ -2812,7 +2812,7 @@ header .button-primary {
     transform: translateY(-50%)
 }
 
-.search-line .button-primary {
+.search-line .buttonPrimary {
     font-weight: 400;
     min-width: 18rem;
     margin-left: 1.4rem
@@ -2827,7 +2827,7 @@ header .button-primary {
         padding-left: 9.5rem
     }
 
-    .search-line .button-primary {
+    .search-line .buttonPrimary {
         margin-left: 1.2rem;
         font-size: 0;
         min-width: 0;
@@ -2844,7 +2844,7 @@ header .button-primary {
     }
 }
 
-.appointment-list .block-title {
+.appointment-list .blockTitle {
     margin-top: 2.6rem;
     margin-bottom: 4rem
 }
@@ -2973,7 +2973,7 @@ header .button-primary {
     transition: opacity .15s ease-in
 }
 
-.appointment-list--item__schedule .navigation-item {
+.appointment-list--item__schedule .navigationItem {
     top: .4rem;
     margin-top: 0
 }
@@ -2994,7 +2994,7 @@ header .button-primary {
     margin-bottom: 1.4rem
 }
 
-.appointment-list--item__action .button-primary {
+.appointment-list--item__action .buttonPrimary {
     display: block;
     width: 100%;
     font-weight: 400;
@@ -3006,7 +3006,7 @@ header .button-primary {
     margin-bottom: 3.9rem
 }
 
-.appointment-make .flex-row {
+.appointment-make .flexRow {
     flex-wrap: wrap;
     margin: 0 -0.8rem
 }
@@ -3112,7 +3112,7 @@ header .button-primary {
     max-height: 10rem
 }
 
-.appointment-make .button-lightgray {
+.appointment-make .buttonLightgray {
     padding-right: 3rem;
     padding-left: 3rem;
     border-radius: .8rem
@@ -3127,7 +3127,7 @@ header .button-primary {
     max-width: 100%
 }
 
-.appointment-make .buttons .button-primary {
+.appointment-make .buttons .buttonPrimary {
     max-width: 100%;
     min-width: 27rem;
     margin-left: 1rem;
@@ -3172,14 +3172,14 @@ header .button-primary {
 }
 @media screen and (max-width: 1242px) {
 
-.appointment-make .buttons .button-primary {
+.appointment-make .buttons .buttonPrimary {
     max-width: 100%;
     min-width: 25rem;
 }
 }
 @media screen and (max-width: 992px) {
 
-    .appointment-make .buttons .button-primary {
+    .appointment-make .buttons .buttonPrimary {
         margin-left: 0;
     }
 
@@ -3218,7 +3218,7 @@ header .button-primary {
         padding: 0
     }
 
-    .appointment-list--item__schedule .navigation-item {
+    .appointment-list--item__schedule .navigationItem {
         display: none
     }
 
@@ -3293,7 +3293,7 @@ header .button-primary {
         justify-content: center
     }
 
-    .appointment-make.finish .buttons .button-lightgray {
+    .appointment-make.finish .buttons .buttonLightgray {
         width: auto
     }
 
@@ -3343,8 +3343,8 @@ header .button-primary {
         margin-bottom: 0
     }
 
-    .appointment-make .buttons .button-lightgray,
-    .appointment-make .buttons .button-primary {
+    .appointment-make .buttons .buttonLightgray,
+    .appointment-make .buttons .buttonPrimary {
         width: 100%;
         padding: 1.7rem 1.5rem;
         font-size: 1.4rem
@@ -3384,7 +3384,7 @@ header .button-primary {
         margin-bottom: 0
     }
 
-    .appointment-make .callback.button-lightgray {
+    .appointment-make .callback.buttonLightgray {
         display: block;
         width: 100%
     }
@@ -3509,7 +3509,7 @@ header .button-primary {
     right: 0
 }
 
-.profile--info .button-primary {
+.profile--info .buttonPrimary {
     display: block;
     width: 100%;
     margin-top: 2.3rem
@@ -3777,8 +3777,8 @@ header .button-primary {
     justify-content: space-between
 }
 
-.special-offers-detail .buttons .button-primary,
-.special-offers-detail .buttons .button-lightgray {
+.special-offers-detail .buttons .buttonPrimary,
+.special-offers-detail .buttons .buttonLightgray {
     min-width: 18rem;
     max-width: 100%
 }
@@ -3887,8 +3887,8 @@ header .button-primary {
         margin-bottom: 0
     }
 
-    .special-offers-detail .buttons .button-primary,
-    .special-offers-detail .buttons .button-lightgray {
+    .special-offers-detail .buttons .buttonPrimary,
+    .special-offers-detail .buttons .buttonLightgray {
         min-width: 0;
         width: 100%;
         max-width: 100%
@@ -3964,7 +3964,7 @@ header .button-primary {
         margin-bottom: 0
     }
 
-    .special-offers-detail .buttons .button-primary {
+    .special-offers-detail .buttons .buttonPrimary {
         order: 1
     }
 }
@@ -4045,16 +4045,16 @@ header .button-primary {
     margin-bottom: 0
 }
 
-.services-slider .navigation-item {
+.services-slider .navigationItem {
     margin-top: 0;
     top: 4.6rem
 }
 
-.services-slider .navigation-prev {
+.services-slider .navigationPrev {
     left: -0.9rem
 }
 
-.services-slider .navigation-next {
+.services-slider .navigationNext {
     right: -0.9rem
 }
 
@@ -4167,8 +4167,8 @@ header .button-primary {
     margin-top: 2.8rem
 }
 
-.doctors-detail .buttons .button-primary,
-.doctors-detail .buttons .button-lightgray {
+.doctors-detail .buttons .buttonPrimary,
+.doctors-detail .buttons .buttonLightgray {
     min-width: 18rem;
     max-width: 100%
 }
@@ -4241,8 +4241,8 @@ header .button-primary {
         margin-bottom: 4rem
     }
 
-    .doctors-detail .buttons .button-lightgray,
-    .doctors-detail .buttons .button-primary {
+    .doctors-detail .buttons .buttonLightgray,
+    .doctors-detail .buttons .buttonPrimary {
         padding: 1.1rem 2rem;
         font-size: 1.4rem;
         min-width: 0;
@@ -4250,11 +4250,11 @@ header .button-primary {
         max-width: 100%
     }
 
-    .doctors-detail .buttons .button-primary {
+    .doctors-detail .buttons .buttonPrimary {
         margin-right: 1.1rem
     }
 
-    .doctors-detail .buttons .button-lightgray {
+    .doctors-detail .buttons .buttonLightgray {
         margin-left: 1.1rem
     }
 
@@ -4269,28 +4269,28 @@ header .button-primary {
         flex-wrap: wrap
     }
 
-    .doctors-detail .buttons .button-lightgray,
-    .doctors-detail .buttons .button-primary {
+    .doctors-detail .buttons .buttonLightgray,
+    .doctors-detail .buttons .buttonPrimary {
         flex: 0 0 100%;
         max-width: 100%;
         margin: 0
     }
 
-    .doctors-detail .buttons .button-primary {
+    .doctors-detail .buttons .buttonPrimary {
         margin-bottom: 1.5rem
     }
 }
 
-.reviews-make-form .row-list {
+.reviews-make-form .rowList {
     margin-bottom: 2.8rem
 }
 
-.reviews-make-form .row-list--item {
+.reviews-make-form .rowListItem {
     border: none;
     color: #585353
 }
 
-.reviews-make-form .row-list--item.status {
+.reviews-make-form .rowListItem.status {
     color: #7e7e7e
 }
 
@@ -4298,12 +4298,12 @@ header .button-primary {
     margin-top: 2.5rem
 }
 
-.reviews-make-form .buttons .button-primary {
+.reviews-make-form .buttons .buttonPrimary {
     min-width: 27.5rem;
     max-width: 100%
 }
 
-.reviews-make-form .buttons .button-lightgray {
+.reviews-make-form .buttons .buttonLightgray {
     min-width: 21.6rem;
     max-width: 100%
 }
@@ -4314,7 +4314,7 @@ header .button-primary {
     margin: 0 -0.8rem
 }
 
-.reviews-negative-form .form-checkbox {
+.reviews-negative-form .formCheckbox {
     margin-top: 3rem;
     margin-bottom: 0
 }
@@ -4332,12 +4332,12 @@ header .button-primary {
     justify-content: space-between
 }
 
-.reviews-negative-form .buttons .button-lightgray {
+.reviews-negative-form .buttons .buttonLightgray {
     width: 21.6rem;
     max-width: 100%
 }
 
-.reviews-negative-form .buttons .button-primary {
+.reviews-negative-form .buttons .buttonPrimary {
     display: block;
     width: 100%
 }
@@ -4434,7 +4434,7 @@ header .button-primary {
 }
 
 @media screen and (max-width: 992px) {
-    .reviews-make-form .row-list {
+    .reviews-make-form .rowList {
         margin-bottom: 3.7rem
     }
 
@@ -4442,15 +4442,15 @@ header .button-primary {
         margin-top: 1.4rem
     }
 
-    .reviews-make-form .buttons .button-primary,
-    .reviews-make-form .buttons .button-lightgray {
+    .reviews-make-form .buttons .buttonPrimary,
+    .reviews-make-form .buttons .buttonLightgray {
         font-size: 1.4rem;
         padding: 1.7rem 2rem;
         width: 100%;
         min-width: 0
     }
 
-    .reviews-make-form .form-checkbox {
+    .reviews-make-form .formCheckbox {
         margin-bottom: 0
     }
 
@@ -4489,7 +4489,7 @@ header .button-primary {
         height: 20.5rem
     }
 
-    .reviews-negative-form .form-checkbox {
+    .reviews-negative-form .formCheckbox {
         margin-top: 2.5rem
     }
 
@@ -4502,7 +4502,7 @@ header .button-primary {
         max-width: 50%
     }
 
-    .reviews-negative-form .buttons .col .button-lightgray {
+    .reviews-negative-form .buttons .col .buttonLightgray {
         display: block;
         width: 100%
     }
@@ -4602,12 +4602,12 @@ header .button-primary {
     margin-bottom: 2.8rem
 }
 
-.modal-content .button-primary {
+.modal-content .buttonPrimary {
     display: block;
     width: 100%
 }
 
-.modal-content .form-checkbox {
+.modal-content .formCheckbox {
     margin-top: 2.8rem
 }
 
@@ -4630,7 +4630,7 @@ header .button-primary {
     }
 }
 
-.mobile-menu {
+.mobileMenu {
     display: none;
     position: fixed;
     left: 0;
@@ -4647,29 +4647,29 @@ header .button-primary {
     transition: transform .3s ease-in
 }
 
-.mobile-menu .container {
+.mobileMenu .container {
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: auto
 }
 
-.mobile-menu--logo {
+.mobileMenuLogo {
     display: block;
     max-height: 5.9rem;
     margin-right: auto
 }
 
-.mobile-menu--logo img {
+.mobileMenuLogo img {
     max-height: 100%
 }
 
-.mobile-menu--top {
+.mobileMenuTop {
     display: flex;
     padding-bottom: 6rem
 }
 
-.mobile-menu--close {
+.mobileMenuClose {
     width: 2.4rem;
     height: 2.4rem;
     margin-top: .6rem;
@@ -4677,12 +4677,12 @@ header .button-primary {
     cursor: pointer
 }
 
-.mobile-menu--close svg {
+.mobileMenuClose svg {
     max-width: 100%;
     max-height: 100%
 }
 
-.mobile-menu-icon {
+.mobileMenuIcon {
     display: none;
     width: 2.8rem;
     height: 2.8rem;
@@ -4690,21 +4690,21 @@ header .button-primary {
     cursor: pointer
 }
 
-.mobile-menu-icon svg {
+.mobileMenuIcon svg {
     max-width: 100%;
     max-height: 100%
 }
 
-.mobile-menu ul {
+.mobileMenu ul {
     padding: 0;
     margin: 0 0 auto
 }
 
-.mobile-menu li {
+.mobileMenu li {
     list-style-type: none
 }
 
-.mobile-menu li a {
+.mobileMenu li a {
     display: block;
     font-size: 1.8rem;
     font-size: inherit;
@@ -4716,23 +4716,23 @@ header .button-primary {
     border-radius: 1.3rem
 }
 
-.mobile-menu li a:hover {
+.mobileMenu li a:hover {
     text-decoration: none
 }
 
-.mobile-menu li.selected a {
+.mobileMenu li.selected a {
     font-weight: 700;
     color: #fff;
     background-color: #d30d15
 }
 
-.mobile-menu--social {
+.mobileMenuSocial {
     display: flex;
     align-items: center;
     padding-top: 2rem
 }
 
-.mobile-menu--social__title {
+.mobileMenuSocialTitle {
     padding-right: 1.5rem;
     margin: 0;
     flex-grow: 1;
@@ -4740,74 +4740,74 @@ header .button-primary {
     font-weight: 700
 }
 
-.mobile-menu--social__list {
+.mobileMenuSocialList {
     display: flex
 }
 
-.mobile-menu--social__list a {
+.mobileMenuSocialList a {
     display: block;
     width: 4rem;
     height: 4rem;
     margin-right: 2.1rem
 }
 
-.mobile-menu--social__list a:last-child {
+.mobileMenuSocialList a:last-child {
     margin-right: 0
 }
 
-.mobile-menu--social__list a svg {
+.mobileMenuSocialList a svg {
     max-width: 100%;
     max-height: 100%
 }
 
-.mobile-menu.open {
+.mobileMenu.open {
     opacity: 1;
     transform: translateX(0)
 }
 
 @media screen and (max-width: 1240px) {
-    .mobile-menu {
+    .mobileMenu {
         display: block
     }
 
-    .mobile-menu-icon {
+    .mobileMenuIcon {
         display: block
     }
 }
 
 @media screen and (max-width: 400px) {
-    .mobile-menu {
+    .mobileMenu {
         padding-top: 3rem
     }
 
-    .mobile-menu--social__title {
+    .mobileMenuSocialTitle {
         font-size: 1.4rem
     }
 
-    .mobile-menu-icon {
+    .mobileMenuIcon {
         margin-left: 2rem
     }
 
-    .mobile-menu li a {
+    .mobileMenu li a {
         font-size: 1.4rem;
         padding: 1.5rem 1.6rem
     }
 
-    .mobile-menu--top {
+    .mobileMenuTop {
         padding-bottom: 4rem
     }
 }
 
 @media screen and (max-width: 370px) {
-    .mobile-menu--logo {
+    .mobileMenuLogo {
         max-width: calc(100% - 13rem)
     }
 
-    .mobile-menu--social {
+    .mobileMenuSocial {
         flex-wrap: wrap
     }
 
-    .mobile-menu--social__title {
+    .mobileMenuSocialTitle {
         flex: 0 0 100%;
         max-width: 100%;
         margin-bottom: 2rem;

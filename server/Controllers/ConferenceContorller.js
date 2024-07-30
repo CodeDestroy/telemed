@@ -1,3 +1,4 @@
+const ConsultationService = require('../Services/ConsultationService')
 const rooms = require('../Utils/RoomManager')
 
 class ConferenceController {
@@ -97,6 +98,33 @@ class ConferenceController {
             return res.json({timer: 'start', data: conferenceEvent})
         } */
         
+    }
+
+    async endConference (req, res) {
+        try {
+            console.log(rooms.getAllRooms())
+            const roomName =  (req.body.roomName)
+            const protocol = req.body.protocol
+            /* const roomInfo = rooms.getRoomInfo(roomName.toLowerCase()) */
+            const tmk = await ConsultationService.getSlotByRoomName(roomName)
+            //Оставить на потом
+            /* if (roomInfo.started === 0)
+                return res.status(406).json({message: 'Консультация не была инициирована'}) */
+            tmk.room.ended = true;
+            tmk.room.meetingEnd = new Date();
+            tmk.room.protocol = protocol
+            tmk.slotStatusId = 4
+            tmk.room.save()
+            tmk.save()
+            rooms.removeRoom(roomName.toLowerCase())
+            /* console.log(tmk)*/
+            /* console.log(roomInfo)  */
+            console.log(rooms.getAllRooms())
+            res.status(200).json(tmk)
+        }
+        catch (e) {
+            res.status(400).send(e.message)
+        }
     }
 }
 

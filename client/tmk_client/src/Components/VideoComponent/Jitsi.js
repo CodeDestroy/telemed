@@ -196,25 +196,8 @@ function Jitsi(props) {
             /* JitsiRef.current.style.display = 'none' */
             console.log('Call ended successfully: ', nativeEvent, ' ', result.data); 
             /* window.location = '/' */
+
             handleProtocolModalShow()
-            /* result.then((data) => {
-                JitsiRef.current.style.display = 'none'
-                console.log('Call ended successfully: ', nativeEvent, ' ', data);
-                handleProtocolModalShow()
-            }) */
-            /* const response = await fetch('https://your-server-endpoint.com/end-call', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: 'Call ended' }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const result = await response.json(); */
             
         } catch (error) {
             console.error('Error ending call:', error);
@@ -227,6 +210,11 @@ function Jitsi(props) {
             isFullScreen = true
         props.onFullScreen(event, jitsiFrame, isFullScreen)
         /* setIsFullScreen(!isFullScreen) */
+    }
+    const openModelChat = () => {
+        console.log(store.user.id)
+        props.openModalChat()
+        console.log('chat')
     }
     return (
         <div ref={JitsiRef}>
@@ -252,6 +240,10 @@ function Jitsi(props) {
                             key: 'invite',
                             preventExecution: false
                         },
+                        {
+                            key:  'chat',
+                            preventExecution: true
+                        }
                     ]
                     /* customToolbarButtons: [
                         {
@@ -269,7 +261,7 @@ function Jitsi(props) {
                     SHOW_CHROME_EXTENSION_BANNER: false,
 
                     TOOLBAR_BUTTONS: ['microphone', 'camera', 'desktop', 'fullscreen',
-                    'fodeviceselection', 'recording', 'hangup',
+                    'fodeviceselection', 'recording', 'hangup', 'chat',
                      
                     'videoquality', 'filmstrip', 
                     'tileview', 'videobackgroundblur', 'download', 'participants-pane', 'pip', 'speakerstats',
@@ -314,6 +306,9 @@ function Jitsi(props) {
                         if (event.key === 'fullscreen') {
                             openCustomFullScreen(event, externalApi.getIFrame().parentNode)
                         }
+                        if (event.key === 'chat') {
+                            openModelChat(event)
+                        }
                     })
 
                      
@@ -324,10 +319,15 @@ function Jitsi(props) {
                 containerStyles = {{display: 'flex', flex: 1}}
             />
 
-            <ConferenceProtocol 
-                show={showProtocolModal} 
-                onHide={handleProtocolModalClose}
-            />
+            { roomName ?
+                <ConferenceProtocol 
+                    show={showProtocolModal} 
+                    onHide={handleProtocolModalClose}
+                    room={roomName}
+                />
+                :
+                ''
+            }
         </div>
         
     )

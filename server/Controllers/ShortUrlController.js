@@ -9,7 +9,7 @@ class ShortUrlController {
 
     async create(req, res)  {
         const { url }  =  req.body;
-        const  { shortUrl }  =  await UrlManager.createShortUrl(url)
+        const  { shortUrl }  =  await UrlManager.createShort(url)
         res.send(shortUrl)
     }
 }

@@ -5,13 +5,17 @@ import { observer } from 'mobx-react-lite';
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
-
+import styles from '../Assets/css/Main.module.css'
 import { Context } from '..';
 const MainPage = () => {
     const {store} = useContext(Context)
 
     const swiperRef = useRef(0)
     
+    useEffect(() => {
+        console.log(store.user.accessLevel)
+    }, [])
+
     const handleSwiperPrev = useCallback(() => {
         if (!swiperRef.current) return;
             swiperRef.current.swiper.slidePrev();
@@ -27,22 +31,22 @@ const MainPage = () => {
         store.isAuth &&
         <>
             <Header/>
-            <div className="mobile-menu">
-                <div className="container mobile-menu--inner">
-                    <div className="mobile-menu--top">
-                        <div className="mobile-menu--logo">
+            {/* <div className={styles.mobileMenu}>
+                <div className={styles.container "mobile-menu--inner"}>
+                    <div className={styles.mobileMenuTop}>
+                        <div className={styles.mobileMenuLogo}>
                             <a href="#">
                                 <img src="/assets/img/logo.png"/>
                             </a>
                         </div>
-                        <div className="mobile-menu--close">
+                        <div className={styles.mobileMenuClose}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1.16699 22.8346L22.6159 1.38573M1.16699 1.16797L22.6159 22.6169" stroke="#D30D15" strokeWidth="2.16667" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
                     </div>
                     <ul>
-                        <li className="selected"><a href="#">Главная</a></li>
+                        <li className={styles.selected}><a href="#">Главная</a></li>
                         <li><a href="#">Мои анализы</a></li>
                         <li><a href="#">Моя история</a></li>
                         <li><a href="#">Профиль</a></li>
@@ -52,11 +56,11 @@ const MainPage = () => {
                         <li><a href="#">Услуги</a></li>
                         <li><a href="#">Врачи</a></li>
                     </ul>
-                    <div className="mobile-menu--social">
-                        <p className="mobile-menu--social__title">
+                    <div className={styles.mobileMenuSocial}>
+                        <p className={styles.mobileMenuSocialTitle}>
                             Следите за нами в соцсетях
                         </p>
-                        <div className="mobile-menu--social__list">
+                        <div className={styles.mobileMenuSocialList}>
                             <a href="#">
                                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M28.1766 11.9721C28.1846 11.9721 28.1952 11.9721 28.2058 11.9721C28.4834 11.9721 28.741 12.0584 28.9522 12.2072L28.9482 12.2045C29.1023 12.3386 29.2058 12.5272 29.2311 12.7397V12.7437C29.2576 12.9057 29.2722 13.0916 29.2722 13.2815C29.2722 13.3679 29.2696 13.4529 29.2629 13.5378V13.5259C28.9641 16.672 27.668 24.3015 27.0093 27.8234C26.7304 29.3147 26.1819 29.8141 25.6507 29.8619C24.4967 29.9695 23.6202 29.0996 22.502 28.3665C20.7517 27.2178 19.7623 26.5033 18.0637 25.3838C16.0996 24.0916 17.3732 23.3785 18.4914 22.2178C18.7849 21.9123 23.8725 17.2842 23.9721 16.8645C23.9774 16.8393 23.9801 16.8114 23.9801 16.7822C23.9801 16.6786 23.9416 16.5843 23.8792 16.5126C23.8101 16.4675 23.7238 16.4422 23.6335 16.4422C23.5737 16.4422 23.5166 16.4542 23.4635 16.4741L23.4661 16.4728C23.2908 16.5126 20.4949 18.3603 15.0784 22.0159C14.4874 22.4821 13.741 22.7769 12.9283 22.8114H12.9203C11.7689 22.672 10.7238 22.4157 9.73174 22.0505L9.83001 22.0823C8.58433 21.676 7.59495 21.4622 7.67995 20.7742C7.7251 20.4166 8.21824 20.0505 9.15936 19.676C14.9566 17.1501 18.8225 15.4852 20.757 14.6813C22.8911 13.5485 25.3652 12.6162 27.9668 12.012L28.1753 11.9708L28.1766 11.9721ZM19.9535 0C8.92829 0.0265604 0 8.97078 0 20C0 31.0452 8.95352 40 20 40C31.0465 40 40 31.0465 40 20C40 8.97078 31.0717 0.0265604 20.0491 0H20.0465C20.0155 0 19.9845 0 19.9535 0Z" fill="#D30D15"/>
@@ -70,12 +74,12 @@ const MainPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
             <main>
-                <div className="content">
-                    <div className="container flex">
-                        <div className="side-bar">
-                            <ul className="side-bar--menu">
+                <div className={styles.content}>
+                    <div className={`${styles.container} ${styles.flex}`}>
+                        <div className={styles.sideBar}>
+                            <ul className={styles.sideBarMenu}>
                                 <li><a href="#">Главная</a></li>
                                 <li><a href="#">Мои анализы</a></li>
                                 <li><a href="#">Моя история</a></li>
@@ -86,11 +90,11 @@ const MainPage = () => {
                                 <li><a href="#">Услуги</a></li>
                                 <li><a href="#">Врачи</a></li>
                             </ul>
-                            <div className="side-bar--social">
-                                <p className="side-bar--social__title">
+                            <div className={styles.sideBarSocial}>
+                                <p className={styles.sideBarSocialTitle}>
                                     Следите за нами в соцсетях
                                 </p>
-                                <div className="side-bar--social__list">
+                                <div className={styles.sideBarSocialList}>
                                     <a href="#">
                                         <img src="/assets/img/vk.svg"/>
                                     </a>
@@ -99,11 +103,11 @@ const MainPage = () => {
                                     </a>
                                 </div>
                             </div>
-                            <a href="#" className="button-telegram">Чат-бот Telegram</a>
+                            <a href="#" className={styles.buttonTelegram}>Чат-бот Telegram</a>
                         </div>
-                        <div className="side-content">
-                            <div className="articles">
-                                <p className="block-title">
+                        <div className={styles.sideContent}>
+                            <div className={styles.articles}>
+                                <p className={styles.blockTitle}>
                                     ДЛЯ ВАС
                                 </p>
                                 <Swiper
@@ -115,121 +119,121 @@ const MainPage = () => {
                                     /* onSwiper={(swiper) => console.log(swiper)} */
                                     >
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(/assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(/assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>    
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                     <SwiperSlide>
-                                        <a href="#" className="articles--item">
-                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className="articles--item__image"></span>
-                                            <p className="articles--item__title">
+                                        <a href="#" className={styles.articlesItem}>
+                                            <span style={{backgroundImage: "url(assets/img/article.png)"}}  className={styles.articlesItemImage}></span>
+                                            <p className={styles.articlesItemTitle}>
                                                 Сезон не простуд
                                             </p>
                                         </a>
                                     </SwiperSlide>
                                 </Swiper>
-                                <div className="navigation-item navigation-prev" onClick={handleSwiperPrev}>
+                                <div className={`${styles.navigationItem} ${styles.navigationPrev}`} onClick={handleSwiperPrev}>
                                     <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="11.5" cy="11.5" r="11.5" transform="rotate(-180 11.5 11.5)" fill="#7E7E7E"/>
                                         <path d="M14.7158 5.63439C14.3416 5.26016 13.7348 5.26016 13.3606 5.63439L8.6768 10.3228C7.92892 11.0714 7.92921 12.2845 8.67738 13.0327L13.364 17.7193C13.7382 18.0936 14.3451 18.0936 14.7193 17.7193C15.0936 17.3451 15.0936 16.7383 14.7193 16.364L10.7081 12.3528C10.3338 11.9786 10.3338 11.3717 10.7081 10.9975L14.7158 6.98966C15.0901 6.61543 15.0901 6.00871 14.7158 5.63439Z" fill="white"/>
                                     </svg>
                                 </div>
-                                <div className="navigation-item navigation-next" onClick={handleSwiperNext}>
+                                <div className={`${styles.navigationItem} ${styles.navigationNext}`} onClick={handleSwiperNext}>
                                     <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="11.5" cy="11.5" r="11.5" fill="#7E7E7E"/>
                                         <path d="M8.28415 17.3656C8.65839 17.7398 9.26521 17.7398 9.63944 17.3656L14.3232 12.6772C15.0711 11.9286 15.0708 10.7155 14.3226 9.96728L9.63599 5.28069C9.26176 4.90644 8.65494 4.90644 8.28069 5.28069C7.90644 5.65494 7.90644 6.26172 8.28069 6.63598L12.2919 10.6472C12.6662 11.0214 12.6662 11.6283 12.2919 12.0025L8.28415 16.0103C7.90989 16.3846 7.90989 16.9913 8.28415 17.3656Z" fill="white"/>
                                     </svg>
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="split">
-                                    <p className="block-title">
+                            <div className={styles.row}>
+                                <div className={styles.split}>
+                                    <p className={styles.blockTitle}>
                                         Мои анализы
                                     </p>
-                                    <a className="split--link text-right" href="#">
+                                    <a className={`${styles.splitLink} ${styles.textRight}`} href="#">
                                         cмотреть все анализы
                                     </a>
                                 </div>
-                                <div className="row-list">
-                                    <div className="row-list--item analysis finish">
-                                        <p className="date">
+                                <div className={styles.rowList}>
+                                    <div className={`${styles.rowListItem} ${styles.analysis} ${styles.finish}`}>
+                                        <p className={styles.date}>
                                             25.09.2023
                                         </p>
-                                        <p className="title">
+                                        <p className={styles.title}>
                                             <b>Общий анализ крови с СОЭ с ручным подсчетом лейкоцитов</b>
                                         </p>
-                                        <p className="pacient">
+                                        <p className={styles.pacient}>
                                             Иванова Софья
                                         </p>
-                                        <a href="#" className="status finish">
+                                        <a href="#" className={`${styles.status} ${styles.finish}`}>
                                             Результат
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path fillRule="evenodd" clipRule="evenodd" d="M19.714 6.14807L14.259 0.363037C14.07 0.164037 13.803 0 13.529 0H1.979C0.874004 0 0 1 0 2.104V9.104C0 9.656 0.437014 10 0.989014 10H0.993988C1.54699 10 2 9.656 2 9.104V3.104C2 2.552 2.427 2 2.979 2H12V6.104C12 7.209 12.874 8 13.979 8H18V9.104C18 9.656 18.437 10 18.989 10H18.994C19.547 10 20 9.656 20 9.104V6.83704C20 6.58004 19.891 6.33407 19.714 6.14807ZM3.979 15.104C3.979 14.552 3.531 14.104 2.979 14.104H1.979V16.104H2.979C3.531 16.104 3.979 15.656 3.979 15.104ZM5.97501 14.838C6.06501 16.568 4.689 18 2.979 18H2V19.104C2 19.656 1.54699 20 0.993988 20H0.989014C0.437014 20 0 19.656 0 19.104V13.104C0 12.552 0.427004 12 0.979004 12H2.80899C4.43399 12 5.89001 13.216 5.97501 14.838ZM11 15.104C11 14.552 10.531 14 9.979 14H9V18H9.979C10.531 18 11 17.656 11 17.104V15.104ZM13 15V17C13 18.65 11.65 20 10 20H7.89499C7.39999 20 7 19.599 7 19.104V12.979C7 12.438 7.438 12 7.979 12H10C11.65 12 13 13.35 13 15ZM20 13.026V13.052C20 13.604 19.531 14 18.979 14H16V16H18.979C19.531 16 20 16.473 20 17.026V17.052C20 17.604 19.531 18 18.979 18H16V19.104C16 19.656 15.547 20 14.994 20H14.989C14.437 20 14 19.656 14 19.104V13.104C14 12.552 14.427 12 14.979 12H18.979C19.531 12 20 12.473 20 13.026Z" fill="#D30D15"/>
                                             </svg>
                                         </a>
                                     </div>
-                                    <div className="row-list--item analysis finish">
-                                        <p className="date">
+                                    <div className={`${styles.rowListItem} ${styles.analysis} ${styles.finish}`}>
+                                        <p className={styles.date}>
                                             05.09.2023
                                         </p>
-                                        <p className="title">
+                                        <p className={styles.title}>
                                             <b>Анализ крови на тиреотропный гормон (ТТГ), свободный тироксин (Т4) и свободный трийодтиронин (Т3 св.)</b>
                                         </p>
-                                        <p className="pacient">
+                                        <p className={styles.pacient}>
                                             Иванова Екатерина
                                         </p>
-                                        <a href="#" className="status finish">
+                                        <a href="#" className={`${styles.status} ${styles.finish}`}>
                                             Результат
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path fillRule="evenodd" clipRule="evenodd" d="M19.714 6.14807L14.259 0.363037C14.07 0.164037 13.803 0 13.529 0H1.979C0.874004 0 0 1 0 2.104V9.104C0 9.656 0.437014 10 0.989014 10H0.993988C1.54699 10 2 9.656 2 9.104V3.104C2 2.552 2.427 2 2.979 2H12V6.104C12 7.209 12.874 8 13.979 8H18V9.104C18 9.656 18.437 10 18.989 10H18.994C19.547 10 20 9.656 20 9.104V6.83704C20 6.58004 19.891 6.33407 19.714 6.14807ZM3.979 15.104C3.979 14.552 3.531 14.104 2.979 14.104H1.979V16.104H2.979C3.531 16.104 3.979 15.656 3.979 15.104ZM5.97501 14.838C6.06501 16.568 4.689 18 2.979 18H2V19.104C2 19.656 1.54699 20 0.993988 20H0.989014C0.437014 20 0 19.656 0 19.104V13.104C0 12.552 0.427004 12 0.979004 12H2.80899C4.43399 12 5.89001 13.216 5.97501 14.838ZM11 15.104C11 14.552 10.531 14 9.979 14H9V18H9.979C10.531 18 11 17.656 11 17.104V15.104ZM13 15V17C13 18.65 11.65 20 10 20H7.89499C7.39999 20 7 19.599 7 19.104V12.979C7 12.438 7.438 12 7.979 12H10C11.65 12 13 13.35 13 15ZM20 13.026V13.052C20 13.604 19.531 14 18.979 14H16V16H18.979C19.531 16 20 16.473 20 17.026V17.052C20 17.604 19.531 18 18.979 18H16V19.104C16 19.656 15.547 20 14.994 20H14.989C14.437 20 14 19.656 14 19.104V13.104C14 12.552 14.427 12 14.979 12H18.979C19.531 12 20 12.473 20 13.026Z" fill="#D30D15"/>
@@ -238,82 +242,82 @@ const MainPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="row">
-                                <div className="split">
-                                    <p className="block-title">
+                            <div className={styles.row}>
+                                <div className={styles.split}>
+                                    <p className={styles.blockTitle}>
                                         МОЯ ИСТОРИЯ
                                     </p>
-                                    <a className="split--link text-right" href="#">
+                                    <a className={`${styles.splitLink} ${styles.textRight}`} href="#">
                                         СМОТРЕТЬ ВСЮ ИСТОРИЮ
                                     </a>
                                 </div>
-                                <div className="row-list">
-                                    <div className="row-list--item reception finish">
-                                        <p className="date">
+                                <div className={styles.rowList}>
+                                    <div className={`${styles.rowListItem} ${styles.reception} ${styles.finish}`}>
+                                        <p className={styles.date}>
                                             25.09.2023
                                         </p>
-                                        <p className="title">
+                                        <p className={styles.title}>
                                             <b>Детский невролог</b><br></br>
                                             Первичный приём 
                                         </p>
-                                        <p className="doctor">
+                                        <p className={styles.doctor}>
                                             Колбаков А.Н.
                                         </p>
-                                        <p className="address">
+                                        <p className={styles.address}>
                                             Лизюкова, 24
                                         </p>
-                                        <p className="pacient">
+                                        <p className={styles.pacient}>
                                             Иванова Екатерина
                                         </p>
-                                        <a href="#" className="status finish">
+                                        <a href="#" className={`${styles.status} ${styles.finish}`}>
                                             Заключение
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path fillRule="evenodd" clipRule="evenodd" d="M19.714 6.14807L14.259 0.363037C14.07 0.164037 13.803 0 13.529 0H1.979C0.874004 0 0 1 0 2.104V9.104C0 9.656 0.437014 10 0.989014 10H0.993988C1.54699 10 2 9.656 2 9.104V3.104C2 2.552 2.427 2 2.979 2H12V6.104C12 7.209 12.874 8 13.979 8H18V9.104C18 9.656 18.437 10 18.989 10H18.994C19.547 10 20 9.656 20 9.104V6.83704C20 6.58004 19.891 6.33407 19.714 6.14807ZM3.979 15.104C3.979 14.552 3.531 14.104 2.979 14.104H1.979V16.104H2.979C3.531 16.104 3.979 15.656 3.979 15.104ZM5.97501 14.838C6.06501 16.568 4.689 18 2.979 18H2V19.104C2 19.656 1.54699 20 0.993988 20H0.989014C0.437014 20 0 19.656 0 19.104V13.104C0 12.552 0.427004 12 0.979004 12H2.80899C4.43399 12 5.89001 13.216 5.97501 14.838ZM11 15.104C11 14.552 10.531 14 9.979 14H9V18H9.979C10.531 18 11 17.656 11 17.104V15.104ZM13 15V17C13 18.65 11.65 20 10 20H7.89499C7.39999 20 7 19.599 7 19.104V12.979C7 12.438 7.438 12 7.979 12H10C11.65 12 13 13.35 13 15ZM20 13.026V13.052C20 13.604 19.531 14 18.979 14H16V16H18.979C19.531 16 20 16.473 20 17.026V17.052C20 17.604 19.531 18 18.979 18H16V19.104C16 19.656 15.547 20 14.994 20H14.989C14.437 20 14 19.656 14 19.104V13.104C14 12.552 14.427 12 14.979 12H18.979C19.531 12 20 12.473 20 13.026Z" fill="#D30D15"/>
                                             </svg>
                                         </a>
                                     </div>
-                                    <div className="row-list--item reception finish">
-                                        <p className="date">
+                                    <div className={`${styles.rowListItem} ${styles.reception} ${styles.finish}`}>
+                                        <p className={styles.date}>
                                             25.09.2023
                                         </p>
-                                        <p className="title">
+                                        <p className={styles.title}>
                                             <b>Детский невролог</b><br></br>
                                             Первичный приём 
                                         </p>
-                                        <p className="doctor">
+                                        <p className={styles.doctor}>
                                             Колбаков А.Н.
                                         </p>
-                                        <p className="address">
+                                        <p className={styles.address}>
                                             Лизюкова, 24
                                         </p>
-                                        <p className="pacient">
+                                        <p className={styles.pacient}>
                                             Иванова Екатерина
                                         </p>
-                                        <a href="#" className="status finish">
+                                        <a href="#" className={`${styles.status} ${styles.finish}`}>
                                             Заключение
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path fillRule="evenodd" clipRule="evenodd" d="M19.714 6.14807L14.259 0.363037C14.07 0.164037 13.803 0 13.529 0H1.979C0.874004 0 0 1 0 2.104V9.104C0 9.656 0.437014 10 0.989014 10H0.993988C1.54699 10 2 9.656 2 9.104V3.104C2 2.552 2.427 2 2.979 2H12V6.104C12 7.209 12.874 8 13.979 8H18V9.104C18 9.656 18.437 10 18.989 10H18.994C19.547 10 20 9.656 20 9.104V6.83704C20 6.58004 19.891 6.33407 19.714 6.14807ZM3.979 15.104C3.979 14.552 3.531 14.104 2.979 14.104H1.979V16.104H2.979C3.531 16.104 3.979 15.656 3.979 15.104ZM5.97501 14.838C6.06501 16.568 4.689 18 2.979 18H2V19.104C2 19.656 1.54699 20 0.993988 20H0.989014C0.437014 20 0 19.656 0 19.104V13.104C0 12.552 0.427004 12 0.979004 12H2.80899C4.43399 12 5.89001 13.216 5.97501 14.838ZM11 15.104C11 14.552 10.531 14 9.979 14H9V18H9.979C10.531 18 11 17.656 11 17.104V15.104ZM13 15V17C13 18.65 11.65 20 10 20H7.89499C7.39999 20 7 19.599 7 19.104V12.979C7 12.438 7.438 12 7.979 12H10C11.65 12 13 13.35 13 15ZM20 13.026V13.052C20 13.604 19.531 14 18.979 14H16V16H18.979C19.531 16 20 16.473 20 17.026V17.052C20 17.604 19.531 18 18.979 18H16V19.104C16 19.656 15.547 20 14.994 20H14.989C14.437 20 14 19.656 14 19.104V13.104C14 12.552 14.427 12 14.979 12H18.979C19.531 12 20 12.473 20 13.026Z" fill="#D30D15"/>
                                             </svg>
                                         </a>
                                     </div>
-                                    <div className="row-list--item reception finish">
-                                        <p className="date">
+                                    <div className={`${styles.rowListItem} ${styles.reception} ${styles.finish}`}>
+                                        <p className={styles.date}>
                                             25.09.2023
                                         </p>
-                                        <p className="title">
+                                        <p className={styles.title}>
                                             <b>Детский невролог</b><br></br>
                                             Первичный приём 
                                         </p>
-                                        <p className="doctor">
+                                        <p className={styles.doctor}>
                                             Колбаков А.Н.
                                         </p>
-                                        <p className="address">
+                                        <p className={styles.address}>
                                             Лизюкова, 24
                                         </p>
-                                        <p className="pacient">
+                                        <p className={styles.pacient}>
                                             Иванова Екатерина
                                         </p>
-                                        <a href="#" className="status finish">
+                                        <a href="#" className={`${styles.status} ${styles.finish}`}>
                                             Заключение
                                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path fillRule="evenodd" clipRule="evenodd" d="M19.714 6.14807L14.259 0.363037C14.07 0.164037 13.803 0 13.529 0H1.979C0.874004 0 0 1 0 2.104V9.104C0 9.656 0.437014 10 0.989014 10H0.993988C1.54699 10 2 9.656 2 9.104V3.104C2 2.552 2.427 2 2.979 2H12V6.104C12 7.209 12.874 8 13.979 8H18V9.104C18 9.656 18.437 10 18.989 10H18.994C19.547 10 20 9.656 20 9.104V6.83704C20 6.58004 19.891 6.33407 19.714 6.14807ZM3.979 15.104C3.979 14.552 3.531 14.104 2.979 14.104H1.979V16.104H2.979C3.531 16.104 3.979 15.656 3.979 15.104ZM5.97501 14.838C6.06501 16.568 4.689 18 2.979 18H2V19.104C2 19.656 1.54699 20 0.993988 20H0.989014C0.437014 20 0 19.656 0 19.104V13.104C0 12.552 0.427004 12 0.979004 12H2.80899C4.43399 12 5.89001 13.216 5.97501 14.838ZM11 15.104C11 14.552 10.531 14 9.979 14H9V18H9.979C10.531 18 11 17.656 11 17.104V15.104ZM13 15V17C13 18.65 11.65 20 10 20H7.89499C7.39999 20 7 19.599 7 19.104V12.979C7 12.438 7.438 12 7.979 12H10C11.65 12 13 13.35 13 15ZM20 13.026V13.052C20 13.604 19.531 14 18.979 14H16V16H18.979C19.531 16 20 16.473 20 17.026V17.052C20 17.604 19.531 18 18.979 18H16V19.104C16 19.656 15.547 20 14.994 20H14.989C14.437 20 14 19.656 14 19.104V13.104C14 12.552 14.427 12 14.979 12H18.979C19.531 12 20 12.473 20 13.026Z" fill="#D30D15"/>
@@ -326,12 +330,12 @@ const MainPage = () => {
                     </div>
                 </div>
             </main>
-            <div className="bottom-menu">
-                <a href="#" className="button-primary">Записаться на приём</a>
-                <div className="container">
-                    <div className="bottom-menu--list">
+            <div className={styles.bottomMenu}>
+                <a href="#" className={styles.buttonPrimary}>Записаться на приём</a>
+                <div className={styles.container}>
+                    <div className={styles.bottomMenuList}>
                         <a href="#">
-                            <span className="icon">
+                            <span className={styles.icon}>
                                 <svg width="27" height="32" viewBox="0 0 27 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9.33333 31H2.38889C1.62183 31 1 30.2363 1 29.2941V16.3533C1 15.9009 1.14633 15.4669 1.40679 15.147L12.5179 1.49966C13.0603 0.833446 13.9397 0.833446 14.4821 1.49966L25.5932 15.147C25.8536 15.4669 26 15.9009 26 16.3533V29.2941C26 30.2363 25.3782 31 24.6111 31H17.6667M9.33333 31H17.6667M9.33333 31V20.7645C9.33333 19.8223 9.95517 19.0585 10.7222 19.0585H16.2778C17.0449 19.0585 17.6667 19.8223 17.6667 20.7645V31" stroke="#D30D15" strokeWidth="2" strokeLinejoin="round"/>
                                 </svg>
@@ -339,7 +343,7 @@ const MainPage = () => {
                             Главная
                         </a>
                         <a href="#">
-                            <span className="icon">
+                            <span className={styles.icon}>
                                 <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M29.7052 7.34167L22.6582 0.294697C22.2652 -0.0981313 21.6279 -0.0983333 21.2344 0.294697L18.8854 2.64369C18.6966 2.83247 18.5905 3.08854 18.5905 3.35551C18.5905 3.62248 18.6966 3.87854 18.8854 4.06732L19.3481 4.53005L1.26788 22.6104C0.450303 23.4278 0 24.5149 0 25.6711C0 26.8273 0.450303 27.9143 1.26788 28.732C2.08545 29.5495 3.17263 29.9999 4.32879 29.9999C5.48495 29.9999 6.57202 29.5495 7.3896 28.732L25.4699 10.6517L25.9326 11.1144C26.1215 11.3032 26.3775 11.4092 26.6444 11.4092C26.9114 11.4092 27.1676 11.3032 27.3563 11.1144L29.7053 8.7653C30.0983 8.37227 30.0983 7.7348 29.7052 7.34167ZM5.96586 27.3083C5.52859 27.7457 4.94717 27.9865 4.32879 27.9865C3.7104 27.9865 3.12889 27.7457 2.69162 27.3083C2.25424 26.8711 2.01343 26.2895 2.01343 25.6712C2.01343 25.0527 2.25424 24.4714 2.69162 24.0341L14.8993 11.8264L18.1736 15.1008L5.96586 27.3083ZM19.5973 13.6769L16.3229 10.4026L20.7718 5.95369L24.0462 9.22803L19.5973 13.6769ZM26.6443 8.97894L21.021 3.35551L21.9464 2.43015L27.5697 8.05348L26.6443 8.97894Z" fill="#D30D15"/>
                                 </svg>
@@ -347,7 +351,7 @@ const MainPage = () => {
                             анализы
                         </a>
                         <a href="#">
-                            <span className="icon">
+                            <span className={styles.icon}>
                                 <svg width="29" height="33" viewBox="0 0 29 33" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M24.1875 28.6094V30.5469C24.1875 31.0797 23.7516 31.5156 23.2188 31.5156H2.39062C1.85781 31.5156 1.42188 31.0797 1.42188 30.5469V2.45312C1.42188 1.92031 1.85781 1.48438 2.39062 1.48438H14.9359L24.1875 10.2516V22.6031" stroke="#D30D15" strokeWidth="2"/>
                                     <path d="M24.1875 10.6391H15.9531C15.4203 10.6391 14.9844 10.2031 14.9844 9.67031V1.96875" stroke="#D30D15" strokeWidth="2"/>
@@ -362,7 +366,7 @@ const MainPage = () => {
                             история
                         </a>
                         <a href="#">
-                            <span className="icon">
+                            <span className={styles.icon}>
                                 <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M24.5 8.7V23.5C24.5 23.7652 24.3946 24.0196 24.2071 24.2071C24.0196 24.3946 23.7652 24.5 23.5 24.5H2C1.73478 24.5 1.48043 24.3946 1.29289 24.2071C1.10536 24.0196 1 23.7652 1 23.5V2C1 1.73478 1.10536 1.48043 1.29289 1.29289C1.48043 1.10536 1.73478 1 2 1H17.57" stroke="#D30D15" strokeWidth="2"/>
                                     <path d="M6.48965 16.1358L6.16965 18.9308C6.1626 18.9931 6.16961 19.0562 6.19016 19.1155C6.21071 19.1748 6.24428 19.2287 6.28841 19.2733C6.33253 19.3179 6.38608 19.3521 6.44513 19.3733C6.50419 19.3945 6.56724 19.4021 6.62965 19.3958L9.40965 19.0758C9.50384 19.0641 9.59164 19.022 9.65965 18.9558L24.1996 4.36077C24.2769 4.28368 24.3382 4.1921 24.38 4.09129C24.4218 3.99048 24.4434 3.88241 24.4434 3.77327C24.4434 3.66413 24.4218 3.55606 24.38 3.45525C24.3382 3.35444 24.2769 3.26287 24.1996 3.18577L22.3246 1.30077C22.1681 1.14445 21.9559 1.05664 21.7347 1.05664C21.5134 1.05664 21.3012 1.14445 21.1447 1.30077L6.60465 15.8908C6.54001 15.9573 6.49953 16.0435 6.48965 16.1358Z" stroke="#D30D15" strokeWidth="2"/>
@@ -372,7 +376,7 @@ const MainPage = () => {
                             запись на приём
                         </a>
                         <a href="#">
-                            <span className="icon">
+                            <span className={styles.icon}>
                                 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M1.35804 16.0793C0.880654 15.0805 0.880654 13.9194 1.35804 12.9206C1.56445 12.4887 1.91642 12.0758 2.62037 11.2498C2.90054 10.921 3.04063 10.7566 3.1583 10.581C3.42804 10.1786 3.61525 9.72664 3.70908 9.25134C3.75002 9.04399 3.76719 8.8287 3.80156 8.39811C3.88789 7.31625 3.93106 6.77531 4.09046 6.32401C4.45914 5.28019 5.28019 4.45916 6.32401 4.09046C6.7753 3.93106 7.31625 3.88788 8.39812 3.80155C8.82871 3.7672 9.044 3.75002 9.25135 3.70907C9.72665 3.61524 10.1786 3.42804 10.581 3.1583C10.7566 3.04063 10.921 2.90054 11.2498 2.62037C12.0758 1.91641 12.4888 1.56444 12.9206 1.35805C13.9194 0.880651 15.0806 0.880651 16.0794 1.35805C16.5112 1.56444 16.9242 1.91641 17.7503 2.62037C18.079 2.90054 18.2434 3.04063 18.419 3.1583C18.8215 3.42804 19.2734 3.61524 19.7486 3.70907C19.9561 3.75002 20.1713 3.7672 20.602 3.80155C21.6838 3.88788 22.2247 3.93106 22.676 4.09046C23.7198 4.45916 24.5409 5.28019 24.9096 6.32401M4.09046 22.676C4.45914 23.7198 5.28019 24.5409 6.32401 24.9096C6.7753 25.069 7.31625 25.1121 8.39812 25.1985C8.82871 25.2328 9.044 25.2501 9.25135 25.2909C9.72665 25.3848 10.1786 25.5719 10.581 25.8418C10.7566 25.9594 10.921 26.0994 11.2498 26.3797C12.0758 27.0836 12.4888 27.4356 12.9206 27.642C13.9194 28.1193 15.0806 28.1193 16.0794 27.642C16.5112 27.4356 16.9242 27.0836 17.7503 26.3797C18.079 26.0994 18.2434 25.9594 18.419 25.8418C18.8215 25.5719 19.2734 25.3848 19.7486 25.2909C19.9561 25.2501 20.1713 25.2328 20.602 25.1985C21.6838 25.1121 22.2247 25.069 22.676 24.9096C23.7198 24.5409 24.5409 23.7198 24.9096 22.676C25.069 22.2247 25.1121 21.6838 25.1985 20.6019C25.2328 20.1714 25.2499 19.956 25.291 19.7487C25.3847 19.2734 25.5719 18.8214 25.8418 18.419C25.9594 18.2434 26.0995 18.079 26.3797 17.7503C27.0836 16.9242 27.4356 16.5112 27.6421 16.0793C28.1193 15.0805 28.1193 13.9194 27.6421 12.9206" stroke="#D30D15" strokeWidth="2" strokeLinecap="round"/>
                                     <path d="M10.1084 18.8952L18.8981 10.1055" stroke="#D30D15" strokeWidth="2" strokeLinecap="round"/>

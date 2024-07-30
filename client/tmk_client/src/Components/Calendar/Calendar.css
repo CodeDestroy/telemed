@@ -1,0 +1,58 @@
+.calendar-component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .days {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .day {
+    font-size: larger;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .day:disabled {
+    color: lightgray;
+  }
+
+  .inactive {
+    color: lightgray;
+  }
+  
+  .timeslots {
+    margin-left: 1rem;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .timeslots-day {
+    box-sizing: inherit;
+    flex-wrap: wrap;
+    padding: 10px 10px 0;
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .timeslot {
+    max-width: 10rem;
+    /* margin: 0.75rem;
+    padding: 7px;
+    display: grid;
+    margin-bottom: 5px; */
+    height: 40px;
+    /* min-width: initial; */
+    background-color: rgb(26, 93, 208);
+    border-color: rgb(26, 93, 208);
+    margin: 1rem;
+    /* color: white;
+    text-align: center; */
+    font-size: larger;
+  }
+  

@@ -1,4 +1,4 @@
-import $api from "../api";
+import {$api} from "../api";
 
 //import { AuthResponse } from "../models/response/AuthResponse";
 
@@ -20,5 +20,17 @@ export default class AuthService {
     //был post, Но лучше оставить get
     static async logout () {
         return $api.get('/api/logout');
+    }
+
+    static async checkPhone(phone) {
+        return $api.get('/api/check-phone', {params: {phone}});
+    }
+
+    static async confirmRegistration (secondName, name, patronomicName, birthDate, email, phone, password) {
+        return $api.post('/api/confirm-registration', {secondName, name, patronomicName, birthDate, email, phone, password});
+    }
+
+    static async confirmEmail (phone, code ) {
+        return $api.post('/api/confirm-email', {phone, code});
     }
 }

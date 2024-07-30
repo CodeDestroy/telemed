@@ -1,4 +1,4 @@
-import $api from "../api";
+import {$api} from "../api";
 
 class ConferenceService {
     static async joinConference (conferenceEvent) {
@@ -11,6 +11,9 @@ class ConferenceService {
 
     static async participantJoined (conferenceEvent)  {
         return await  $api.post("/api/conference/participantJoined",  {conferenceEvent});
+    }
+    static async endConference (roomName, protocol)  {
+        return await $api.post("/api/conference/end", {roomName, protocol});
     }
 }
 

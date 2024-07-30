@@ -1,6 +1,6 @@
 import React, { createContext } from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+/* import './index.css'; */
 import App from './App';
 import Store from './Store/Store';
 
