@@ -1,8 +1,8 @@
 import MainPage from "../Components/MainPage";
 import Login from "../Components/Login";
 import VideoCompoent from '../Components/VideoComponent'
-import AdminMain from '../Components/AdminPanel/Main'
-import AdminRegistration from '../Components/AdminPanel/Registration'
+/* import AdminMain from '../Components/AdminPanel/Main/'
+import AdminRegistration from '../Components/AdminPanel/Registration' */
 import { observer } from 'mobx-react-lite';
 import {
   createBrowserRouter,
@@ -26,14 +26,14 @@ const mainRouter = createBrowserRouter([
       path: '/room/:roomId',
       element: <VideoCompoent/>
     },
-    {
+   /*  {
       path: '/admin',
       element: <AdminMain/>,
     },
     {
       path: '/admin/registration',
       element: <AdminRegistration/>
-    }
+    } */
     /* {
       element: <PriateRouter/>
     } */

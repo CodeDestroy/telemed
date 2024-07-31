@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Stack from "react-bootstrap/Stack";
 import { Context } from "../../..";
 import ImageModal from './ImageModal'
@@ -16,6 +16,12 @@ const ChildComponent = ({message, files, user}) => {
     const handleShow = () => setShow(true); */
 
     const {store} = useContext(Context);
+
+
+    useEffect(()=>{
+        console.log(user)
+        console.log(store.user)
+    }, [])
 
     if (store.user)
     return (
@@ -52,7 +58,7 @@ const ChildComponent = ({message, files, user}) => {
                                     return (
                                     <div key={`imageFileBlock_${Date.now()}_${file.id}`}>
                                         <br/>
-                                        <img alt="" onClick={() => setModalShow(true)} id={file.id} key={file.id + '-' + Date.now()} className='message-img' src={`http://localhost:80${file.path}`}></img>
+                                        <img alt="" onClick={() => setModalShow(true)} id={file.id} key={file.id + '-' + Date.now()} className='message-img' src={`${process.env.REACT_APP_SERVER_URL}${file.path}`}></img>
                                         <ImageModal 
                                             key={`imageModal_${Date.now()}_${message.id}`}
                                             show={modalShow}
@@ -64,8 +70,8 @@ const ChildComponent = ({message, files, user}) => {
                                 default:
                                     return  <Stack style={{fontSize: '13pt'}} direction="horizontal" key={file.id + '-' + Date.now()} gap={2}>
                                                 
-                                                <a key={`a_${file.id}-${Date.now()}`} style={{display: 'flex'}} href={`http://localhost:80${file.path}`}>
-                                                    <img style={{display: 'flex'}} src={'http://localhost:80/files.png'} width={'7%'}></img>{file.name}
+                                                <a key={`a_${file.id}-${Date.now()}`} style={{display: 'flex'}} href={`${process.env.REACT_APP_SERVER_URL}${file.path}`}>
+                                                    <img style={{display: 'flex'}} src={`${process.env.REACT_APP_SERVER_URL}/files.png`} width={'7%'}></img>{file.name}
                                                 </a>
                                             </Stack>
                             }

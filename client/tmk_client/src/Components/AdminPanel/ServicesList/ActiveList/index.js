@@ -14,7 +14,7 @@ function Index() {
     const { store } = useContext(Context);
     const [consultations, setConsultations] = useState([]);
     const [expandedRowIds, setExpandedRowIds] = useState([]);
-
+    const now = moment();
     const handleExpandClick = (id) => {
         setExpandedRowIds((prevState) => {
             return (prevState.includes(id) ? prevState.filter(rowId => rowId !== id) : [...prevState, id]);
@@ -57,7 +57,11 @@ function Index() {
             headerName: "Начало конференции", 
             renderCell: (cellValues) => {
                 if (!cellValues.row.detail) {
-                    return moment(cellValues.row.slotStartDateTime).format('DD.MM.YYYY HH:mm');
+                    
+                    const time = moment(cellValues.row.slotStartDateTime)
+                    return (
+                        <Box sx={{color: time.isBefore(now) ? 'red' : 'black'}}>{time.format('DD.MM.YYYY HH:mm')}</Box>
+                    )
                 }
                 return cellValues.value;
             },
@@ -68,7 +72,7 @@ function Index() {
             headerName: "Информация", 
             renderCell: (cellValues) => {
                 if (!cellValues.row.detail) {
-                    return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
+                    return (<a target='_blank' href={`${process.env.REACT_APP_SERVER_URL}/short/${cellValues.row.dUrl}`} >Подключиться</a>);
                 }
                 else if (cellValues.row.url) {
                     return cellValues.row.url;
@@ -131,8 +135,8 @@ function Index() {
                     
                 ),
                 slotStartDateTime: (
-                    <Box>
-                        <div>{moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}</div>
+                    <Box sx={{color: moment(row.slotStartDateTime).isBefore(now) ? 'red' : 'black'}}>
+                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
                 url: (
@@ -140,7 +144,7 @@ function Index() {
                         <InputLabel htmlFor={`${row.id}-detail-copy`}>Ссылка для пациента</InputLabel>
                         <Input
                             id="standard-adornment-password"
-                            value={`http://localhost/short/${row.pUrl}`}
+                            value={`${process.env.REACT_APP_SERVER_URL}/short/${row.pUrl}`}
                             endAdornment={
                                 <InputAdornment position="start" /* sx={{
                                     width: '5rem'
@@ -148,7 +152,7 @@ function Index() {
                                     <IconButton
                                         id={`${row.id}-detail-copy`}
                                         aria-label="toggle password visibility"
-                                        onClick={event => handleClickCopy(event, `http://localhost/short/${row.pUrl}`)}
+                                        onClick={event => handleClickCopy(event, `${process.env.REACT_APP_SERVER_URL}/short/${row.pUrl}`)}
                                     >
                                         <ContentCopyIcon />
                                     </IconButton>
@@ -167,13 +171,13 @@ function Index() {
                     </Box>
                 ),
                 slotStartDateTime: (
-                    <Box>
-                        <div>{moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}</div>
+                    <Box sx={{color: moment(row.slotStartDateTime).isBefore(now) ? 'red' : 'black'}}>
+                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
                 url: (
                     <Box>
-                        <a target='_blank' href={`http://localhost/short/${row.dUrl}`} >Подключиться</a>
+                        <a target='_blank' href={`${process.env.REACT_APP_SERVER_URL}/short/${row.dUrl}`} >Подключиться</a>
                     </Box>
                 )
             });

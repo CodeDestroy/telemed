@@ -1,4 +1,4 @@
-import React, {useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import Container from "react-bootstrap/Container";
 import { MessageObj } from './MessageObj';
 import './SendForm.css';
@@ -18,6 +18,7 @@ const SendForm = ({
     store,
     containerClass
 }) => {
+
     return (
         <>
             <Container className={containerClass} id='chatContainer'>

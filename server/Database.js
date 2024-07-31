@@ -79,7 +79,7 @@ module.exports = class Database {
     },
     avatar: {
       type: DataTypes.STRING,
-      defaultValue: 'http://localhost/images/defaultAvatar.png'
+      defaultValue: `${process.env.SERVER_URL}images/defaultAvatar.png`
     },
     email: {
       type: DataTypes.STRING,
@@ -582,6 +582,7 @@ module.exports = class Database {
         exp: moment(testSlot.slotEndDateTime).unix(), // время истечения срока действия токена (например, через час)
         context: {
           user: {
+            id: testUserDoctor.id,
             name: `${testDoctor.secondName} ${testDoctor.firstName}`, // имя пользователя
             email: testUserDoctor.email, // email пользователя
             avatar: testUserDoctor.avatar, // URL аватара пользователя (необязательно)
@@ -599,6 +600,7 @@ module.exports = class Database {
         exp: moment(testSlot.slotEndDateTime).unix(), // время истечения срока действия токена (например, через час)
         context: {
           user: {
+            id: testUserPatient.id,
             name: `${testPatient.secondName} ${testPatient.firstName}`, // имя пользователя
             email: testUserPatient.email, // email пользователя
             avatar: testUserPatient.avatar, // URL аватара пользователя (необязательно)

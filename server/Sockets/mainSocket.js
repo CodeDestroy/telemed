@@ -42,6 +42,9 @@ const httpSocket = async (httpServer, [cors]) => {
                         },
                     ]
                 });
+                //НЕ ПОЛУЧАЕМ ID ПОЧЕМУ ТО
+                /* console.log(decodedUser)
+                console.log(user) */
 
                 if (decodedUser.avatar != '') {
                     user.avatar = decodedUser.avatar;
@@ -159,9 +162,9 @@ const httpSocket = async (httpServer, [cors]) => {
         socket.on('message:upload', async (text, file, name, type, roomId, userId) => {
             let i = 0;
             const files_created = [];
-            console.log(`text: ${text} roomId: ${roomId} userId: ${userId}` )
+            /* console.log(`text: ${text} roomId: ${roomId} userId: ${userId}` ) */
             let room = await database.models.Rooms.findByPk(roomId);
-            console.log(text)
+            /* console.log(text) */
             const message = await database.models.Messages.create({ text: text, roomId: room.id, userId });
             if (file) {
 
@@ -373,7 +376,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
             let i = 0;
             const files_created = [];
             let room = await database.models.Rooms.findByPk(roomId);
-            console.log(text)
+            /* console.log(text) */
             const message = await database.models.Messages.create({ text: text, roomId: room.id, userId });
             if (file) {
 

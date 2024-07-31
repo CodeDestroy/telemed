@@ -342,6 +342,7 @@ class ConsultationService {
                 exp: moment(slot.slotEndDateTime).add(10, 'm').unix(), // время истечения срока действия токена (например, через час)
                 context: {
                     user: {
+                        id: doctor.userId,
                         name: `${doctor.secondName} ${doctor.firstName}`, // имя пользователя
                         email: doctor.user.email, // email пользователя
                         avatar: doctor.user.avatar, // URL аватара пользователя (необязательно)
@@ -373,6 +374,7 @@ class ConsultationService {
                 exp: moment(slot.slotEndDateTime).add(10, 'm').unix(), // время истечения срока действия токена (например, через час)
                 context: {
                     user: {
+                        id: patinet.userId,
                         name: `${patinet.secondName} ${patinet.firstName}`, // имя пользователя
                         email: patinet.user.email, // email пользователя
                         avatar: patinet.user.avatar, // URL аватара пользователя (необязательно)

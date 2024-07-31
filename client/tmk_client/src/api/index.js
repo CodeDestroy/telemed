@@ -1,7 +1,7 @@
 import axios from "axios";
 import AuthService from "../Services/AuthService";
-import Store from "../Store/Store";
-export const API_URL = 'http://127.0.0.1:80/' //'https://10.36.0.13:8443/'
+import Store from "../Store/Store"; 
+export const API_URL = process.env.REACT_APP_SERVER_URL //'https://10.36.0.13:8443/'
 
 const $api = axios.create({
     withCredentials: true,

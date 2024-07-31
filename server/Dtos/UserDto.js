@@ -9,6 +9,7 @@ class UserDto {
             accessLevel: user_role.accessLevel,
             avatar: user.avatar,
             email: user.email,
+            phone: user.phone,
             //payload2
             roleName: user_role.roleName,
             secondName: person.secondName,

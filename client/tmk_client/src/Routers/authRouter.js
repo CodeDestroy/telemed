@@ -1,5 +1,4 @@
 import Login from "../Components/Login";
-import AdminMain from '../Components/AdminPanel/Main'
 import AdminRegistration from '../Components/AdminPanel/Registration'
 import Calendar from "../Components/Calendar";
 import { observer } from 'mobx-react-lite';

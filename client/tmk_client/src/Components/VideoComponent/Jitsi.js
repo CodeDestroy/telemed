@@ -7,7 +7,7 @@ import mainUtil from '../../Utils/mainUtil';
 import { Context } from '../..';
 import { observer } from 'mobx-react-lite';
 import socket from '../../socket'
-
+import EndConferenceModal from '../Modals/EndConferenceModal'
 import './Jitsi.css'
 const CustomComponent = () => {
     /* useEffect(() => {
@@ -108,6 +108,10 @@ function Jitsi(props) {
     //https://distant-assistant.ru:9443/room/newroom?token=
     //https://distant-assistant.ru:9443/room/room?token=
 
+
+    useEffect(() => {
+        console.log(store.user)
+    }, [store])
 
     const onConferenceCreatedTimestamp = (nativeEvent) => {
         /* Conference terminated event */
@@ -319,14 +323,17 @@ function Jitsi(props) {
                 containerStyles = {{display: 'flex', flex: 1}}
             />
 
-            { roomName ?
+            { roomName && store.user?.doctor ?
                 <ConferenceProtocol 
                     show={showProtocolModal} 
                     onHide={handleProtocolModalClose}
                     room={roomName}
                 />
                 :
-                ''
+                <EndConferenceModal 
+                    show={showProtocolModal} 
+                    onHide={handleProtocolModalClose}
+                />
             }
         </div>
         

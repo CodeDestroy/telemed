@@ -249,6 +249,8 @@
   left: 72%!important
 }
 
+
+
 .chat .chat-message {
   padding: 20px
 }
@@ -275,6 +277,10 @@
 
 .float-right {
   float: right
+}
+
+.text-right {
+  text-align: end;
 }
 
 .clearfix:after {

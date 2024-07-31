@@ -1,4 +1,4 @@
-import AdminMain from '../Components/AdminPanel/Main'
+import AdminMain from '../Components/AdminPanel/Main/AdminDashboard'
 import CreateSlot from '../Components/AdminPanel/ServicesList/CreateSlot'
 import adminLocations from '../Locations/AdminLocations';
 import AllSlots from '../Components/AdminPanel/ServicesList/AllSlots'

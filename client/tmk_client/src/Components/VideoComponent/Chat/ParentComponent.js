@@ -22,7 +22,7 @@ const ParentComponent = ({ roomID, token, show, onHide }) => {
         children.push(<ChildComponent key={message.id} message={message} files={files} user={user} />);
         setData(children);
         setNumChildren((count) => count + 1);
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" });
     }, [children]);
 
     useLayoutEffect(() => {
@@ -46,9 +46,9 @@ const ParentComponent = ({ roomID, token, show, onHide }) => {
 
     useEffect(() => {
         if (!show)
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            messagesEndRef?.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
         else 
-            messagesEndRefModal.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            messagesEndRefModal?.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
         
     }, [numChildren]);
 
@@ -59,14 +59,14 @@ const ParentComponent = ({ roomID, token, show, onHide }) => {
 
     useEffect(() => {
         if (!show)
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            messagesEndRef?.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
         else 
-            messagesEndRefModal.current.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+            messagesEndRefModal?.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
     }, [dataPosts]);
 
     useEffect(() => {
         if (show)
-            messagesEndRefModal.current.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
+            messagesEndRefModal?.current?.scrollIntoView({ behavior: "instant", block: "end", inline: "nearest" });
         
     }, [show])
 

@@ -64,14 +64,14 @@ function Index() {
             disableColumnSort: true
         },
         { 
-            field: "url", 
-            headerName: "Информация", 
+            field: "protocol", 
+            headerName: "Протокол ТМК", 
             renderCell: (cellValues) => {
-                if (!cellValues.row.detail) {
+                /* if (!cellValues.row.detail) {
                     return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
-                }
-                else if (cellValues.row.url) {
-                    return cellValues.row.url;
+                } */
+                if (cellValues.row.protocol) {
+                    return cellValues.row.protocol;
                 }
                 return cellValues.value;
             },
@@ -88,8 +88,9 @@ function Index() {
 
                     array.forEach(function(part, index, theArray) {
                         theArray[index].patient = `Пациент: ${theArray[index].pSecondName} ${theArray[index].pFirstName}`;
-                        theArray[index].url = theArray[index].dUrl;
+                        /* theArray[index].url = theArray[index].dUrl; */
                     });
+                    console.log(array)
                     setConsultations(array);
 
                 } catch (e) {
@@ -125,37 +126,18 @@ function Index() {
                 detail: true,
                 patient: (
                     <Box>
-                        <div>{row.patient} {row.pPatronomicName}</div>
+                        {row.patient} {row.pPatronomicName}
                     </Box>
                         
                     
                 ),
                 slotStartDateTime: (
                     <Box>
-                        <div>{moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}</div>
+                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
-                url: (
-                    <FormControl sx={{ m: 1, width: '20rem', ml: 0, mt: 2.5 }} variant="standard">
-                        <InputLabel htmlFor={`${row.id}-detail-url`}>Ссылка для пациента</InputLabel>
-                        <Input
-                            id="standard-adornment-password"
-                            value={`http://localhost/short/${row.pUrl}`}
-                            endAdornment={
-                                <InputAdornment position="start" /* sx={{
-                                    width: '5rem'
-                                }} */>
-                                    <IconButton
-                                        id={`${row.id}-detail-copy`}
-                                        aria-label="toggle password visibility"
-                                        onClick={event => handleClickCopy(event, `http://localhost/short/${row.pUrl}`)}
-                                    >
-                                        <ContentCopyIcon />
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
+                protocol: (
+                    <></>
                 )
             });
             acc.push({
@@ -163,18 +145,18 @@ function Index() {
                 detail: true,
                 patient: (
                     <Box>
-                        <div>{row.dSecondName} {row.dFirstName} {row.dPatronomicName}</div>
+                        {row.dSecondName} {row.dFirstName} {row.dPatronomicName}
                     </Box>
                 ),
                 slotStartDateTime: (
                     <Box>
-                        <div>{moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}</div>
+                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
-                url: (
-                    <Box>
-                        <a target='_blank' href={`http://localhost/short/${row.dUrl}`} >Подключиться</a>
-                    </Box>
+                protocol: (
+                    <>
+                        
+                    </>
                 )
             });
         }
