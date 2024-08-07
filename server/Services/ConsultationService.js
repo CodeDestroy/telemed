@@ -340,13 +340,13 @@ class ConsultationService {
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
                 nbf: moment(slot.slotStartDateTime).add(-1, 'm').unix(),
                 exp: moment(slot.slotEndDateTime).add(10, 'm').unix(), // время истечения срока действия токена (например, через час)
+                moderator: true, // установить true, если пользователь является модератором
                 context: {
                     user: {
                         id: doctor.userId,
                         name: `${doctor.secondName} ${doctor.firstName}`, // имя пользователя
                         email: doctor.user.email, // email пользователя
                         avatar: doctor.user.avatar, // URL аватара пользователя (необязательно)
-                        moderator: true // установить true, если пользователь является модератором
                     }
                 }
             };
@@ -372,13 +372,14 @@ class ConsultationService {
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
                 nbf: moment(slot.slotStartDateTime).add(-1, 'm').unix(),
                 exp: moment(slot.slotEndDateTime).add(10, 'm').unix(), // время истечения срока действия токена (например, через час)
+                moderator: false, // установить true, если пользователь является модератором
                 context: {
                     user: {
                         id: patinet.userId,
                         name: `${patinet.secondName} ${patinet.firstName}`, // имя пользователя
                         email: patinet.user.email, // email пользователя
                         avatar: patinet.user.avatar, // URL аватара пользователя (необязательно)
-                        moderator: false // установить true, если пользователь является модератором
+                        
                     }
                 }
             };

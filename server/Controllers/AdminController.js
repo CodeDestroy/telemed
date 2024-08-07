@@ -47,6 +47,7 @@ class AdminController {
             const patientPayload = await ConsultationService.createPayloadPatient(patient.id, newRoom.id)
             const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
             const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
+            console.log(CLIENT_URL)
             const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`
             const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
             const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.user.id, newRoom.id)

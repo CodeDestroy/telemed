@@ -580,13 +580,14 @@ module.exports = class Database {
         room: roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
         nbf: moment(testSlot.slotStartDateTime).add(-1, 'm').unix(),
         exp: moment(testSlot.slotEndDateTime).unix(), // время истечения срока действия токена (например, через час)
+        moderator: true, // установить true, если пользователь является модератором
         context: {
           user: {
             id: testUserDoctor.id,
             name: `${testDoctor.secondName} ${testDoctor.firstName}`, // имя пользователя
             email: testUserDoctor.email, // email пользователя
             avatar: testUserDoctor.avatar, // URL аватара пользователя (необязательно)
-            moderator: true // установить true, если пользователь является модератором
+            
           }
         }
       };
@@ -598,13 +599,14 @@ module.exports = class Database {
         room: roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
         nbf: moment(testSlot.slotStartDateTime).add(-1, 'm').unix(),
         exp: moment(testSlot.slotEndDateTime).unix(), // время истечения срока действия токена (например, через час)
+        moderator: false, // установить true, если пользователь является модератором
         context: {
           user: {
             id: testUserPatient.id,
             name: `${testPatient.secondName} ${testPatient.firstName}`, // имя пользователя
             email: testUserPatient.email, // email пользователя
             avatar: testUserPatient.avatar, // URL аватара пользователя (необязательно)
-            moderator: false // установить true, если пользователь является модератором
+            
           }
         }
       };
@@ -616,13 +618,13 @@ module.exports = class Database {
       const { customAlphabet } = await import('nanoid');
       const nanoid = customAlphabet(ALPHABET, 10);
       const shortUrl1 = nanoid();
-      const newUrlEntity1 = await this.models.Url.create({originalUrl: `http://localhost:3000/room/${roomForSlot.roomName}?token=${tokenUser1}`, shortUrl: shortUrl1, roomId: roomForSlot.id, userId: testUserDoctor.id })
+      const newUrlEntity1 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot.roomName}?token=${tokenUser1}`, shortUrl: shortUrl1, roomId: roomForSlot.id, userId: testUserDoctor.id })
       const shortUrl2 = nanoid();
-      const newUrlEntity2 = await this.models.Url.create({originalUrl: `http://localhost:3000/room/${roomForSlot2.roomName}`, shortUrl: shortUrl2, roomId: roomForSlot2.id, userId: testUserDoctor.id})
+      const newUrlEntity2 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot2.roomName}`, shortUrl: shortUrl2, roomId: roomForSlot2.id, userId: testUserDoctor.id})
       const shortUrl3 = nanoid();
-      const newUrlEntity3 = await this.models.Url.create({originalUrl: `http://localhost:3000/room/${roomForSlot.roomName}?token=${tokenPatient1}`, shortUrl: shortUrl3, roomId: roomForSlot.id, userId: testUserPatient.id })
+      const newUrlEntity3 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot.roomName}?token=${tokenPatient1}`, shortUrl: shortUrl3, roomId: roomForSlot.id, userId: testUserPatient.id })
       const shortUrl4 = nanoid();
-      const newUrlEntity4 = await this.models.Url.create({originalUrl: `http://localhost:3000/room/${roomForSlot2.roomName}`, shortUrl: shortUrl4, roomId: roomForSlot2.id, userId: testUserPatient2.id})
+      const newUrlEntity4 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot2.roomName}`, shortUrl: shortUrl4, roomId: roomForSlot2.id, userId: testUserPatient2.id})
     }
     
     console.log('All models were synchronized successfully.');

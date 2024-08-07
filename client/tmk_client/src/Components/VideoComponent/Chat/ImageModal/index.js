@@ -19,7 +19,7 @@ function Index(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{textAlign: '-webkit-center'}}>
-            <img alt='' id={file.id} key={file.id + '-' + Date.now()} className='message-img-modal' src={`http://localhost:80${file.path}`}></img>
+            <img alt='' id={file.id} key={file.id + '-' + Date.now()} className='message-img-modal' src={`${process.env.REACT_APP_SERVER_URL}${file.path}`}></img>
             <div className='modal-message-text'>{message.text}</div>
         </Modal.Body>
       </Modal>

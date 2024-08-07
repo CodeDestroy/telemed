@@ -29,7 +29,6 @@ function AdminHeader() {
     
     const {store} = useContext(Context)
     const handleLogout = async () => {
-        window.location.href = adminLocations.index
         await store.logout()
     }
 

@@ -8,7 +8,8 @@ const HOST = process.env.SERVER_URL;
 exports.HOST = HOST;
 const HTTP_PORT = process.env.HTTP_PORT;
 exports.HTTP_PORT = HTTP_PORT;
-const PORT = process.env.PORT;
+const HTTPS_PORT = process.env.HTTPS_PORT;
+exports.HTTPS_PORT = HTTPS_PORT;
 const cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
@@ -31,7 +32,7 @@ const AuthMiddleware = require('./middleware/AuthMiddleware')
 app.use(cookieParser());
 app.use(cors({
   credentials: true,
-  origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru'],
 }));
 
 app.use(bodyParser.urlencoded({ 
