@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const UrlManager = require('../Utils/UrlManager')
 const CLIENT_URL = process.env.CLIENT_URL;
 const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
+const MailManager = require("../Utils/MailManager");
 
 class AdminController {
     async getAllConsultations(req, res) {
@@ -39,7 +40,8 @@ class AdminController {
     async createConsultation(req, res) {
         try {
             const {doctor, patient, startDateTime, duration } = req.body
-            
+            /* console.log(patient.user) */
+            /* return res.json(patient.user) */
             const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration)
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
@@ -52,6 +54,25 @@ class AdminController {
             const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
             const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.user.id, newRoom.id)
             const patientShortUrl = await UrlManager.createShort(patientUrl, patient.user.id, newRoom.id)
+            const transporter = await MailManager.getTransporter()
+            const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
+            const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
+            const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.user.email, patientLink)
+            transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                if (error) {
+                    return console.log(error);
+                }
+                console.log('Сообщение отправленно: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            });
+            const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.user.email, doctorLink)
+            transporter.sendMail(mailOptionsDoctor, (error, info) => {
+                if (error) {
+                    return console.log(error);
+                }
+                console.log('Сообщение отправленно: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            });
             res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom})
         }
         catch (e) {
@@ -84,6 +105,17 @@ class AdminController {
         try {
             const allDoctors = await DoctorService.getAllDoctors()
             res.status(200).json(allDoctors)
+        }
+        catch (e) {
+            res.status(404).json(e.message)
+        }
+    }
+
+    async getDoctor (req, res) {
+        try {
+            const id = req.params.id
+            const doctor = await DoctorService.getDoctor(id);
+            res.status(200).json(doctor)
         }
         catch (e) {
             res.status(404).json(e.message)

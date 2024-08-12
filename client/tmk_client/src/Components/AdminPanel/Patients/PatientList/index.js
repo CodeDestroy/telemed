@@ -11,6 +11,7 @@ import AdminService from '../../../../Services/AdminService';
 import LoadingScreen from '../../../Loading';
 import moment from 'moment-timezone';
 import Avatar from '@mui/material/Avatar';
+import adminLocations from '../../../../Locations/AdminLocations';
 
 const columns = [
     { 
@@ -88,7 +89,7 @@ const PatientList = () => {
             <Container>
                 <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
                     <h2>Список пациентов</h2>
-                    <Button variant="contained" color="primary" component={Link} to="/patients/create">
+                    <Button variant="contained" color="primary" component={Link} to={adminLocations.createPatient}>
                         Создать
                     </Button>
                 </Box>

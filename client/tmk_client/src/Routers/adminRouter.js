@@ -9,7 +9,9 @@ import PageNotFound from '../Components/Errors/PageNotFound';
 import PatientList from '../Components/AdminPanel/Patients/PatientList';
 import PatientEdit from '../Components/AdminPanel/Patients/PatientEdit';
 import PatientCreate from '../Components/AdminPanel/Patients/PatientCreate';
-
+import DoctorList from '../Components/AdminPanel/Doctors/DoctorList';
+import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
+import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 const adminRouter = createBrowserRouter([
     {
         path: "*",
@@ -38,6 +40,18 @@ const adminRouter = createBrowserRouter([
     {
       path: adminLocations.createPatient,
       element: <PatientCreate/>
+    },
+    {
+      path: adminLocations.doctorManagement,
+      element: <DoctorList/>
+    },
+    {
+      path: adminLocations.editDoctor,
+      element: <DoctorEdit/>
+    },
+    {
+      path: adminLocations.createDoctor,
+      element: <DoctorCreate/>
     }
     /* {
         path: '/test',

@@ -549,10 +549,10 @@ module.exports = class Database {
       const admin_pass_to_hash = adminPassword.valueOf();
       const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
       const adminHashPassword = bcrypt.hashSync(admin_pass_to_hash, 8)
-      const testUserDoctor = await this.models.Users.create({login: 'test', password: hashPassword, userRoleId: doctorRole.id, phone: '89518531985'})
+      const testUserDoctor = await this.models.Users.create({login: 'test', password: hashPassword, userRoleId: doctorRole.id, phone: '89518531984', email: 'andrey.novichihin1@gmail.com'})
       const testDoctor = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Тестов', firstName: 'Тест', patronomicName: 'Тестович', birthDate: new Date(), info: 'Тестовый доктор'})
       
-      const testUserPatient = await this.models.Users.create({login: 'test1', password: hashPassword, userRoleId: patientRole.id, phone: '89507730984'})
+      const testUserPatient = await this.models.Users.create({login: 'test1', password: hashPassword, userRoleId: patientRole.id, phone: '89507730984', email: 'andrei_novichihin@mail.ru'})
       const testPatient = await this.models.Patients.create({userId: testUserPatient.id, secondName: 'Пациентов', firstName: 'Пациент', patronomicName: 'Пациентович', birthDate: new Date(), info: 'Тестовый пациент'})
       
       const testUserPatient2 = await this.models.Users.create({login: 'test2', password: hashPassword, userRoleId: patientRole.id, phone: '88005553535'})

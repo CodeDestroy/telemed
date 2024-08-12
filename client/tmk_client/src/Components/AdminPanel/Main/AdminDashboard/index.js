@@ -4,7 +4,7 @@ import { Card, CardContent, Typography, Button, List, ListItem, ListItemText } f
 import AdminHeader from '../../Header';
 import { Context } from '../../../..';
 
-const AdminDashboard = () => {
+const DoctorDashboard = () => {
     const { store } = useContext(Context);
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const AdminDashboard = () => {
                                 <Typography variant="body2" color="text.secondary">
                                     Телефон: {store.user.phone}
                                 </Typography>
-                                <Button>Настройки</Button>
+                                <Button disabled={true}>Настройки</Button>
                             </CardContent>
                         </Card>
                     </Col>
@@ -50,11 +50,8 @@ const AdminDashboard = () => {
                                         <ListItemText primary="Памятка" />
                                     </ListItem>
                                     <ListItem>
-                                        <ListItemText primary="Требования к аппаратному обеспечению" />
-                                    </ListItem>
-                                    <ListItem>
                                         <ListItemText primary="Инструкция (PDF)" />
-                                        <Button variant="contained" color="primary" href="/path/to/instruction.pdf" download>
+                                        <Button disabled={true} variant="contained" color="primary" href="/path/to/instruction.pdf" download>
                                             Скачать
                                         </Button>
                                     </ListItem>
@@ -75,9 +72,58 @@ const AdminDashboard = () => {
                         </Card>
                     </Col>
                 </Row>
+                <Row className="justify-content-center">
+                    <Col md={8}>
+                        <Card style={cardStyle2}>
+                            <CardContent>
+                                <Typography variant="h6" component="div">
+                                    Требования к программному и аппаратному обеспечению
+                                </Typography>
+                                <List>
+                                    <ListItem>
+                                        <ListItemText primary="Минимальные требования:" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Операционная система: Windows 7+, macOS 10.12+, Linux (современные дистрибутивы)" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Браузер: Современные версии Chrome, Firefox, Safari, Edge" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Процессор: Двухъядерный процессор" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Оперативная память: 4 ГБ" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Сеть: Широкополосное соединение с минимальной скоростью 1.5 Мбит/с для видео 720p" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Рекомендуемые требования:" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Операционная система: Windows 10, macOS 10.15+, Linux (современные дистрибутивы)" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Браузер: Последние версии Chrome, Firefox, Safari, Edge" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Процессор: Четырехъядерный процессор" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Оперативная память: 8 ГБ" />
+                                    </ListItem>
+                                    <ListItem>
+                                        <ListItemText primary="Сеть: Широкополосное соединение с минимальной скоростью 3 Мбит/с для устойчивого видео 720p" />
+                                    </ListItem>
+                                </List>
+                            </CardContent>
+                        </Card>
+                    </Col>
+                </Row>
             </Container>
         </>
     );
 };
 
-export default AdminDashboard;
+export default DoctorDashboard;

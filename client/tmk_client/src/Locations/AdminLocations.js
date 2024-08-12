@@ -4,6 +4,8 @@ const adminLocations = {
     profile: '/profile',
     dashboard: '/dashboard',
     doctorManagement: '/doctors',
+    createDoctor: '/doctors/create',
+    editDoctor: '/doctors/edit/:id',
     patientManagement: '/patients',
     slotsManagement: '/slots',
     createPatient: '/patients/create',

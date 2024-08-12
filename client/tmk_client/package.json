@@ -1,0 +1,61 @@
+{
+  "name": "tmk_client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@faker-js/faker": "^8.4.1",
+    "@jitsi/react-sdk": "^1.4.0",
+    "@mui/icons-material": "^5.16.1",
+    "@mui/material": "^5.16.1",
+    "@mui/x-data-grid": "^7.10.0",
+    "@mui/x-date-pickers": "^7.10.0",
+    "@react-input/mask": "^1.2.5",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.6.8",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.12",
+    "dotenv": "^16.4.5",
+    "mobx": "^6.12.3",
+    "mobx-react-lite": "^4.0.7",
+    "moment-timezone": "^0.5.45",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "react-scripts": "^5.0.1",
+    "react-speech-recognition": "^3.10.0",
+    "react-timer-hook": "^3.0.7",
+    "socket.io-client": "^4.7.5",
+    "swiper": "^11.1.1",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

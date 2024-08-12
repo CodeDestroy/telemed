@@ -42,6 +42,21 @@ class DoctorService {
             console.log(e)
         }
     }
+
+    async getDoctor(id) {
+        try {
+            const doctor = await database.models.Doctors.findByPk(id, {
+                include: [{
+                    model: database.models.Users,
+                    required: true
+                }]
+            })
+            return doctor;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
 }
 
 module.exports = new DoctorService();
