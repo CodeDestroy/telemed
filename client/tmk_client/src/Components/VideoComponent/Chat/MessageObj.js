@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import Stack from "react-bootstrap/Stack";
 import { Context } from "../../..";
 import ImageModal from './ImageModal'
+import './MessageObj.css'
 const MessageObj = ({ children }) => {
     return (
         children.length !== 0 ? children : ''
@@ -45,7 +46,7 @@ const ChildComponent = ({message, files, user}) => {
                             } 
                         </strong>
                         
-                        {new Date(message.createdAt).toLocaleString('ru-RU', { weekday: 'short', year: 'numeric', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' })}
+                        {new Date(message.createdAt).toLocaleString('ru-RU', { weekday: 'short', year: 'numeric', month: 'long', day: '2-digit', hour: 'numeric', minute: 'numeric' })}
                     </span>
                     <img key={`img_${Date.now()}_${message.id}`} src={user.avatar} alt="avatar"/>
                 </div>
@@ -70,7 +71,7 @@ const ChildComponent = ({message, files, user}) => {
                                 default:
                                     return  <Stack style={{fontSize: '13pt'}} direction="horizontal" key={file.id + '-' + Date.now()} gap={2}>
                                                 
-                                                <a key={`a_${file.id}-${Date.now()}`} style={{display: 'flex'}} href={`${process.env.REACT_APP_SERVER_URL}${file.path}`}>
+                                                <a key={`a_${file.id}-${Date.now()}`} style={{display: 'flex'}} target="_blank" href={`${process.env.REACT_APP_SERVER_URL}${file.path}`}>
                                                     <img style={{display: 'flex'}} src={`${process.env.REACT_APP_SERVER_URL}/files.png`} width={'7%'}></img>{file.name}
                                                 </a>
                                             </Stack>

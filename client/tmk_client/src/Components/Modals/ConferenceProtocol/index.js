@@ -87,21 +87,34 @@ const Index = (props) => {
             centered
             style={{position: 'relative!important'}}
         >
-            <Modal.Header closeButton>
+            <Modal.Header 
+                closeButton
+                onHide={endConference}
+            >
                 {/* <Modal.Title>Modal title</Modal.Title> */}
             </Modal.Header>
             <Modal.Body style={{textAlign: 'center', fontSize: '2rem'}}>
-                Спасибо за участие в тестировании телемедицинских консультаций!
+                <p style={{fontSize: '2rem', fontWeight: 'bold'}}>Спасибо за участие в тестировании телемедицинских консультаций!</p>
+                <p style={{fontSize: '1.5rem'}}>Составьте протокол в свободной форме (используя клавиатуру или голосовой ввод)</p>
                 <div style={{ marginTop: '20px', position: 'relative' }}>
                     <TextField
                         multiline
-                        rows={20}
+                        maxRows={8}
+                        minRows={5}
                         variant="outlined"
+                        label={`Составьте протокол`}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         fullWidth
                         InputProps={{
                             style: { fontSize: '2rem', paddingRight: '50px' }
+                        }}
+                        InputLabelProps={{
+                            sx: {
+                                fontSize: "2rem",
+                                fontFamily: 'inherit',
+                                "&.MuiOutlinedInput-notchedOutline": { fontSize: "2rem" }
+                            }
                         }}
                     />
                     <IconButton

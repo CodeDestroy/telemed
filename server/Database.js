@@ -150,7 +150,14 @@ module.exports = class Database {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
+    snils: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     medOrgId: {
+      type: DataTypes.INTEGER,
+    },
+    postId: {
       type: DataTypes.INTEGER,
     },
     info: {
@@ -211,12 +218,79 @@ module.exports = class Database {
       allowNull: false,
         
     },
+    snils: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     info: {
       type: DataTypes.STRING
     }
   }, {
     timestamps: false
   })
+
+  this.models.Posts = this.sequelize.define('post', {
+    postName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+
+
+  })
+
+  this.models.MedicalOrgs = this.sequelize.define('medical_org', {
+    medOrgName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    inn: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+  })
+
+  this.models.API = this.sequelize.define('api', {
+    apiName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    apiKey: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    apiSecret: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    apiUrl: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    apiType: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    apiVersion: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    medOrgId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    }
+
+  })
+
 
   this.models.Rooms = this.sequelize.define('room', {
     roomName: {
@@ -444,7 +518,8 @@ module.exports = class Database {
     /* const { Users, UsersRoles, Teachers, Students, ClassLevels, Classes, StudentsMarks, ClassLesons, Lessons, Modules } = this.models; */
     /* Classes.hasOne(Students, { foreignKey: 'classId'})
     Students.belongsTo(Classes, { foreignKey: 'classId' }); */
-    const { Users, UsersRoles, Doctors, Admins, Patients, Tokens, Rooms, Messages, Files, Url, Settings, LogTypes, Logs, Services, Slots, Payments, PayTypes, SlotStatus, ConfirmCodes } = this.models;
+    const { Users, UsersRoles, Doctors, Admins, Patients, Tokens, Rooms, Messages, Files, Url, Settings, LogTypes, Logs, Services, Slots, Payments, PayTypes, 
+          SlotStatus, ConfirmCodes, MedicalOrgs, Posts, API } = this.models;
 
     UsersRoles.hasMany(Users, {foreignKey: 'userRoleId'});
     Users.belongsTo(UsersRoles, {foreignKey: 'userRoleId'})
@@ -461,6 +536,15 @@ module.exports = class Database {
     Doctors.belongsTo(Users, {foreignKey: 'userId'})
     Admins.belongsTo(Users, {foreignKey: 'userId'})
     Patients.belongsTo(Users, {foreignKey: 'userId'})
+
+    MedicalOrgs.hasMany(Doctors, {foreignKey: 'medOrgId'})
+    Doctors.belongsTo(MedicalOrgs, {foreignKey: 'medOrgId'})
+
+    MedicalOrgs.hasMany(API, {foreignKey: 'medOrgId'})
+    API.belongsTo(MedicalOrgs, {foreignKey: 'medOrgId'})
+
+    Posts.hasMany(Doctors, {foreignKey: 'postId'})
+    Doctors.belongsTo(Posts, {foreignKey: 'postId'})
 
     Users.belongsToMany(Rooms, { through: 'users_rooms' });
     Rooms.belongsToMany(Users, { through: 'users_rooms' });
@@ -558,13 +642,13 @@ module.exports = class Database {
       const testUserPatient2 = await this.models.Users.create({login: 'test2', password: hashPassword, userRoleId: patientRole.id, phone: '88005553535'})
       const testPatient2 = await this.models.Patients.create({userId: testUserPatient2.id, secondName: 'Иванов', firstName: 'Иван', patronomicName: 'Иванович', birthDate: new Date(), info: 'Тестовый пациент 2'})
 
-      const testUserAdmin = await this.models.Users.create({login: 'admin', password: adminHashPassword, userRoleId: adminRole.id, phone: '89529547485'})
+      const testUserAdmin = await this.models.Users.create({login: 'admin', password: adminHashPassword, userRoleId: adminRole.id, phone: '0'})
       const testAdmin = await this.models.Admins.create({userId: testUserAdmin.id, secondName: 'Админов', firstName: 'Админ', patronomicName: 'Админович', birthDate: new Date(), info: 'Тестовый админ'})
       
       
       const room = await this.models.Rooms.create({roomName: 'sometestroomname', meetingStart: new Date()})
       
-      const testSlot = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(1, 'm').toDate(), slotEndDateTime: moment(new Date()).add(11, 'm').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient.id})
+      const testSlot = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(1, 'm').toDate(), slotEndDateTime: moment(new Date()).add(11, 'd').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient.id})
       const testSlot2 = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(11, 'm').toDate(), slotEndDateTime: moment(new Date()).add(21, 'm').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient2.id})
 
       const roomName = await UserManager.translit(`${testDoctor.secondName}_${testPatient.secondName}_${testSlot.slotStartDateTime.getTime()}`)
@@ -573,12 +657,19 @@ module.exports = class Database {
       const roomForSlot = await this.models.Rooms.create({roomName: roomName, meetingStart: testSlot.slotStartDateTime, slotId: testSlot.id})
       const roomForSlot2 = await this.models.Rooms.create({roomName: roomName2, meetingStart: testSlot.slotStartDateTime, slotId: testSlot2.id})
       
+      const botPassword = 'askjdbknasbdprpehurdfdf'
+      const pass_to_hash_bot = botPassword.valueOf();
+      const hashPasswordBot = bcrypt.hashSync(pass_to_hash_bot, 8);
+
+      const botUser = await this.models.Users.create({login: 'telegram_bot', password: hashPasswordBot, phone: "999999999", confirmed: true, userRoleId: adminRole.id})
+      const token = await this.models.Tokens.create({userId: botUser.id, refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsImxvZ2luIjoidGVsZWdyYW1fYm90IiwicGFzc3dvcmQiOiIkMmEkMDgkNDNzVGZlYzhiZFgwbWtaMmhGeUhTT0w1Q3hWRkRaTS5CeWMvLkNvVi93LnBYbkpmaVdsRXEiLCJhY2Nlc3NMZXZlbCI6MywiYXZhdGFyIjpudWxsLCJlbWFpbCI6IiIsInBob25lIjoiOTk5OTk5OTk5Iiwicm9sZU5hbWUiOiLQkNC00LzQuNC90LjRgdGC0YDQsNGC0L7RgCIsInNlY29uZE5hbWUiOiLQkdC-0YIiLCJmaXJzdE5hbWUiOiLQkdC-0YIiLCJwYXRyb25vbWljTmFtZSI6ItCR0L7RgiIsImluZm8iOm51bGwsImJpcnRoRGF0ZSI6bnVsbCwiaWF0IjoxNzIzMTIzMzI0LCJleHAiOjE4NTc3MTUzMjR9.FYtvlt1SqfPE53f3Kw_JHGfTUl_ug9ilRUwVHYEtDpM"})
+
       const payloadForUser1 = {
         aud: roomName, // аудитория (аудитория приложения, например jitsi)
         iss: JITSI_APP_ID, // издатель токена
         sub: JITSI_SERVER_URL, // цель токена (обычно URL сервера)
         room: roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
-        nbf: moment(testSlot.slotStartDateTime).add(-1, 'm').unix(),
+        nbf: moment(testSlot.slotStartDateTime).add(-10, 'd').unix(),
         exp: moment(testSlot.slotEndDateTime).unix(), // время истечения срока действия токена (например, через час)
         moderator: true, // установить true, если пользователь является модератором
         context: {

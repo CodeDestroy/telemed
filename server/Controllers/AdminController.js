@@ -122,6 +122,31 @@ class AdminController {
         }
     }
 
+    async createDoctor (req, res) {
+        try {
+            const {
+                secondName,
+                name,
+                patrinomicName,
+                phone,
+                email,
+                password,
+                birthDate,
+                info
+            } = req.body;
+            const formattedDate = moment(birthDate).format('YYYY-MM-DD');
+            const avatar = req.file;
+            /* return res.json(avatar) */
+            const newUser = await userService.createUser(2, phone, password, SERVER_DOMAIN + 'uploads/' + avatar.filename, email, phone)
+            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info)
+
+            res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
+        }
+        catch (e) {
+            res.status(500).json(e.message)
+        }
+    }
+
     async createPatient (req, res) {
         try {
             const {

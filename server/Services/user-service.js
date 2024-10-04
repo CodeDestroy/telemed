@@ -181,14 +181,20 @@ class UserService {
 
             const pass_to_hash = password.valueOf();
             const hashPassword = await bcrypt.hash(pass_to_hash, 8);
-            const newUser = await database.models.Users.create({
-                login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email, avatar
-            })
-
+            let newUser = null
+            if (avatar)
+                newUser = await database.models.Users.create({
+                    login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email, avatar
+                })
+            else 
+                newUser = await database.models.Users.create({
+                    login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email
+                })
             return newUser
         }
         catch (e) {
             console.log(e)
+            throw e
         }
             
 
@@ -267,7 +273,9 @@ class UserService {
 
         }
         catch (e) {
+            
             console.log(e)
+            throw e
         }
     }
     
@@ -359,8 +367,8 @@ class UserService {
                         model: database.models.Admins,
                         required: false
                     },{
-                        model: database.models.Doctors,
-                        required: true
+                        model: database.models.Patients,
+                        required: false
                     },
 
                 ]
@@ -371,6 +379,7 @@ class UserService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 

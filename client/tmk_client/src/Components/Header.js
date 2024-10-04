@@ -5,7 +5,7 @@ import mainUtil from '../Utils/mainUtil';
 import styles from '../Assets/css/Main.module.css'
 const Header = () => {
     const {store} = React.useContext(Context)
-    
+    const [notificationMenu, setNotificationMenu] = React.useState(false)
     useEffect(() => {
         const html = document.querySelector('html')
         html.style.fontSize = '10px'
@@ -15,6 +15,9 @@ const Header = () => {
         store.checkAuth()
 
     } 
+    const setNotificationsVisible = () => {
+        setNotificationMenu(!notificationMenu)
+    }
     return (
         <header>
             <div className={`${styles.container} ${styles.flexRow} ${styles.alignCenter}`}>
@@ -22,7 +25,7 @@ const Header = () => {
                     <img src="/assets/img/logo.png"/>
                 </a>
 
-                <div className={`${styles.notifications} ${styles.new}`}>
+                <div className={`${styles.notifications} ${styles.new}`} onClick={setNotificationsVisible}>
                     <div className={styles.notificationsIcon}>
                         <svg width="19" height="21" viewBox="0 0 19 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M6.38314 15.2917H3.12903C1.92303 15.2917 1.32004 15.2917 1.19317 15.198C1.05063 15.0928 1.01581 15.0307 1.00037 14.8543C0.986636 14.6972 1.35621 14.0924 2.09537 12.883C2.85854 11.6342 3.50656 9.81594 3.50656 7.24167C3.50656 5.81834 4.11236 4.45331 5.19069 3.44686C6.26903 2.44042 7.73156 1.875 9.25655 1.875C10.7816 1.875 12.2441 2.44042 13.3224 3.44686C14.4008 4.45331 15.0066 5.81834 15.0066 7.24167C15.0066 9.81594 15.6546 11.6342 16.4178 12.883C17.1569 14.0924 17.5265 14.6972 17.5128 14.8543C17.4974 15.0307 17.4625 15.0928 17.32 15.198C17.1931 15.2917 16.5901 15.2917 15.3841 15.2917H12.1316M6.38314 15.2917L6.38156 16.25C6.38156 17.8379 7.66879 19.125 9.25655 19.125C10.8444 19.125 12.1316 17.8379 12.1316 16.25V15.2917M6.38314 15.2917H12.1316" stroke="#000" strokeWidth="1.91667" strokeLinecap="round" strokeLinejoin="round"/>
@@ -30,13 +33,14 @@ const Header = () => {
                         <span className={styles.notificationsCount}>1</span>
                     </div>
 
-                    <div className={styles.notificationsContent}>
+                    <div className={`${styles.notificationsContent}`}  style={{display: `${notificationMenu === true ? 'block' : ''}`}}>
                         <div className={styles.notificationsContentInner}>
                             <div className={styles.notificationsContentClose}>
                                 <svg width="12" height="11" viewBox="0 0 12 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M1.33105 10.0914L10.6045 1.09137M1.33105 1L10.6045 9.99999" stroke="#D30D15" strokeWidth="0.909137" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                             </div>
+                            {/* Тут уведомдения добавить! */}
                             <div className={styles.scroll}>
                                 <div className={styles.notificationsContentItem}>
                                     <p>

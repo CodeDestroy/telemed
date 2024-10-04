@@ -23,7 +23,7 @@ const start = async () => {
         const testOnlineRequestInfo = await healthyChildApi.getOnlineRequestInfo('ac8de4a8-3dd6-11ef-a030-00155d014d04')
         const testOnlineRequestInfo = await healthyChildApi.getOnlineRequestInfo('6827ea0a-3dd6-11ef-a030-00155d014d04')
         console.log(testOnlineRequestInfo) */
-        await database.sync(/* { force: true } */);
+        await database.sync({ force: true });
         /* const httpsServer = https.createServer(options, app); */
         const httpServer = http.createServer(app);
         /* const chalk = await import('chalk'); */

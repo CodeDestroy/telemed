@@ -324,6 +324,7 @@
 }
 .message-img-modal {
   width: 100%;
+  max-width: 500px;
 }
 
 .message-input {

@@ -1,0 +1,24 @@
+@media screen and (max-width: 1440px) {
+    .message-img {
+        width: 400px;
+    }
+    .adaptive-message {
+        max-width: 700px;
+    }
+    
+}
+@media screen and (max-width: 1080px) {
+    .message-img {
+        width: 400px;
+    }
+    .adaptive-message {
+        max-width: 700px;
+    }
+    
+}
+.message-img {
+    width: 100%;
+}
+.adaptive-message {
+    max-width: 500px;
+}

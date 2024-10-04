@@ -182,7 +182,26 @@ const httpSocket = async (httpServer, [cors]) => {
                 files_created.push(file_created);
             }
 
-            const user = await database.models.Users.findByPk(userId);
+            const user = await database.models.Users.findByPk(userId, {
+                include: [
+                    {
+                        model: database.models.UsersRoles,
+                        required: true,
+                    },
+                    {
+                        model: database.models.Doctors,
+                        required: false
+                    },
+                    {
+                        model: database.models.Patients,
+                        required: false
+                    },
+                    {
+                        model: database.models.Admins,
+                        required: false
+                    },
+                ]
+            });
             ioHTTP.to(room.id).emit('message:return', message, user, files_created, 1);
         });
         socket.on('room:leave', async (roomId) => {
@@ -394,7 +413,26 @@ const httpsSocket = async (httpsServer, [cors]) => {
                 files_created.push(file_created);
             }
 
-            const user = await database.models.Users.findByPk(userId);
+            const user = await database.models.Users.findByPk(userId, {
+                include: [
+                    {
+                        model: database.models.UsersRoles,
+                        required: true,
+                    },
+                    {
+                        model: database.models.Doctors,
+                        required: false
+                    },
+                    {
+                        model: database.models.Patients,
+                        required: false
+                    },
+                    {
+                        model: database.models.Admins,
+                        required: false
+                    },
+                ]
+            });
             io.to(room.id).emit('message:return', message, user, files_created, 1);
         });
         socket.on('room:leave', async (roomId) => {

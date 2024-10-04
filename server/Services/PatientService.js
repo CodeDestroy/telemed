@@ -31,17 +31,18 @@ class PatientService {
         }
     }
     //newUser.id, secondName, name, patrinomicName, phone, email, password, formattedDate, info
-    async createPatient(userId, secondName, firstName, patronomicName, birthDate, info) {
+    async createPatient(userId, secondName, firstName, patronomicName, birthDate, info, snils = null) {
         try {
             const patient = await database.models.Patients.create({
                 
-                userId, secondName, firstName, patronomicName, birthDate, info
+                userId, secondName, firstName, patronomicName, birthDate, snils, info
             })
             return patient
       
         }
         catch (e) {
             console.log(e)
+            throw e;
         }
     }
 }

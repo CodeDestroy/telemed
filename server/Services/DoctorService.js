@@ -57,6 +57,26 @@ class DoctorService {
             console.log(e)
         }
     }
+
+    async getDoctorsByFIO(secondName, name, patronomicName) {
+        try {
+            const doctor = await database.models.Doctors.findAll({
+                where: {
+                    secondName: secondName,
+                    firstName: name,
+                    patronomicName: patronomicName
+                },
+                include: [{
+                    model: database.models.Users,
+                    required: true
+                }]
+            })
+            return doctor
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
 }
 
 module.exports = new DoctorService();

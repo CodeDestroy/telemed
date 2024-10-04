@@ -1,7 +1,7 @@
 const ApiError = require('../Errors/api-error')
 const tokenService = require('../Services/token-service')
 const allowedPath = [
-    '/api/login', '/api/logout', '/api/register'
+    '/api/login', '/api/logout', '/api/register', '/'
 ]
 const url = require('node:url');
 module.exports = async function (req, res, next) {
