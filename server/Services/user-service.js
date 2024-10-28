@@ -208,10 +208,12 @@ class UserService {
                 where: {
                     login: login
                 },
-                include: [{
-                    model: database.models.UsersRoles,
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database.models.UsersRoles,
+                        required: true
+                    }
+                ],
             })
             /* console.log(user) */
 
@@ -267,6 +269,19 @@ class UserService {
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin } 
+                case 4:
+                    let superAdmin = await database.models.Admins.findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    
+                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.users_role, superAdmin)
+                    /* console.log({...userDtoAdmin}) */
+                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensSuperAdmin, user: userDtoSuperAdmin } 
                 default: 
                     return ApiError.AuthError(`Ошибка авторизации`)
             }
@@ -341,7 +356,20 @@ class UserService {
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
-                    return { ...tokensAdmin, user: userDtoAdmin } 
+                    return { ...tokensAdmin, user: userDtoAdmin }
+                case 4:
+                    let superAdmin = await database.models.Admins.findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    
+                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.users_role, superAdmin)
+                    /* console.log({...userDtoAdmin}) */
+                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensSuperAdmin, user: userDtoSuperAdmin }  
                 default: 
                 
                     return [] 

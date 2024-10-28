@@ -26,8 +26,8 @@ export default class AuthService {
         return $api.get('/api/check-phone', {params: {phone}});
     }
 
-    static async confirmRegistration (secondName, name, patronomicName, birthDate, email, phone, password) {
-        return $api.post('/api/confirm-registration', {secondName, name, patronomicName, birthDate, email, phone, password});
+    static async confirmRegistration (secondName, name, patronomicName, birthDate, email, phone, password, snils) {
+        return $api.post('/api/confirm-registration', {secondName, name, patronomicName, birthDate, email, phone, password, snils});
     }
 
     static async confirmEmail (phone, code ) {

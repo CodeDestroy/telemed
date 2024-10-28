@@ -19,8 +19,9 @@ const DoctorEdit = () => {
     const { store } = useContext(Context);
     const [doctor, setDoctor] = useState(null);
     const handleSave = () => {
+        console.log(doctor)
       // Здесь должна быть логика сохранения изменений
-      navigate('/doctors');
+        /* navigate('/doctors'); */
     };
 
     useEffect(() => {
@@ -51,6 +52,9 @@ const DoctorEdit = () => {
     }
     const setPatronomicName = (event) => {
         setDoctor({...doctor, 'patronomicName': event.target.value });
+    }
+    const handleSnilsChange = (event) => {
+        setDoctor({...doctor, snils: event.target.value });
     }
     const handleConfirmed = (event) => {
         setDoctor({...doctor, user: { 
@@ -94,6 +98,7 @@ return (
                             />
                         </LocalizationProvider> */}
                         <TextField label="Телефон" variant="outlined" fullWidth value={doctor.user.phone} onChange={setPhone}/>
+                        <TextField label="СНИЛС" variant="outlined" fullWidth value={doctor.snils} onChange={handleSnilsChange}/>
                         <TextField label="Email" variant="outlined" fullWidth value={doctor.user.email} onChange={setEmail}/>
                         <FormGroup>
                             <FormControlLabel control={

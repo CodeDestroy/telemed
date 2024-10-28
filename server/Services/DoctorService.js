@@ -29,11 +29,11 @@ class DoctorService {
         }
     }
 
-    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info) {
+    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null) {
         try {
             const doctor = await database.models.Doctors.create({
                 
-                userId, secondName, firstName, patronomicName, birthDate, info
+                userId, secondName, firstName, patronomicName, birthDate, info, snils
             })
             return doctor
       
@@ -65,6 +65,42 @@ class DoctorService {
                     secondName: secondName,
                     firstName: name,
                     patronomicName: patronomicName
+                },
+                include: [{
+                    model: database.models.Users,
+                    required: true
+                }]
+            })
+            return doctor
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    /* async getDoctorByInn (inn) {
+        try {
+            const doctor = await database.models.Doctors.findOne({
+                where: {
+                    inn: inn,
+                },
+                include: [{
+                    model: database.models.Users,
+                    required: true
+                }]
+            })
+            return doctor
+        }
+        catch (e) {
+            console.log(e)
+        }
+    } */
+
+    async getDoctorBySnils (snils) {
+        try {
+            const doctor = await database.models.Doctors.findOne({
+                where: {
+                    snils: snils,
                 },
                 include: [{
                     model: database.models.Users,

@@ -19,6 +19,10 @@ function AdminButtons() {
         window.location.href = adminLocations.slotsManagement;
     }
 
+    const handleCalendarManagement = () => {
+        window.location.href = adminLocations.calendar
+    }
+
     return (
         <>
             <Button
@@ -44,6 +48,12 @@ function AdminButtons() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Управление слотами
+            </Button>
+            <Button
+                onClick={handleCalendarManagement}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+                Управление слотами (Календарь)
             </Button>
         </>
     );

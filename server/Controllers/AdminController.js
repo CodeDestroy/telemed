@@ -14,9 +14,21 @@ const MailManager = require("../Utils/MailManager");
 class AdminController {
     async getAllConsultations(req, res) {
         try {
-
-
-            const allSlots = await ConsultationService.getAllSlots()
+            console.log(req.user)
+            let allSlots = []
+            if (req.user.accessLevel === 4) {
+                allSlots = await ConsultationService.getAllSlots()
+            }
+            else if (req.user.accessLevel === 3) {
+                allSlots = await ConsultationService.getAllSlotsInMO(req.user.id)
+            }
+            else if (req.user.accessLevel === 2) {
+                allSlots = await ConsultationService.getAllDoctorSlotsRaw(req.user.personId)
+            }
+            else if (req.user.accessLevel === 1) {
+                //Все слоты пациента
+            }
+            
             res.status(200).json(allSlots)
         }
         catch (e) {
@@ -57,22 +69,26 @@ class AdminController {
             const transporter = await MailManager.getTransporter()
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
-            const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.user.email, patientLink)
-            transporter.sendMail(mailOptionsPatinet, (error, info) => {
-                if (error) {
-                    return console.log(error);
-                }
-                console.log('Сообщение отправленно: %s', info.messageId);
-                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            });
-            const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.user.email, doctorLink)
-            transporter.sendMail(mailOptionsDoctor, (error, info) => {
-                if (error) {
-                    return console.log(error);
-                }
-                console.log('Сообщение отправленно: %s', info.messageId);
-                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            });
+            if (patient.user.email) {
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.user.email, patientLink)
+                transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            }
+            if (doctor.user.email) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.user.email, doctorLink)
+                transporter.sendMail(mailOptionsDoctor, (error, info) => {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            }
             res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom})
         }
         catch (e) {
@@ -132,13 +148,15 @@ class AdminController {
                 email,
                 password,
                 birthDate,
-                info
+                info,
+                inn,
+                snils
             } = req.body;
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             /* return res.json(avatar) */
-            const newUser = await userService.createUser(2, phone, password, SERVER_DOMAIN + 'uploads/' + avatar.filename, email, phone)
-            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info)
+            const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
 
             res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
         }
@@ -161,8 +179,9 @@ class AdminController {
             } = req.body;
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
+            
             /* return res.json(avatar) */
-            const newUser = await userService.createUser(3, phone, password, SERVER_DOMAIN + 'uploads/' + avatar.filename, email, phone)
+            const newUser = await userService.createUser(3, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
             const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info)
 
             res.status(201).json({ message: 'Пациент создан успешно', userId: newUser.id, patientId: newPatient.id });

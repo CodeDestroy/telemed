@@ -127,6 +127,7 @@ function Jitsi(props) {
             /* console.log(nativeEvent); */
             
             const result = await ConferenceService.joinConference({...nativeEvent}); 
+            console.log(result)
 /*             console.log(result.data); */
             /* socket.emit('timer:start', {...nativeEvent, time}) */
             if (result.data.timer == 'start') {
@@ -155,7 +156,7 @@ function Jitsi(props) {
     //Срабатывает у всех
     const onParticipantLeft = async (nativeEvent) => {
         try {
-            /* console.log(nativeEvent, localId) */
+            console.log(nativeEvent, localId)
             /* const currTime = Date.now(); */
             /* const result = await ConferenceService.leaveConference({...nativeEvent, roomName});
 
@@ -175,6 +176,7 @@ function Jitsi(props) {
         try {
             /* const currTime = Date.now(); */
             const result = await ConferenceService.participantJoined({...nativeEvent, roomName});
+            console.log(result)
             if (result.data.timer == 'start') {
                 /* console.log(result.data) */
                 props.onJoin(result.data?.time);

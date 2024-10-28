@@ -2,6 +2,7 @@ const database = require('../Database/setDatabase');
 const { Op } = require('sequelize')
 const DateTimeManager = require('../Utils/DateTimeManager')
 const moment = require('moment-timezone');
+const { raw } = require('body-parser');
 
 const JITSI_APP_ID = process.env.JITSI_APP_ID;
 const JITSI_SERVER_URL = process.env.JITSI_SERVER_URL;
@@ -40,7 +41,95 @@ class ConsultationService {
                     url2."roomId" = r.id 
                     and url."roomId" = r.id `, 
             {
-                raw: true
+                raw: false
+            })
+            return slots;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    async getAllSlotsInMO (userId) {
+        try {
+            const user = await database.models.Users.findByPk(userId, {
+                include: [{
+                    model: database.models.Admins,
+                    required: true,
+                }]
+            })
+            console.log(user)
+            if (user.admin.medOrgId) {
+                const slots = await database.sequelize.query(`
+                    select s.id as "id" , 
+                        p."firstName" as "pFirstName", 
+                        p."secondName" as "pSecondName", 
+                        p."patronomicName" as "pPatronomicName", 
+                        d."firstName" as "dFirstName", 
+                        d."secondName" as "dSecondName", 
+                        d."patronomicName" as "dPatronomicName", 
+                        url."shortUrl" as "dUrl", 
+                        url2."shortUrl" as "pUrl", *
+                    from slots s 
+                    left join rooms r  on s.id = r."slotId" 
+                    left join patients p on p.id  = s."patientId" 
+                    join doctors d on d.id = s."doctorId" 
+                    join urls url on url."userId" = d."userId" 
+                    join urls url2 on url2."userId" = p."userId" 
+                    where 
+                        d."medOrgId" = ${user.admin.medOrgId} and
+                        url2."roomId" = r.id 
+                        and url."roomId" = r.id `, 
+                {
+                    raw: false
+                })
+                return slots;
+            }
+            else {
+                throw new Error('Не найдена Мед Организация, обратитесь в поддержку.')
+            }
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }   
+    }
+
+    async getAllDoctorSlotsRaw(doctorId) {
+        try {
+            /* const slots = await database.models.Slots.findAll({
+                include: [{
+                    model: database.models.Rooms,
+                    required: false
+                },
+                {
+                    model: database.models.Patients,
+                    required: false
+                }]
+            }); */
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", *
+                from slots s 
+                left join rooms r  on s.id = r."slotId" 
+                left join patients p on p.id  = s."patientId" 
+                join doctors d on d.id = s."doctorId" 
+                join urls url on url."userId" = d."userId" 
+                join urls url2 on url2."userId" = p."userId" 
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and d.id = ${doctorId}`, 
+                    
+            {
+                raw: false
             })
             return slots;
         }
@@ -63,14 +152,18 @@ class ConsultationService {
                     }
 
                 },
-                include: [{
-                    model: database.models.Rooms,
-                    required: false
-                },
-                {
-                    model: database.models.Patients,
-                    required: false
-                }]
+                include: [
+                    {
+                        model: database.models.Rooms,
+                        required: false
+                    },
+                    {
+                        model: database.models.Patients,
+                        required: false
+                    }
+                ]
+            },{
+                raw: true
             })
             return slots
         }
@@ -101,6 +194,8 @@ class ConsultationService {
             console.log(e)
         }
     }
+
+
 
     async getEndedDoctorSlots (doctorId) {
         try {

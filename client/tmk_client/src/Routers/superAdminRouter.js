@@ -14,7 +14,7 @@ import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
 import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 import Schedule from '../Components/AdminPanel/Schedule';
 
-const adminRouter = createBrowserRouter([
+const superAdminRouter = createBrowserRouter([
     {
         path: "*",
         element: <PageNotFound/>,
@@ -68,4 +68,4 @@ const adminRouter = createBrowserRouter([
     } */
 ]);
 
-export default adminRouter
+export default superAdminRouter

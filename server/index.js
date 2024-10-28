@@ -26,13 +26,15 @@ const conferenceRouter = require('./Routers/ConferenceRouter')
 const shortUrlRouter = require('./Routers/ShortUrlRouter')
 const integrationRouter = require('./Routers/IntegrationRouter')
 const doctorRouter = require('./Routers/DoctorRouter')
+const outerServicesRouter = require('./Routers/OuterServicesRouter')
 const { start } = require('./start');
 const adminRouter = require('./Routers/AdminRouter')
 const AuthMiddleware = require('./middleware/AuthMiddleware')
 app.use(cookieParser());
 app.use(cors({
   credentials: true,
-  origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:3000/', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru'],
+  origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:3000/', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru', 
+          'http://localhost:8180/', 'http://localhost:8180'],
 }));
 
 app.use(bodyParser.urlencoded({ 
@@ -47,6 +49,7 @@ app.use('/api/conference', conferenceRouter)
 app.use('/api/integration', integrationRouter)
 app.use('/api/doctor', AuthMiddleware, doctorRouter)
 app.use('/api/admin', AuthMiddleware, adminRouter)
+app.use('/api/service', outerServicesRouter)
 ioConnections = [];
 
 start();

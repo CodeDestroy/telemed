@@ -10,6 +10,8 @@ import AdminServicesList from '../Components/AdminPanel/ServicesList/ActiveList'
 import EndedList from '../Components/AdminPanel/ServicesList/EndedList'
 import doctorLocations from '../Locations/DoctorLocations'
 import VideoComponent from "../Components/VideoComponent";
+import CreateSchedule from "../Components/AdminPanel/CreateScheduler";
+import Schedule from "../Components/AdminPanel/Schedule";
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -26,14 +28,18 @@ const doctorRouter = createBrowserRouter([
     {
       path: doctorLocations.endedConsultations,
       element: <EndedList/>
+    },
+    {
+      path: doctorLocations.createSchedule,
+      element: <CreateSchedule/>
+    },
+    {
+      path: doctorLocations.schedule,
+      element: <Schedule/>
+
     }
-    /* {
-        path: '/test',
-        element: <Calendar/>
-    } */
-    /* {
-      element: <PriateRouter/>
-    } */
+
+
 ]);
 
 export default doctorRouter

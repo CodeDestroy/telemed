@@ -3,7 +3,10 @@ const doctorLocations = {
     consultations: '/consultations/active',
     profile: '/profile',
     tmk: '/room/:roomId',
-    endedConsultations: '/consultations/ended'
+    endedConsultations: '/consultations/ended',
+    createSchedule: '/profile/schedule',
+    schedule: '/profile/calendar',
+    
 };
 
 export default doctorLocations;

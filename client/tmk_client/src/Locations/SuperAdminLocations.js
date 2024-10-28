@@ -1,4 +1,4 @@
-const adminLocations = {
+const superAdminLocations = {
     index: '/',
     createConsultation: '/slots/create',
     profile: '/profile',
@@ -13,4 +13,4 @@ const adminLocations = {
     calendar: '/calendar'
 };
   
-export default adminLocations;
+export default superAdminLocations;

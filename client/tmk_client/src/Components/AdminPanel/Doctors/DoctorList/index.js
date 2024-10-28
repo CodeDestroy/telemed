@@ -87,7 +87,7 @@ const DoctorList = () => {
             <SubMenu menuItems={menuItems} />
             <Container>
                 <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
-                    <h2>Список пациентов</h2>
+                    <h2>Список врачей</h2>
                     <Button variant="contained" color="primary" component={Link} to="/doctors/create">
                         Создать
                     </Button>

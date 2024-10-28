@@ -73,7 +73,7 @@ class AuthController {
 
     async confirmRegistration (req, res) {
         try {
-            const {secondName, name, patronomicName, birthDate, email, phone, password} = req.body
+            const {secondName, name, patronomicName, birthDate, email, phone, password, snils} = req.body
            
             const parsedDate = await DateTimeManager.parseDateFromRussian(birthDate)
             const newUser = await userService.createUser(2, phone, password, null ,email, phone)
@@ -91,7 +91,7 @@ class AuthController {
                 console.log('Сообщение отправленно: %s', info.messageId);
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             });
-            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patronomicName, parsedDate)
+            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patronomicName, parsedDate, null, snils)
             
             res.status(200).send([newUser, newDoctor])
         }

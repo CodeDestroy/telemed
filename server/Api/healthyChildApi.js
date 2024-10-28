@@ -24,18 +24,47 @@ class healthyChildApi {
         return request.data
     }
 
+    async getOnlineEmployeeInfo (empid) {
+        const request = await $api.get('/api/get-online-employee-info', {params: {empid}})
+        return request.data
+    }
+
     async getOnlineRequestInfo (rqstid) {
         const request = await $api.get('/api/get-online-request-info', {params: {rqstid}})
         return request.data
     }
 
-    async setOnlineRequestPaid (data) {
-        return null;
+    async setOnlineRequestPaid (rqstid, sum) {
+        /* 
+        const data = {
+            "rqstid": ID заявки,
+            "sum": сумма оплаты в рублях
+        }
+        */
+        const response = await $api.post('/api/set-online-request-paid', {rqstid, sum})
+        return response.data;
     }
 
-    async setOnlineRequestDone (data) {
-        return null;
+    async setOnlineRequestDone (rqstid) {
+        /* 
+        const data = {
+            "rqstid": ID заявки
+        }
+        */
+        const response = await $api.post('/api/set-online-request-done', {rqstid})
+        return response.data;
     }
+
+    async cancelOnlineRequest (rqstid) {
+        /* 
+        const data = {
+            "rqstid": ID заявки
+        }
+        */
+        const response = await $api.post('/api/cancel-online-request', {rqstid})
+        return response.data;
+    }
+    
 }
 
 module.exports = new healthyChildApi();

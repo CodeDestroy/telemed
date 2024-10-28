@@ -11,6 +11,14 @@ function DoctorItems() {
         window.location.href = doctorLocations.endedConsultations;
     };
 
+    const handleCreateSchedule = () => {
+        window.location.href = doctorLocations.createSchedule
+    }
+
+    const handleSchedule = () => {
+        window.location.href = doctorLocations.schedule
+    }
+
     return (
         <>
             <MenuItem onClick={handleConsultations}>
@@ -18,6 +26,12 @@ function DoctorItems() {
             </MenuItem>
             <MenuItem onClick={handleEndedConsultations}>
                 <Typography textAlign="center">Проведенные консультации</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleCreateSchedule}>
+                <Typography textAlign="center">Моё расписание</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleSchedule}>
+                <Typography textAlign="center">Календарь</Typography>
             </MenuItem>
         </>
     );

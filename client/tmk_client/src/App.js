@@ -1,21 +1,16 @@
-import { useLayoutEffect, useContext, useEffect } from "react";
-import Header from "./Components/Header";
-import Login from "./Components/Login";
-import MainPage from "./Components/MainPage";
+import {  useContext, useEffect } from "react";
+
 import Loading from './Components/Loading'
 import { observer } from 'mobx-react-lite';
-import { Route, Routes , BrowserRouter } from 'react-router-dom';
 import { Context } from './';
-/* import './Assets/css/Main.css' */
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import socket from "./socket";
+
+import { RouterProvider } from "react-router-dom";
 import mainRouter from './Routers/mainRouter'
 import adminRouter from "./Routers/adminRouter";
 import doctorRouter from "./Routers/doctorRouter";
 import authRouter from './Routers/authRouter'
+import superAdminRouter from "./Routers/superAdminRouter";
+
 function App() {
   
   const { store } = useContext(Context);
@@ -54,7 +49,7 @@ function App() {
     }
     else if (store.isAuth || localStorage.getItem('token')) {
       html.style.removeProperty('font-size')
-      /* console.log(store.user.accessLevel) */
+      /* console.log('try to login') */
       switch (store.user.accessLevel) {
         case 1: 
           return (<RouterProvider router={mainRouter} />)
@@ -62,6 +57,10 @@ function App() {
           return (<RouterProvider router={doctorRouter} />)
         case 3: 
           return (<RouterProvider router={adminRouter} />)
+        case  4: 
+          return (<RouterProvider router={superAdminRouter} />)
+        default: 
+        return (<RouterProvider router={authRouter} />)
       }
     }
     else {
@@ -76,38 +75,4 @@ function App() {
   
 }
 
-/* export default observer(App);
-import { useLayoutEffect, useContext, useState } from "react";
-import Header from "./Components/Header";
-import Login from "./Components/Login";
-import MainPage from "./Components/MainPage";
-import { observer } from 'mobx-react-lite';
-import { Route, Routes , BrowserRouter } from 'react-router-dom';
-import { Context } from './';
-import { Navigate, Outlet } from 'react-router-dom';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import mainRouter from './Routers/mainRouter'
-function App() {
-  const {store} = useContext(Context)
-  const [auth, setAuth] = useState(false)
-  useLayoutEffect (() => {
-      if (localStorage.getItem('token')) {
-        store.checkAuth()
-        .then( () => {
-          setAuth(true)
-        })
-        .catch((e) => {
-          setAuth(false)
-        })
-      }
-      
-  }, [store])
-  return (
-      auth && !window.location.href == 'login' ? <RouterProvider router={mainRouter} /> : window.location.href = 'login'
-  )  
-}
-*/
 export default observer(App); 

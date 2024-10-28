@@ -18,6 +18,7 @@ const RegistratinStep2 = () => {
     const [name, setName] = useState('')
     const [patronomicName, setPatronomicName] = useState('')
     const [birthDate, setBirthDate] = useState('')
+    const [snils, setSnils] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -53,6 +54,15 @@ const RegistratinStep2 = () => {
         setBirthDate('')
     }
 
+    const handleChangeSnils = (event) => {
+        
+        setSnils(event.target.value)
+    }
+
+    const clearSnils = () => {
+        setSnils('')
+    }
+
     const handleChangeEmail = (event) => {
         setEmail(event.target.value)
     }
@@ -74,7 +84,10 @@ const RegistratinStep2 = () => {
         event.preventDefault()
         const checkBox = document.getElementById('agreement')
         if (checkBox.checked && secondName != '' && name != '' && birthDate.length == 10 && email != '') {
-            const response = await AuthService.confirmRegistration(secondName, name, patronomicName, birthDate, email, phone, password)
+            let newSnils = snils
+            newSnils = newSnils.replaceAll('-', '')
+            newSnils = newSnils.replaceAll(' ', '')
+            const response = await AuthService.confirmRegistration(secondName, name, patronomicName, birthDate, email, phone, password, newSnils)
             console.log(response)
             if (response.status == 200) {
                 window.location.href = authLocations.registrationStep3 + `?phone=${(phone).trim()}`
@@ -144,6 +157,27 @@ return (
                             />
                             <label htmlFor="birthday" className={styles.formLabel}>Дата рождения</label>
                             <span className={styles.formClear} onClick={clearBirthDate}>
+                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 10.0914L10 1.09137M1 1L10 9.99999" stroke="#7E7E7E" strokeWidth="0.909137" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                        <div className={styles.formGroup}>
+                            {/* <input /> */}
+                            <InputMask 
+                                mask="___-___-___ __" replacement="_"
+                                showMask 
+                                separate 
+                                id="snils" 
+                                name="snils" 
+                                className={`${styles.formInput} date-mask`} 
+                                type="text" placeholder="Введите" 
+                                value={snils} 
+                                onChange={handleChangeSnils}
+                                required="required"
+                            />
+                            <label htmlFor="snils" className={styles.formLabel}>СНИЛС</label>
+                            <span className={styles.formClear} onClick={clearSnils}>
                                 <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M1 10.0914L10 1.09137M1 1L10 9.99999" stroke="#7E7E7E" strokeWidth="0.909137" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>

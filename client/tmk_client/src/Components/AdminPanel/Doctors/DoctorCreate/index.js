@@ -24,6 +24,8 @@ const DoctorCreate = () => {
     const [secondName, setSecondName] = useState('')
     const [name, setName] = useState('')
     const [patrinomicName, setPatronomicName] = useState('')
+    const [inn, setInn] = useState('')
+    const [snils, setSnils] = useState('')
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [info, setInfo] = useState('')
@@ -47,6 +49,8 @@ const DoctorCreate = () => {
         formData.append('patrinomicName', patrinomicName);
         formData.append('phone', phone);
         formData.append('email', email);
+        formData.append('inn', inn)
+        formData.append('snils', snils)
         formData.append('password', password);
         formData.append('birthDate', birthDate ? birthDate.toISOString() : '');
         formData.append('info', info);
@@ -66,6 +70,7 @@ const DoctorCreate = () => {
             setPhone('')
             setEmail('')
             setPassword('')
+            setInn('')
             setBirthDate(null)
             setInfo('')
             setAvatar(null)
@@ -116,6 +121,14 @@ const DoctorCreate = () => {
         setInfo(event.target.value);
     }
 
+    const handleInnChange  = (event) => {
+        setInn(event.target.value)
+    }
+
+    const handleSnilsChange  = (event) => {
+        setSnils(event.target.value)
+    } 
+
     const [saveOpen, setSaveOpen] = React.useState(false);
 
     const handleClick = () => {
@@ -162,7 +175,9 @@ const DoctorCreate = () => {
                     <TextField label="Отчество" variant="outlined" fullWidth value={patrinomicName} onChange={handlePatronomicNameChange}/>
                     <TextField label="Номер телефона" variant="outlined" fullWidth value={phone} onChange={handlePhoneChange}/>
                     <TextField label="Email" variant="outlined" fullWidth value={email} onChange={handleEmailChange}/>
-                    <LocalizationProvider  dateAdapter={AdapterDayjs} adapterLocale="ru">
+                    <TextField label="Инн" variant="outlined" fullWidth value={inn} onChange={handleInnChange}/>
+                    <TextField label="СНИЛС" variant="outlined" fullWidth value={snils} onChange={handleSnilsChange}/>
+                    <LocalizationProvider  dateAdapter={AdapterDayjs} adapterLocale="ru"> 
                         <DatePicker
                             label="Дата рождения"
                             value={birthDate}

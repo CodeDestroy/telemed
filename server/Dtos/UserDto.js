@@ -17,6 +17,7 @@ class UserDto {
             patronomicName: person.patronomicName,
             info: person.info,
             birthDate: person.birthDate,
+            personId: person.id,
         }
         return (result)
     }

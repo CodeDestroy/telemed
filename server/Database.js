@@ -512,6 +512,51 @@ module.exports = class Database {
     timestamps: false
   })
 
+  this.models.WeekDays = this.sequelize.define('week_days', {
+    id: {
+      type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: false
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  }, {
+    timestamps: false
+  })
+
+  this.models.Schedule = this.sequelize.define('schedule', {
+    doctorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    scheduleDayId: { //0 - вс, 1 - пн, ..., 6 - сб
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    scheduleStartTime: {
+      type: DataTypes.TIME,
+      allowNull: false
+    },
+    scheduleEndTime: {
+      type: DataTypes.TIME,
+      allowNull: false
+    },
+    scheduleStatus: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
+    scheduleServiceTypeId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    }
+
+  })
+  
+
   }
 
   defineAssociations() {
@@ -519,13 +564,22 @@ module.exports = class Database {
     /* Classes.hasOne(Students, { foreignKey: 'classId'})
     Students.belongsTo(Classes, { foreignKey: 'classId' }); */
     const { Users, UsersRoles, Doctors, Admins, Patients, Tokens, Rooms, Messages, Files, Url, Settings, LogTypes, Logs, Services, Slots, Payments, PayTypes, 
-          SlotStatus, ConfirmCodes, MedicalOrgs, Posts, API } = this.models;
+          SlotStatus, ConfirmCodes, MedicalOrgs, Posts, API, Schedule, WeekDays } = this.models;
 
     UsersRoles.hasMany(Users, {foreignKey: 'userRoleId'});
     Users.belongsTo(UsersRoles, {foreignKey: 'userRoleId'})
 
     Users.hasMany(Tokens, {foreignKey: 'userId'})
     Tokens.belongsTo(Users, {foreignKey: 'userId'})
+
+    Doctors.hasMany(Schedule, {foreignKey: 'doctorId'})
+    Schedule.belongsTo(Doctors, {foreignKey: 'doctorId'})
+
+    WeekDays.hasMany(Schedule, {foreignKey: 'scheduleDayId'})
+    Schedule.belongsTo(WeekDays, {foreignKey: 'scheduleDayId'})
+
+    Services.hasMany(Schedule, {foreignKey: 'scheduleServiceTypeId'})
+    Schedule.belongsTo(Services, {foreignKey: 'scheduleServiceTypeId'})
 
     Users.hasMany(ConfirmCodes, {foreignKey: 'userId'})
     ConfirmCodes.belongsTo(Users, {foreignKey: 'userId'})
@@ -623,9 +677,14 @@ module.exports = class Database {
       const roomsLogType = await this.models.LogTypes.create({logTypeName: 'Лог комнат'})
 
 
+      const superAdminRole = await this.models.UsersRoles.create({roleName: 'СуперАдминистратор', accessLevel: '4'})
       const adminRole = await this.models.UsersRoles.create({roleName: 'Администратор', accessLevel: '3'})
       const doctorRole = await this.models.UsersRoles.create({roleName: 'Врач', accessLevel: '2'})
       const patientRole = await this.models.UsersRoles.create({roleName: 'Пациент', accessLevel: '1'})
+
+      
+      const healthyChildOrg = await this.models.MedicalOrgs.create({medOrgName: 'Здоровый ребёнок'})
+
 
       const password = 'test'
       const adminPassword = 'admin'
@@ -633,9 +692,36 @@ module.exports = class Database {
       const admin_pass_to_hash = adminPassword.valueOf();
       const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
       const adminHashPassword = bcrypt.hashSync(admin_pass_to_hash, 8)
+
+
+
       const testUserDoctor = await this.models.Users.create({login: 'test', password: hashPassword, userRoleId: doctorRole.id, phone: '89518531984', email: 'andrey.novichihin1@gmail.com'})
-      const testDoctor = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Тестов', firstName: 'Тест', patronomicName: 'Тестович', birthDate: new Date(), info: 'Тестовый доктор'})
+      const testDoctor = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Тестов', firstName: 'Тест', patronomicName: 'Тестович', birthDate: new Date(), info: 'Тестовый доктор', medOrgId: healthyChildOrg.id})
+
+      /* scheduleStartTime: {
+        type: DataTypes.TIME,
+        allowNull: false
+      },
+      scheduleEndTime */
+      const monday = await this.models.WeekDays.create({name: 'Понедельник', id: 1})
+      const tuesday = await this.models.WeekDays.create({name: 'Вторник', id: 2})
+      const wednesday = await this.models.WeekDays.create({name: 'Среда', id: 3})
+      const thursday = await this.models.WeekDays.create({name: 'Четверг', id: 4})
+      const friday = await this.models.WeekDays.create({name: 'Пятница', id: 5})
+      const saturday = await this.models.WeekDays.create({name: 'Суббота', id: 6})
+      const sunday = await this.models.WeekDays.create({name: 'Воскресенье', id: 0})
+
+
+      const testMon1Schedule = await this.models.Schedule.create({scheduleDayId: monday.id, doctorId: testDoctor.id, scheduleStartTime: '10:00', scheduleEndTime: '13:00', scheduleServiceTypeId: 1})
+      const testMon2Schedule = await this.models.Schedule.create({scheduleDayId: monday.id, doctorId: testDoctor.id, scheduleStartTime: '14:00', scheduleEndTime: '16:00', scheduleServiceTypeId: 1})
+      const testTue1Schedule = await this.models.Schedule.create({scheduleDayId: tuesday.id, doctorId: testDoctor.id, scheduleStartTime: '9:00', scheduleEndTime: '13:00', scheduleServiceTypeId: 1})
+      const testTue2Schedule = await this.models.Schedule.create({scheduleDayId: tuesday.id, doctorId: testDoctor.id, scheduleStartTime: '14:00', scheduleEndTime: '18:00', scheduleServiceTypeId: 1})
       
+      const testUserDoctor2 = await this.models.Users.create({login: '88001111112', password: hashPassword, userRoleId: doctorRole.id, phone: '88001111112', email: null})
+      const testDoctor2 = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Гуров', firstName: 'Александр', patronomicName: 'Анатольевич', birthDate: new Date(), 
+                                                            info: 'Тестовый доктор', snils: '07680070095', medOrgId: healthyChildOrg.id})
+      
+
       const testUserPatient = await this.models.Users.create({login: 'test1', password: hashPassword, userRoleId: patientRole.id, phone: '89507730984', email: 'andrei_novichihin@mail.ru'})
       const testPatient = await this.models.Patients.create({userId: testUserPatient.id, secondName: 'Пациентов', firstName: 'Пациент', patronomicName: 'Пациентович', birthDate: new Date(), info: 'Тестовый пациент'})
       
@@ -643,13 +729,21 @@ module.exports = class Database {
       const testPatient2 = await this.models.Patients.create({userId: testUserPatient2.id, secondName: 'Иванов', firstName: 'Иван', patronomicName: 'Иванович', birthDate: new Date(), info: 'Тестовый пациент 2'})
 
       const testUserAdmin = await this.models.Users.create({login: 'admin', password: adminHashPassword, userRoleId: adminRole.id, phone: '0'})
-      const testAdmin = await this.models.Admins.create({userId: testUserAdmin.id, secondName: 'Админов', firstName: 'Админ', patronomicName: 'Админович', birthDate: new Date(), info: 'Тестовый админ'})
+      const testAdmin = await this.models.Admins.create({userId: testUserAdmin.id, secondName: 'Админов', firstName: 'Админ', patronomicName: 'Админович', birthDate: new Date(), info: 'Тестовый админ', medOrgId: healthyChildOrg.id})
+      
+      const testSuperUserAdmin = await this.models.Users.create({login: 'superAdmin', password: adminHashPassword, userRoleId: superAdminRole.id, phone: '01'})
+      const testSuperAdmin = await this.models.Admins.create({userId: testSuperUserAdmin.id, secondName: 'Админов', firstName: 'Админ', patronomicName: 'Админович', birthDate: new Date(), info: 'Тестовый админ'})
       
       
       const room = await this.models.Rooms.create({roomName: 'sometestroomname', meetingStart: new Date()})
       
-      const testSlot = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(1, 'm').toDate(), slotEndDateTime: moment(new Date()).add(11, 'd').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient.id})
-      const testSlot2 = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(11, 'm').toDate(), slotEndDateTime: moment(new Date()).add(21, 'm').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient2.id})
+      const testSlot = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(1, 'm').toDate(), slotEndDateTime: moment(new Date()).add(31, 'm').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient.id})
+      const testSlot2 = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: moment(new Date()).add(11, 'm').toDate(), slotEndDateTime: moment(new Date()).add(41, 'm').toDate(), serviceId: service.id, isBusy: true, patientId: testPatient2.id})
+      
+      const testSlot3 = await this.models.Slots.create({doctorId: testDoctor.id, slotStartDateTime: '2024-10-28T11:30:00.000Z', slotEndDateTime: '2024-10-28T12:00:00.000Z', serviceId: service.id, isBusy: true, patientId: testPatient.id})
+
+      const roomName3 = await UserManager.translit(`${testDoctor.secondName}_${testPatient2.secondName}_${testSlot3.slotStartDateTime.getTime()}`)
+      const roomForSlot3 = await this.models.Rooms.create({roomName: roomName3, meetingStart: testSlot3.slotStartDateTime, slotId: testSlot3.id})
 
       const roomName = await UserManager.translit(`${testDoctor.secondName}_${testPatient.secondName}_${testSlot.slotStartDateTime.getTime()}`)
       
@@ -716,6 +810,11 @@ module.exports = class Database {
       const newUrlEntity3 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot.roomName}?token=${tokenPatient1}`, shortUrl: shortUrl3, roomId: roomForSlot.id, userId: testUserPatient.id })
       const shortUrl4 = nanoid();
       const newUrlEntity4 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot2.roomName}`, shortUrl: shortUrl4, roomId: roomForSlot2.id, userId: testUserPatient2.id})
+      
+      const shortUrl5 = nanoid();
+      const newUrlEntity5 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot3.roomName}?token=${tokenPatient1}`, shortUrl: shortUrl5, roomId: roomForSlot3.id, userId: testUserPatient.id })
+      const shortUrl6 = nanoid();
+      const newUrlEntity6 = await this.models.Url.create({originalUrl: `${process.env.CLIENT_URL}/room/${roomForSlot3.roomName}`, shortUrl: shortUrl6, roomId: roomForSlot3.id, userId: testUserDoctor.id})
     }
     
     console.log('All models were synchronized successfully.');
