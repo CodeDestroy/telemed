@@ -20,7 +20,9 @@ import doctorLocations from '../../../Locations/DoctorLocations';
 import adminLocations from '../../../Locations/AdminLocations';
 import DoctorButtons from './MainButtons/DoctorButtons'
 import AdminButtons from './MainButtons/AdminButtons'
+import SuperAdminButtons from './MainButtons/SuperAdminButtons'
 import AdminItems from './MainItems/AdminItems';
+import SuperAdminItems from './MainItems/SuperAdminItems'
 import DoctorItems from './MainItems/DoctorItems';
 
 const pages = ['Products', 'Pricing', 'Blog'];
@@ -105,7 +107,7 @@ function AdminHeader() {
                             display: { xs: 'block', md: 'none' },
                         }}
                     >
-                        {store.user.accessLevel === 2 ? <DoctorItems /> : <AdminItems />}
+                        {store.user.accessLevel === 2 ? <DoctorItems /> : (store.user.accessLevel === 3 ? <AdminItems /> : <SuperAdminItems /> )}
                     </Menu>
                 </Box>
                 
@@ -127,7 +129,7 @@ function AdminHeader() {
                     
                 </Typography>
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                    {store.user.accessLevel === 2 ? <DoctorButtons /> : <AdminButtons />}
+                    {store.user.accessLevel === 2 ? <DoctorButtons /> : (store.user.accessLevel === 3 ? <AdminButtons /> : <SuperAdminButtons /> )}
                 </Box>
 
                 <Box sx={{ flexGrow: 0 }}>

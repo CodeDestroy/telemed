@@ -29,12 +29,12 @@ class HealthyChildController {
 
             const employee = await healthyChildApi.getOnlineEmployeeInfo(empid)
             const employeeSnils = employee.snils.replaceAll('-', '')
-            console.log(employee)
+            /* console.log(employee) */
             
             //Получаем ФИО Врача
             /* const doctorFIOObj = await UserManager.parseFullName(empfio) */
             //const message = await smsProstoAPI.sendMessage('89518531985', 'Привет')
-            console.log(slot)
+            /* console.log(slot) */
             /* console.log(doctorFIOObj) */
             const doctor = await DoctorService.getDoctorBySnils(employeeSnils)
             /* const doctor = doctors[0] */
@@ -43,7 +43,7 @@ class HealthyChildController {
                 throw new Error('Доктор не найден в системе. Обратитесь в поддержку.')
             }
             const clientHealthyChild = await healthyChildApi.getOnlineClientInfo(clid)
-            console.log(clientHealthyChild)
+           /*  console.log(clientHealthyChild) */
             /* const clientHealthyChild = {
                 lname: "Новичихин",
                 fname: "Андрей",
@@ -71,7 +71,7 @@ class HealthyChildController {
                 /* return res.json(avatar) */
                 const info = `Законный представитель ${clientHealthyChild?.lrfio}`
                 const newUser = await UserService.createUser(3, patientPhone, password, null , null , patientPhone)
-                console.log(`newUser: \n  ${patientPhone}\n${password}`)
+                /* console.log(`newUser: \n  ${patientPhone}\n${password}`) */
                 const newPatient = await PatientService.createPatient(newUser.id, clientHealthyChild.lname, clientHealthyChild.fname, clientHealthyChild.sname, formattedDate, info, null)
                 candidate = await UserService.checkPhone(patientPhone)
             }

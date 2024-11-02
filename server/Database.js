@@ -593,6 +593,9 @@ module.exports = class Database {
 
     MedicalOrgs.hasMany(Doctors, {foreignKey: 'medOrgId'})
     Doctors.belongsTo(MedicalOrgs, {foreignKey: 'medOrgId'})
+    
+    MedicalOrgs.hasMany(Admins, {foreignKey: 'medOrgId'})
+    Admins.belongsTo(MedicalOrgs, {foreignKey: 'medOrgId'})
 
     MedicalOrgs.hasMany(API, {foreignKey: 'medOrgId'})
     API.belongsTo(MedicalOrgs, {foreignKey: 'medOrgId'})
@@ -718,7 +721,7 @@ module.exports = class Database {
       const testTue2Schedule = await this.models.Schedule.create({scheduleDayId: tuesday.id, doctorId: testDoctor.id, scheduleStartTime: '14:00', scheduleEndTime: '18:00', scheduleServiceTypeId: 1})
       
       const testUserDoctor2 = await this.models.Users.create({login: '88001111112', password: hashPassword, userRoleId: doctorRole.id, phone: '88001111112', email: null})
-      const testDoctor2 = await this.models.Doctors.create({userId: testUserDoctor.id, secondName: 'Гуров', firstName: 'Александр', patronomicName: 'Анатольевич', birthDate: new Date(), 
+      const testDoctor2 = await this.models.Doctors.create({userId: testUserDoctor2.id, secondName: 'Гуров', firstName: 'Александр', patronomicName: 'Анатольевич', birthDate: new Date(), 
                                                             info: 'Тестовый доктор', snils: '07680070095', medOrgId: healthyChildOrg.id})
       
 

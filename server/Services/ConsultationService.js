@@ -58,7 +58,7 @@ class ConsultationService {
                     required: true,
                 }]
             })
-            console.log(user)
+
             if (user.admin.medOrgId) {
                 const slots = await database.sequelize.query(`
                     select s.id as "id" , 
@@ -268,6 +268,43 @@ class ConsultationService {
             })
             /* const slots = await database.sequelize.query(`SELECT * FROM slots s join rooms r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
             /* console.log(slots) */
+            return slots;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    //Возвращаем все акуальные слоты по врачу
+    async getActiveDoctorSlotsByDate(doctorId, date) {
+        try {
+            const currTime = (new Date(date).toISOString()).substring(0, 10);
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", *
+                from slots s 
+                left join rooms r  on s.id = r."slotId" 
+                left join patients p on p.id  = s."patientId" 
+                join doctors d on d.id = s."doctorId" 
+                join urls url on url."userId" = d."userId" 
+                join urls url2 on url2."userId" = p."userId" 
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and s."doctorId" = :doctorId 
+                    and s."slotStartDateTime"::date = :date
+                    and (r."ended" != true or r."ended" is null) `, 
+            {
+                replacements: { doctorId: doctorId, date: currTime}, 
+                raw: true
+            })
             return slots;
         }
         catch (e) {

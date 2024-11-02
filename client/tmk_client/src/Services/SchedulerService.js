@@ -4,8 +4,8 @@ import {$api, $apiMultipartData} from "../api";
 
 export default class SchedulerService {
 
-    static async getDcotorSchedule (doctorId) {
-        return $api.get(`/api/doctor/scheduler/${doctorId}`);
+    static async getDcotorSchedule (doctorId, dayid) {
+        return $api.get(`/api/doctor/scheduler/${doctorId}`, {params: {dayid}});
     }
 
     /* static async getEndedConsultations (userId) {

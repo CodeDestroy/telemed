@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, MenuItem } from '@mui/material';
 import adminLocations from '../../../../../Locations/AdminLocations';
 
-function AdminItems() {
+function SuperAdminItems() {
     const handleAdminDashboard = () => {
         window.location.href = adminLocations.dashboard;
     };
@@ -34,15 +34,15 @@ function AdminItems() {
             <MenuItem onClick={handlePatientManagement}>
                 <Typography textAlign="center">Управление пациентами</Typography>
             </MenuItem>
-            {/* <MenuItem onClick={handleSlotsManagement}>
+            <MenuItem onClick={handleSlotsManagement}>
                 <Typography textAlign="center">Управление слотами</Typography>
-            </MenuItem> */}
+            </MenuItem>
 
             <MenuItem onClick={handleCalendarManagement}>
-                <Typography textAlign="center">Управление слотами</Typography>
+                <Typography textAlign="center">Управление слотами (Календарь)</Typography>
             </MenuItem>
         </>
     );
 }
 
-export default AdminItems;
+export default SuperAdminItems;

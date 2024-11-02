@@ -79,7 +79,7 @@ class ConferenceController {
         }
         /* console.log('event: ', conferenceEvent) */
         /* console.log('time in conf: ', rooms.getStartedTimeInRoom(conferenceEvent.roomName)) */
-        console.log('room info: ', rooms.getRoomInfo(conferenceEvent.roomName.toLowerCase()))
+        /* console.log('room info: ', rooms.getRoomInfo(conferenceEvent.roomName.toLowerCase())) */
         
         if (userList.length > 1) {
             /* console.log(`UserList length: ${userList.length}`) */

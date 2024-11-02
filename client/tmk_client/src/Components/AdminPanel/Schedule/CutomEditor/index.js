@@ -39,7 +39,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const [inputPatientValue, setInputPatientValue] = useState('');
     const [selectedPatient, setSelectedPatient] = useState(null)
 
-    const [groupedSchedule, setGroupedSchedule] = useState({})
+    const [groupedSchedule, setGroupedSchedule] = useState([])
     const [activeConsultations, setActiveConsultations] = useState([])
     const [selectedDate, setSelectedDate] = useState(scheduler.state.start.value)
     const [selectedTime, setSelectedTime] = useState(null)
@@ -186,18 +186,62 @@ function CustomEditor ({ scheduler, onStateChange }) {
     }
 
     const getDoctorSchedule = async (doctor) => {
-        const response = await SchedulerService.getDcotorSchedule(doctor.id)
-        let grouped = Object.groupBy(response.data, ({ week_day }) => week_day.name)
+        setError('Невозмжно создать консультацию на прошедшую дату')
+        if (dayjs(state.start).isBefore(dayjs(new Date()), 'date')) {
+            return setGroupedSchedule([])
+        }
+        let response = await SchedulerService.getDcotorSchedule(doctor.id, (state.start).getDay())
+        const schedule = (response.data || []).map(slot => ({
+            ...slot,
+            start: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleStartTime}`),
+            end: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleEndTime}`)
+
+        }));
+        let grouped = Object.groupBy(schedule, ({ week_day }) => week_day.name)
         setGroupedSchedule(sortSchedule(grouped))
     }
 
-    const handleChangeTime = async (newValue) => {
-        if (newValue)   
-            setSelectedTime(newValue)
-    } 
+
+    const isTimeUnavailable = (hour, minute = 0) => {
+        return activeConsultations.some((consultation) => {
+            const start = dayjs(consultation.slotStartDateTime);
+            const end = dayjs(consultation.slotEndDateTime).subtract(2, 'minute');
+            
+            const timeToCheck = dayjs(selectedDate).hour(hour).minute(minute);
+            /* console.log(`start ${start} end ${end} timeToCheck ${timeToCheck}`)
+            console.log(timeToCheck.isBetween(start, end, "second", '[)')) */
+            /* return timeToCheck.isBetween(start, end, "minute", '[)'); */
+            /* console.log(`timeToCheck: ${timeToCheck} start: ${start} ${timeToCheck.isSame(start, 'minute')}`) */
+            return timeToCheck.isSame(start, 'minute')
+        });
+    };
+
+    const isTimeInSchedule = (hour, minute = 0) => {
+        return groupedSchedule[Object.keys(groupedSchedule)[0]].some(({ start, end }) => {
+            // Преобразуем время начала и окончания в минуты с начала дня для сравнения
+            const startTimeInMinutes = start.hour() * 60 + start.minute();
+            const endTimeInMinutes = end.hour() * 60 + end.minute();
+            const timeInMinutes = hour * 60 + minute;
+            
+            return timeInMinutes >= startTimeInMinutes && timeInMinutes < endTimeInMinutes;
+        });
+    };
+
+    /* const handleChangeTime = (newValue) => {
+        if (isTimeInSchedule(newValue)) {
+            setSelectedTime(newValue);
+        }
+    }; */
+
+    const handleChangeTime = (newValue) => {
+        if (isTimeInSchedule(dayjs(newValue).hour(), dayjs(newValue).minute()) && !isTimeUnavailable(dayjs(newValue).hour(), dayjs(newValue).minute())) {
+            setSelectedTime(newValue);
+        }
+    };
 
     const getDoctorActiveConsultations = async (doctor) => {
-        const response = await DoctorService.getConsultations(doctor.user.id)
+        console.log(selectedTime)
+        const response = await DoctorService.getConsultations(doctor.user.id, state.start)
         setActiveConsultations(response.data[0])
     }
 
@@ -255,10 +299,10 @@ function CustomEditor ({ scheduler, onStateChange }) {
                 {Object.keys(groupedSchedule).length ?
                     <>
                         <div>
-                            <p style={{marginBottom: '0.7rem'}}>Расписание врача: </p>
+                            <p style={{marginBottom: '0.7rem'}}>Расписание врача на выбранный день: </p>
                             {Object.keys(groupedSchedule).length ?
                                 Object.keys(groupedSchedule).map(function(key, index) {
-                                    return <><p key={`day_${key}_${index}`} style={{marginBottom: '0.5rem', paddingLeft: '0.5rem'}}>{key}</p>
+                                    return <>
                                     <ol style={{listStyle: "none"}}>
                                         {groupedSchedule[key].map((s) => {
                                             return <li key={`schedule_${s.id}`} style={{paddingLeft: '1rem'}}>{getTime(s.scheduleStartTime)} - {getTime(s.scheduleEndTime)}<br></br></li> 
@@ -300,7 +344,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
                                             mb: 1,
                                             width: '100%'
                                         }}
-                                        /* disablePast={selectedDate.setHours(0,0,0,0) == now.setHours(0,0,0,0) } */
                                         skipDisabled={true}
 
                                         minutesStep={30}
@@ -308,6 +351,22 @@ function CustomEditor ({ scheduler, onStateChange }) {
                                         defaultValue={selectedDate}
                                         value={selectedTime}
                                         onChange={handleChangeTime}
+                                        shouldDisableTime={(time, clockType) => {
+                                            /* console.log(time) */
+                                            /* console.log(time, clockType) */
+                                            if (clockType === 'hours') {
+                                                
+                                                // Проверяем, доступен ли данный час
+                                                return !isTimeInSchedule(dayjs(time).hour()) || isTimeUnavailable(dayjs(time).hour(), dayjs(time).minute());// `time` здесь - час
+                                            }
+                                            if (clockType === 'minutes') {
+                                                // Проверяем, доступны ли указанные минуты в пределах уже выбранного часа
+                                                const selectedHour = selectedTime ? selectedTime.getHours() : 0; // Убедитесь, что `selectedTime` определён
+                                                return !isTimeInSchedule(dayjs(time).hour(), dayjs(time).minute()) || isTimeUnavailable(dayjs(time).hour(), dayjs(time).minute()); // `time` здесь - минуты
+                                            }
+                                            //return !isTimeInSchedule(dayjs(time).hour(), dayjs(time).minute()) || isTimeUnavailable(dayjs(time).hour(), dayjs(time).minute());
+                                            return false;
+                                        }}
                                     />
                                 </Stack>
                                 

@@ -64,6 +64,7 @@ const DoctorList = () => {
 
     const { store } = useContext(Context);
     const [doctors, setDoctors] = useState([]);
+    const [error, setError] = useState('')
     useEffect(() => {
         if (store?.user?.id) {
             async function fetchPatients() {
@@ -74,6 +75,8 @@ const DoctorList = () => {
                     setDoctors(array);
 
                 } catch (e) {
+                    /* alert(e.response.data) */
+                    setError(e.response.data);
                     console.log(e);
                 }
             }
@@ -93,7 +96,7 @@ const DoctorList = () => {
                     </Button>
                 </Box>
                 <Box sx={{ height: 600, width: '100%' }}>
-                    {doctors.length > 0 ?
+                    {doctors.length > 0 && error.length == 0 ?
                         <DataGrid
                             localeText={ruRU.components.MuiDataGrid.defaultProps.localeText}
                             rows={doctors}
@@ -101,8 +104,7 @@ const DoctorList = () => {
                             pageSize={5}
                             rowsPerPageOptions={[5]}
                         />
-                        :
-                        <LoadingScreen/>
+                        : (error.length > 0 ? <h2>{error}</h2> : <LoadingScreen/>)
                     }
                 </Box>
             </Container>

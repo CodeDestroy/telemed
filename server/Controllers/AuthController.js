@@ -86,6 +86,7 @@ class AuthController {
             const mailOptions = await MailManager.getMailOptionsCode(email, newCode.code, link)
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
+                    /* throw new Error(error) */
                     return console.log(error);
                 }
                 console.log('Сообщение отправленно: %s', info.messageId);

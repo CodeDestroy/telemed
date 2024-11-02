@@ -34,9 +34,7 @@ function Schedule() {
     useEffect(() => {
         async function fetchDataSlots() {
             try {
-                console.log(store)
                 const response = await AdminService.getConsultations();
-                console.log(response.data)
                 response.data[0].map((slot) => {
                     const newEvent = {
                         event_id: slot.id || Math.random(),
@@ -119,10 +117,13 @@ function Schedule() {
             </style>
             <Header/>
             <Scheduler
-                view="month"
+                view="week"
+                /* disableViewNavigator={true} */
                 locale={ru}
                 translations={russianTranslition}
+                /* resourceViewMode="tabs" */
                 hourFormat='24'
+                /* agenda={false} */
                 month={
                     {
                         weekDays: [0, 1, 2, 3, 4, 5], 
@@ -130,7 +131,8 @@ function Schedule() {
                         startHour: 8, 
                         endHour: 22,
                         navigation: true,
-                        disableGoToDay: false
+                        disableGoToDay: false,
+                        
                     }
                 }
                 week={{
@@ -138,14 +140,14 @@ function Schedule() {
                     weekStartOn: 1, 
                     startHour: 8, 
                     endHour: 22,
-                    step: 60,
+                    step: 30,
                     navigation: true,
                     disableGoToDay: false
                 }}      
                 day={{
                     startHour: 8, 
                     endHour: 22, 
-                    step: 60,
+                    step: 30,
                     navigation: true
                 }}
                 fields={[

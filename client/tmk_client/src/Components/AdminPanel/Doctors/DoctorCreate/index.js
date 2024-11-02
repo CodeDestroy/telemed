@@ -58,27 +58,34 @@ const DoctorCreate = () => {
             formData.append('avatar', avatar);
         }
         // Здесь должна быть логика создания нового пациента
-        const response = await AdminService.createDoctor(formData)
+        try {
+            const response = await AdminService.createDoctor(formData)
 
-        if (response.status !== 500) {
-            setSaved(true);
-            
-            setSecondName('')
-            
-            setName('')
-            setPatronomicName('')
-            setPhone('')
-            setEmail('')
-            setPassword('')
-            setInn('')
-            setBirthDate(null)
-            setInfo('')
-            setAvatar(null)
-            /* console.log('Создано') */
+            if (response.status !== 500) {
+                setSaved(true);
+                
+                setSecondName('')
+                
+                setName('')
+                setPatronomicName('')
+                setPhone('')
+                setEmail('')
+                setPassword('')
+                setInn('')
+                setBirthDate(null)
+                setInfo('')
+                setAvatar(null)
+                /* console.log('Создано') */
+            }
+            else {
+                console.log('Ошибка', response.data)
+            }
         }
-        else {
-            console.log('Ошибка', response.data)
+        catch (e) {
+            console.log(e)
+            alert(e.response.data)
         }
+       
     };
 
 

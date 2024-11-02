@@ -377,6 +377,7 @@ class UserService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 

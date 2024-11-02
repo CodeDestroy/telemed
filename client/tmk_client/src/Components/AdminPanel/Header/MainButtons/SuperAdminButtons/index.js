@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@mui/material/Button';
 import adminLocations from '../../../../../Locations/AdminLocations';
 
-function AdminButtons() {
+function SuperAdminButtons() {
     const handleAdminDashboard = () => {
         window.location.href = adminLocations.dashboard;
     };
@@ -43,20 +43,26 @@ function AdminButtons() {
             >
                 Управление пациентами
             </Button>
-            {/* <Button
+            <Button
                 onClick={handleSlotsManagement}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Управление слотами
-            </Button> */}
+            </Button>
             <Button
                 onClick={handleCalendarManagement}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                Управление слотами
+                Управление слотами (Календарь)
+            </Button>
+            <Button
+                onClick={handleCalendarManagement}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+                Тест
             </Button>
         </>
     );
 }
 
-export default AdminButtons;
+export default SuperAdminButtons;

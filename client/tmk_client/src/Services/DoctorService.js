@@ -4,8 +4,8 @@ import {$api, $apiMultipartData} from "../api";
 
 export default class DoctorService {
 
-    static async getConsultations (userId) {
-        return $api.get('/api/doctor/consultations/active', {params: {userId}});
+    static async getConsultations (userId, date) {
+        return $api.get('/api/doctor/consultations/active', {params: {userId, date}});
     }
 
     static async getEndedConsultations (userId) {
@@ -17,7 +17,7 @@ export default class DoctorService {
     }
 
     static async getSchedule (doctorId) {
-        return $api.get('/api/doctor/scheduler', {params: {doctorId}})
+        return $api.get(`/api/doctor/scheduler/${doctorId}`)
     }
 
     static async deleteSchedule (id) {

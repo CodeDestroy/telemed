@@ -85,6 +85,31 @@ class SchedulerService {
         }
     }
 
+    async getDoctorScheduleByDay (doctorId, dayId) {
+        try {
+            const schedule = await database.models.Schedule.findAll({
+                where: {
+                    doctorId
+                },
+                include: [
+                    { 
+                        model: database.models.WeekDays,
+                        required: true ,
+                        where: {
+                            id: dayId
+                        }
+                    }
+                ],
+                order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
+            })
+            return schedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async deleteDoctorSchedule (id) {
         try {
             const schedule = await database.models.Schedule.destroy({

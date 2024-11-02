@@ -46,7 +46,7 @@ $api.interceptors.response.use(function (config) {
     return config;
   }, async function (error) {
     const originalRequest = error.config
-        if (error.response.status == 401 && !error.config._isRetry && error.config) {
+        if (error.response?.status == 401 && !error.config._isRetry && error.config) {
             originalRequest._isRetry = true;
             try {
                 const response = await Store.checkAuth()
@@ -68,7 +68,7 @@ $apiMultipartData.interceptors.response.use(function (config) {
     return config;
   }, async function (error) {
     const originalRequest = error.config
-        if (error.response.status == 401 && !error.config._isRetry && error.config) {
+        if (error.response?.status == 401 && !error.config._isRetry && error.config) {
             originalRequest._isRetry = true;
             try {
                 const response = await Store.checkAuth()

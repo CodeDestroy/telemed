@@ -105,14 +105,20 @@ class SchedulerController {
     
     async getDoctorScheduler (req, res) {
         try {
-            const {doctorId} = req.query
-            const schedule = await SchedulerService.getDoctorSchedule(doctorId)
+            const {id} = req.params
+            const {dayid} = req.query
+            let schedule
+            if (!dayid)
+                schedule = await SchedulerService.getDoctorSchedule(id)
+            else 
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
             res.status(200).json(schedule)
         }
         catch (e) {
             res.status(404).json({error: e.message})
         }
     }
+    
 
     async deleteDoctorScheduler (req, res) {
         try {

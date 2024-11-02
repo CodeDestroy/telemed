@@ -115,13 +115,13 @@ class IntegrationController {
             date,
             slots: groupedSlots[date]
         }));
-        console.log(groupedSlotsArray)
+        /* console.log(groupedSlotsArray) */
         res.json(groupedSlotsArray)
     }
 
     async setOnlineRequestPaid (req, res) {
         try {
-            console.log(req.body)
+            /* console.log(req.body) */
             const {fullname, parentName, birthdate, email, phone, selected_slot, snils} = req.body
             /* return res.status(500).json("Тест") */
             /* const regex = /^(\d{2}\.\d{2}\.\d{4}) (\d{2}:\d{2})-(\d{2}:\d{2}) (.+)$/;
@@ -179,7 +179,7 @@ class IntegrationController {
                     const {secondName, firstName, patronomicName} = await UserManager.parseFullName(fullname)
                     const formattedDate = moment(birthdate, "DD.MM.YYYY").format('YYYY-MM-DD');
 
-                    console.log(formattedDate)
+                    /* console.log(formattedDate) */
                     const password = Math.random().toString(36).slice(-8)
                     /* const avatar = req.file; */
                     /* return res.json(avatar) */

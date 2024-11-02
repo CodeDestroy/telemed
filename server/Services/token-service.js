@@ -41,7 +41,8 @@ class TokenService {
             return userData
         }
         catch(e) {
-            return console.log(e);
+            console.log(e)
+            return null
         }
     }
 

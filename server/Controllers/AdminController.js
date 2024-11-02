@@ -10,11 +10,12 @@ const UrlManager = require('../Utils/UrlManager')
 const CLIENT_URL = process.env.CLIENT_URL;
 const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const MailManager = require("../Utils/MailManager");
+const MedicalOrgService = require('../Services/MedicalOrgService')
+const ApiError = require('../Errors/api-error')
 
 class AdminController {
     async getAllConsultations(req, res) {
         try {
-            console.log(req.user)
             let allSlots = []
             if (req.user.accessLevel === 4) {
                 allSlots = await ConsultationService.getAllSlots()
@@ -61,7 +62,6 @@ class AdminController {
             const patientPayload = await ConsultationService.createPayloadPatient(patient.id, newRoom.id)
             const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
             const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
-            console.log(CLIENT_URL)
             const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`
             const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
             const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.user.id, newRoom.id)
@@ -73,7 +73,8 @@ class AdminController {
                 const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.user.email, patientLink)
                 transporter.sendMail(mailOptionsPatinet, (error, info) => {
                     if (error) {
-                        return console.log(error);
+                        throw new Error(error)
+                        /* return console.log(error); */
                     }
                     console.log('Сообщение отправленно: %s', info.messageId);
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
@@ -83,7 +84,7 @@ class AdminController {
                 const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.user.email, doctorLink)
                 transporter.sendMail(mailOptionsDoctor, (error, info) => {
                     if (error) {
-                        return console.log(error);
+                        throw new Error(error)
                     }
                     console.log('Сообщение отправленно: %s', info.messageId);
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
@@ -119,8 +120,22 @@ class AdminController {
 
     async getAllDoctors (req, res) {
         try {
-            const allDoctors = await DoctorService.getAllDoctors()
+            let allDoctors = []
+            if (req.user.accessLevel == 4) {
+                allDoctors = await DoctorService.getAllDoctors()
+            }
+            else if (req.user.accessLevel == 3) {
+                const medOrg = await MedicalOrgService.getMedOrgByUserId(req.user.id)
+                if (!medOrg) {
+                    throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
+                }
+                allDoctors = await DoctorService.getAllDoctorsInMO(medOrg.id)
+            }
+            else {
+                throw ApiError.AuthError('Недостаточно прав для выполнения данной операции.')
+            }
             res.status(200).json(allDoctors)
+            
         }
         catch (e) {
             res.status(404).json(e.message)
@@ -154,11 +169,28 @@ class AdminController {
             } = req.body;
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
-            /* return res.json(avatar) */
-            const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
+            if (req.user.accessLevel == 4) {
+                
+                /* return res.json(avatar) */
+                const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
 
-            res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
+                return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
+            }
+            else if (req.user.accessLevel == 3) {
+                const medOrg = await MedicalOrgService.getMedOrgByUserId(req.user.id)
+                if (!medOrg) {
+                    throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
+                }
+                const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, medOrg.id)
+
+                return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
+            }
+            else {
+                throw ApiError.AuthError('Недостаточно прав для выполнения данной операции.')
+            }
+            
         }
         catch (e) {
             res.status(500).json(e.message)

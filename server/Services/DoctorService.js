@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const database = require('../Database/setDatabase');
 class DoctorService {
     async getDoctorByUserId(userId) {
@@ -11,35 +12,57 @@ class DoctorService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
     async getAllDoctors() {
         try {
-            const patients = await database.models.Doctors.findAll({
+            const doctors = await database.models.Doctors.findAll({
                 include: [{
                     model: database.models.Users,
                     required: true
                 }]
             })
-            return patients;
+            return doctors;
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
-    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null) {
+    async getAllDoctorsInMO(medorgId) {
+        try {
+            const doctors = await database.models.Doctors.findAll({
+                where: {
+                    medOrgId: medorgId
+                },
+                include: [{
+                    model: database.models.Users,
+                    required: true
+                }]
+            })
+            return doctors
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null) {
         try {
             const doctor = await database.models.Doctors.create({
                 
-                userId, secondName, firstName, patronomicName, birthDate, info, snils
+                userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId
             })
             return doctor
       
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -55,6 +78,7 @@ class DoctorService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -75,6 +99,7 @@ class DoctorService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -111,6 +136,7 @@ class DoctorService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 }
