@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 const nodemailer = require('nodemailer');
 const UserDto = require('../Dtos/UserDto')
 const tokenService = require('../Services/token-service')
@@ -8,7 +8,7 @@ class CodeService {
         try {
             const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
             const expireDate = moment(new Date()).add(activeMinutes, 'm').toDate()
-            const newCode = await database.models.ConfirmCodes.create({
+            const newCode = await database["ConfirmCodes"].create({
                 code, userId: userId, expireDate
             })
             return newCode
@@ -30,7 +30,7 @@ class CodeService {
 
     async checkCode(userId, code) {
         try {
-            const confirmCode =  await database.models.ConfirmCodes.findOne({
+            const confirmCode =  await database["ConfirmCodes"].findOne({
                 where: {
                     userId: userId,
                     code: code
@@ -39,7 +39,6 @@ class CodeService {
                     ['id', 'DESC'],
                 ]
             })
-            console.log(confirmCode.expireDate)
             if (confirmCode) return confirmCode
             else return null
         }
@@ -51,12 +50,12 @@ class CodeService {
     async loginByPhone(phone) {
         try {
             //find user
-            const user = await database.models.Users.findOne({
+            const user = await database["Users"].findOne({
                 where: {
                     phone: phone
                 },
                 include: [{
-                    model: database.models.UsersRoles,
+                    model: database["UsersRoles"],
                     required: true
                 }]
             })
@@ -68,7 +67,7 @@ class CodeService {
 
             switch (user.users_role.accessLevel) {
                 case 1: 
-                    let patient = await database.models.Patients.findOne({
+                    let patient = await database["Patients"].findOne({
                         where: {
                             userId: user.id
                         }
@@ -81,7 +80,7 @@ class CodeService {
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
                 case 2:
-                    let doctor = await database.models.Doctors.findOne({
+                    let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
                         }
@@ -94,7 +93,7 @@ class CodeService {
                     //send answer (user and tokens)
                     return { ...tokens, user: userDto } 
                 case 3:
-                    let admin = await database.models.Admins.findOne({
+                    let admin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
                         }

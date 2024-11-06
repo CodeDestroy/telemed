@@ -186,8 +186,9 @@ function CustomEditor ({ scheduler, onStateChange }) {
     }
 
     const getDoctorSchedule = async (doctor) => {
-        setError('Невозмжно создать консультацию на прошедшую дату')
+        
         if (dayjs(state.start).isBefore(dayjs(new Date()), 'date')) {
+            setError('Невозмжно создать консультацию на прошедшую дату')
             return setGroupedSchedule([])
         }
         let response = await SchedulerService.getDcotorSchedule(doctor.id, (state.start).getDay())
@@ -197,7 +198,8 @@ function CustomEditor ({ scheduler, onStateChange }) {
             end: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleEndTime}`)
 
         }));
-        let grouped = Object.groupBy(schedule, ({ week_day }) => week_day.name)
+        console.log(schedule)
+        let grouped = Object.groupBy(schedule, ({ WeekDay }) => WeekDay.name)
         setGroupedSchedule(sortSchedule(grouped))
     }
 
@@ -241,7 +243,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
 
     const getDoctorActiveConsultations = async (doctor) => {
         console.log(selectedTime)
-        const response = await DoctorService.getConsultations(doctor.user.id, state.start)
+        const response = await DoctorService.getConsultations(doctor.User.id, state.start)
         setActiveConsultations(response.data[0])
     }
 

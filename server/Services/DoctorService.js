@@ -1,9 +1,9 @@
 const { where } = require('sequelize');
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 class DoctorService {
     async getDoctorByUserId(userId) {
         try {
-            const doctor = await database.models.Doctors.findOne({
+            const doctor = await database["Doctors"].findOne({
                 where: {
                     userId: userId
                 }
@@ -18,9 +18,9 @@ class DoctorService {
 
     async getAllDoctors() {
         try {
-            const doctors = await database.models.Doctors.findAll({
+            const doctors = await database["Doctors"].findAll({
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -34,12 +34,12 @@ class DoctorService {
 
     async getAllDoctorsInMO(medorgId) {
         try {
-            const doctors = await database.models.Doctors.findAll({
+            const doctors = await database["Doctors"].findAll({
                 where: {
                     medOrgId: medorgId
                 },
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -53,7 +53,7 @@ class DoctorService {
 
     async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null) {
         try {
-            const doctor = await database.models.Doctors.create({
+            const doctor = await database["Doctors"].create({
                 
                 userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId
             })
@@ -68,9 +68,9 @@ class DoctorService {
 
     async getDoctor(id) {
         try {
-            const doctor = await database.models.Doctors.findByPk(id, {
+            const doctor = await database["Doctors"].findByPk(id, {
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -84,14 +84,14 @@ class DoctorService {
 
     async getDoctorsByFIO(secondName, name, patronomicName) {
         try {
-            const doctor = await database.models.Doctors.findAll({
+            const doctor = await database["Doctors"].findAll({
                 where: {
                     secondName: secondName,
                     firstName: name,
                     patronomicName: patronomicName
                 },
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -105,12 +105,12 @@ class DoctorService {
 
     /* async getDoctorByInn (inn) {
         try {
-            const doctor = await database.models.Doctors.findOne({
+            const doctor = await database["Doctors.findOne({
                 where: {
                     inn: inn,
                 },
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users,
                     required: true
                 }]
             })
@@ -123,12 +123,12 @@ class DoctorService {
 
     async getDoctorBySnils (snils) {
         try {
-            const doctor = await database.models.Doctors.findOne({
+            const doctor = await database["Doctors"].findOne({
                 where: {
                     snils: snils,
                 },
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })

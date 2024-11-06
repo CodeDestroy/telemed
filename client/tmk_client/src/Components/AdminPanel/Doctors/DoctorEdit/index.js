@@ -12,14 +12,29 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 import LoadingScreen from '../../../Loading';
+import adminLocations from '../../../../Locations/AdminLocations';
 
 const DoctorEdit = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { store } = useContext(Context);
     const [doctor, setDoctor] = useState(null);
-    const handleSave = () => {
-        console.log(doctor)
+    const [error, setError] = useState(null)
+    const handleSave = async () => {
+
+        try {
+            const response = await AdminService.editDoctor(id, doctor)
+
+            if (response.status == 200) {
+                window.location = adminLocations.doctorManagement
+            }
+            else {
+                setError(response.data.message)
+            }
+        }
+        catch (e) {
+            setError(e.response.data.message)
+        }
       // Здесь должна быть логика сохранения изменений
         /* navigate('/doctors'); */
     };
@@ -57,20 +72,21 @@ const DoctorEdit = () => {
         setDoctor({...doctor, snils: event.target.value });
     }
     const handleConfirmed = (event) => {
-        setDoctor({...doctor, user: { 
-           ...doctor.user, 
-           confirmed: !doctor.user.confirmed
+        setDoctor({...doctor, User: { 
+           ...doctor.User, 
+           confirmed: !doctor.User.confirmed
         }})
     }
     const setPhone = (event) => {
-        setDoctor({...doctor, user: { 
-            ...doctor.user, 
+        console.log(event.target)
+        setDoctor({...doctor, User: { 
+            ...doctor.User, 
             phone: event.target.value
         }})
     }
     const setEmail = (event) => {
-        setDoctor({...doctor, user: { 
-            ...doctor.user, 
+        setDoctor({...doctor, User: { 
+            ...doctor.User, 
             email: event.target.value
         }})
     }
@@ -86,6 +102,7 @@ return (
             <Container>
                 <h2 style={{margin: '2rem 0'}}>Редактировать врача {doctor.secondName} {doctor.firstName}</h2>
                 <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {error?.length > 0 && error ? <h4 style={{color: 'red'}}>{error}</h4> : ''}
                         <TextField label="Фамилия" variant="outlined" fullWidth value={doctor.secondName} onChange={setName}/>
                         <TextField label="Имя" variant="outlined" fullWidth value={doctor.firstName} onChange={setSecondName}/>
                         <TextField label="Отчество" variant="outlined" fullWidth value={doctor.patronomicName} onChange={setPatronomicName}/>
@@ -97,12 +114,12 @@ return (
                                 renderInput={(params) => <TextField {...params} fullWidth />}
                             />
                         </LocalizationProvider> */}
-                        <TextField label="Телефон" variant="outlined" fullWidth value={doctor.user.phone} onChange={setPhone}/>
+                        <TextField label="Телефон" variant="outlined" fullWidth value={doctor.User.phone} onChange={setPhone}/>
                         <TextField label="СНИЛС" variant="outlined" fullWidth value={doctor.snils} onChange={handleSnilsChange}/>
-                        <TextField label="Email" variant="outlined" fullWidth value={doctor.user.email} onChange={setEmail}/>
+                        <TextField label="Email" variant="outlined" fullWidth value={doctor.User.email} onChange={setEmail}/>
                         <FormGroup>
                             <FormControlLabel control={
-                                <Checkbox checked={doctor.user.confirmed}
+                                <Checkbox checked={doctor.User.confirmed}
                                     onChange={handleConfirmed}
                                     inputProps={{ 'aria-label': 'controlled' }} 
                                 />

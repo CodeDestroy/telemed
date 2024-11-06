@@ -1,19 +1,17 @@
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 const { Op, literal, or } = require('sequelize');
 const moment = require('moment-timezone')
 class MedicalOrgService {
     async getMedOrgByUserId(id) {
         try {
-            const medorg = await database.models.MedicalOrgs.findOne({
+            const medorg = await database["MedicalOrgs"].findOne({
                 include: [
                     {
-                        model: database.models.Admins,
-                        as: 'admins',
+                        model: database["Admins"],
                         required: true,
                     },
                     {
-                        model: database.models.Doctors,
-                        as: 'doctors',
+                        model: database["Doctors"],
                         required: true,
                     }
                 ],

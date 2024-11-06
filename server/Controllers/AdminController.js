@@ -12,6 +12,7 @@ const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const MailManager = require("../Utils/MailManager");
 const MedicalOrgService = require('../Services/MedicalOrgService')
 const ApiError = require('../Errors/api-error')
+var validator = require("email-validator");
 
 class AdminController {
     async getAllConsultations(req, res) {
@@ -64,13 +65,13 @@ class AdminController {
             const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
             const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`
             const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
-            const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.user.id, newRoom.id)
-            const patientShortUrl = await UrlManager.createShort(patientUrl, patient.user.id, newRoom.id)
+            const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.User.id, newRoom.id)
+            const patientShortUrl = await UrlManager.createShort(patientUrl, patient.User.id, newRoom.id)
             const transporter = await MailManager.getTransporter()
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
-            if (patient.user.email) {
-                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.user.email, patientLink)
+            if (patient.User.email) {
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink)
                 transporter.sendMail(mailOptionsPatinet, (error, info) => {
                     if (error) {
                         throw new Error(error)
@@ -80,8 +81,8 @@ class AdminController {
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
             }
-            if (doctor.user.email) {
-                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.user.email, doctorLink)
+            if (doctor.User.email) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink)
                 transporter.sendMail(mailOptionsDoctor, (error, info) => {
                     if (error) {
                         throw new Error(error)
@@ -153,6 +154,50 @@ class AdminController {
         }
     }
 
+    async editDoctor (req, res) {
+        try {
+            const id = req.params.id
+            const {user} = req.body
+            const doctor = await DoctorService.getDoctor(id);
+            doctor.secondName = user.secondName
+            doctor.firstName = user.firstName
+            doctor.patronomicName = user.patronomicName
+            doctor.snils = user.snils
+            doctor.User.email = user.User.email
+            doctor.User.confirmed = user.User.confirmed
+            doctor.User.phone = user.User.phone
+            doctor.save()
+            doctor.User.save()
+            res.status(200).json(doctor)
+            
+        }
+        catch (e) {
+            res.status(404).json(e.message)
+        }
+    }
+
+    async editPatient (req, res) {
+        try {
+            const id = req.params.id
+            const {user} = req.body
+            const patient = await PatientService.getPatient(id);
+            patient.secondName = user.secondName
+            patient.firstName = user.firstName
+            patient.patronomicName = user.patronomicName
+            patient.snils = user.snils
+            patient.User.email = user.User.email
+            patient.User.confirmed = user.User.confirmed
+            patient.User.phone = user.User.phone
+            patient.save()
+            patient.User.save()
+            res.status(200).json(patient)
+            
+        }
+        catch (e) {
+            res.status(404).json(e.message)
+        }
+    }
+
     async createDoctor (req, res) {
         try {
             const {
@@ -169,10 +214,22 @@ class AdminController {
             } = req.body;
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
+            let errors = ''
+            if (secondName?.length == 0)
+                errors = errors + 'Фамилия не может быть пустой\n'
+            if (name?.length == 0)
+                errors = errors + 'Имя не может быть пустым\n'
+            if (phone?.length < 9)
+                errors = errors + 'Неверный номер телефона\n'
+            if (!validator.validate(email))
+                errors = errors + 'Неверный email\n'
+            if (birthDate?.length < 10)
+                errors = errors + 'Неверная дата\n'
+            if (errors.length > 0) 
+                throw ApiError.BadRequest(errors)
+
             if (req.user.accessLevel == 4) {
-                
-                /* return res.json(avatar) */
-                const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+                const newUser = await userService.createUrsser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
                 const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
 
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
@@ -209,10 +266,22 @@ class AdminController {
                 birthDate,
                 info
             } = req.body;
+            let errors = ''
+            if (secondName?.length == 0)
+                errors = errors + 'Фамилия не может быть пустой\n'
+            if (name?.length == 0)
+                errors = errors + 'Имя не может быть пустым\n'
+            if (phone?.length < 9)
+                errors = errors + 'Неверный номер телефона\n'
+            if (!validator.validate(email))
+                errors = errors + 'Неверный email\n'
+            if (birthDate?.length < 10)
+                errors = errors + 'Неверная дата рождения\n'
+            if (errors.length > 0) 
+                throw ApiError.BadRequest(errors)
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             
-            /* return res.json(avatar) */
             const newUser = await userService.createUser(3, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
             const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info)
 

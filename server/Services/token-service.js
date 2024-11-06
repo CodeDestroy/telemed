@@ -1,6 +1,6 @@
 /* require { sign, verify } from 'jsonwebtoken'; */
 const { sign, verify } = require('jsonwebtoken');
-const database = require('../Database/setDatabase')
+const database = require('../models/index')
 require('dotenv').config()
 const secretAccess = process.env.SECRET_ACCESS
 const secretRefresh = process.env.SECRET_REFRESH
@@ -48,7 +48,7 @@ class TokenService {
 
     //save refresh token to DB
     async saveToken (userId, refreshToken) {
-        let tokenData = await database.models.Tokens.findAll({
+        let tokenData = await database["Tokens"].findAll({
             where: {
                 userId: userId
             }
@@ -61,7 +61,7 @@ class TokenService {
         }); */
         if (tokenData.length > 0) {
             //result.refreshtoken = refreshToken;
-            tokenData = await database.models.Tokens.update({refreshToken: refreshToken}, {
+            tokenData = await database["Tokens"].update({refreshToken: refreshToken}, {
                 where: {
                     userId: userId
                 }
@@ -77,7 +77,7 @@ class TokenService {
             //await prisma.$queryRaw`UPDATE public.users_db_tokens SET refreshtoken = ${refreshToken} WHERE uirs_users_db_id = ${userId}`
         }
         else {
-            tokenData = await database.models.Tokens.create({
+            tokenData = await database["Tokens"].create({
                 refreshToken: refreshToken,
                 userId: userId
             })
@@ -96,7 +96,7 @@ class TokenService {
  
     //remove token from DB
     async removeToken (refreshToken) {
-        const tokenData = await database.models.Tokens.destroy({
+        const tokenData = await database["Tokens"].destroy({
             where: {
                 refreshToken: refreshToken
             }
@@ -108,7 +108,7 @@ class TokenService {
     //find token in DB
     async findToken (refreshToken) {
 
-        const tokenData = await database.models.Tokens.findOne({
+        const tokenData = await database["Tokens"].findOne({
             where: {
                 refreshToken: refreshToken,
             }

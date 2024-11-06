@@ -27,6 +27,7 @@ const PatientCreate = () => {
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [info, setInfo] = useState('')
+    const [error, setError] = useState('')
 
     const handlePasswordToggle = () => {
         setShowPassword(!showPassword);
@@ -44,32 +45,47 @@ const PatientCreate = () => {
         formData.append('phone', phone);
         formData.append('email', email);
         formData.append('password', password);
-        formData.append('birthDate', birthDate ? birthDate.toISOString() : '');
+        try {
+
+            formData.append('birthDate', birthDate ? birthDate.toISOString() : '');
+        }
+        catch (e) {
+            setError('Неверная дата рождения')
+            return
+        }
         formData.append('info', info);
         if (avatar) {
             formData.append('avatar', avatar);
         }
         // Здесь должна быть логика создания нового пациента
-        const response = await AdminService.createPatient(formData)
+        try {
+            const response = await AdminService.createPatient(formData)
 
-        if (response.status !== 500) {
-            setSaved(true);
-            
-            setSecondName('')
-            
-            setName('')
-            setPatronomicName('')
-            setPhone('')
-            setEmail('')
-            setPassword('')
-            setBirthDate(null)
-            setInfo('')
-            setAvatar(null)
-            /* console.log('Создано') */
+            if (response.status !== 500) {
+                setSaved(true);
+                
+                setSecondName('')
+                
+                setName('')
+                setPatronomicName('')
+                setPhone('')
+                setEmail('')
+                setPassword('')
+                setBirthDate(null)
+                setInfo('')
+                setAvatar(null)
+                setError('')
+                /* console.log('Создано') */
+            }
+            else {
+                /* console.log('Ошибка', response.data) */
+            }
         }
-        else {
-            console.log('Ошибка', response.data)
+        catch (e) {
+            /* console.log(e) */
+            setError(e.response.data);
         }
+        
     };
 
     const [open, setOpen] = useState(false);
@@ -79,7 +95,7 @@ const PatientCreate = () => {
         navigator.clipboard.writeText(url).then(() => {
             setOpen(true);
         }, (err) => {
-            console.error('Could not copy text: ', err);
+            console.error('Невозможно скопировать текст: ', err);
         });
     };
 
@@ -134,9 +150,9 @@ const PatientCreate = () => {
 
     const savedAction = (
         <React.Fragment>
-            <Button color="secondary" size="small" onClick={handleSaveClose}>
+            {/* <Button color="secondary" size="small" onClick={handleSaveClose}>
                 Отмена (не работает)
-            </Button>
+            </Button> */}
             <IconButton
                 size="small"
                 aria-label="close"
@@ -155,6 +171,7 @@ const PatientCreate = () => {
             <Container>
                 <h2>Создать пациента</h2>
                 <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {error?.length > 0 ? <h4>{error}</h4> : ''}
                     <TextField label="Фамилия" variant="outlined" fullWidth value={secondName} onChange={handleSecondNameChange}/>
                     <TextField label="Имя" variant="outlined" fullWidth value={name} onChange={handleNameChange}/>
                     <TextField label="Отчество" variant="outlined" fullWidth value={patrinomicName} onChange={handlePatronomicNameChange}/>
@@ -166,6 +183,7 @@ const PatientCreate = () => {
                             value={birthDate}
                             onChange={(newValue) => setBirthDate(newValue)}
                             renderInput={(params) => <TextField {...params} fullWidth />}
+                            disableFuture 
                         />
                     </LocalizationProvider>
                     <TextField
@@ -174,7 +192,7 @@ const PatientCreate = () => {
                         variant="outlined"
                         fullWidth
                         value={password}
-                        onChange={(newValue) => setPassword(newValue)}
+                        onChange={(newValue) => setPassword(newValue.target.value)}
                         InputProps={{
                             endAdornment: (
                             <InputAdornment position="end">

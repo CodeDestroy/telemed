@@ -20,6 +20,11 @@ export default class AdminService {
         return $api.get(`/api/admin/patients/${patientId}`);
     }
 
+    static async editPatient(patientId, patient) {
+        return $api.post(`/api/admin/patients/${patientId}`, {user: patient});
+    }
+    
+
     static async getDoctors() {
         return $api.get('/api/admin/doctors/all');
     }
@@ -27,6 +32,11 @@ export default class AdminService {
     static async getDoctor(doctorId) {
         return $api.get(`/api/admin/doctors/${doctorId}`);
     }
+    
+    static async editDoctor(doctorId, doctor) {
+        return $api.post(`/api/admin/doctors/${doctorId}`, {user: doctor});
+    }
+
 
     static async createDoctor(formData) {
         return $apiMultipartData.post('/api/admin/doctors/create', formData);

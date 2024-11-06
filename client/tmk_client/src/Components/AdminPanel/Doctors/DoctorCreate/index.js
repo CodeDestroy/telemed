@@ -29,7 +29,7 @@ const DoctorCreate = () => {
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [info, setInfo] = useState('')
-
+    const [error, setError] = useState('')
 
     const [open, setOpen] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -52,7 +52,14 @@ const DoctorCreate = () => {
         formData.append('inn', inn)
         formData.append('snils', snils)
         formData.append('password', password);
-        formData.append('birthDate', birthDate ? birthDate.toISOString() : '');
+        try {
+
+            formData.append('birthDate', birthDate ? birthDate.toISOString() : '');
+        }
+        catch (e) {
+            setError('Неверная дата рождения')
+            return
+        }
         formData.append('info', info);
         if (avatar) {
             formData.append('avatar', avatar);
@@ -75,6 +82,7 @@ const DoctorCreate = () => {
                 setBirthDate(null)
                 setInfo('')
                 setAvatar(null)
+                setError('')
                 /* console.log('Создано') */
             }
             else {
@@ -82,8 +90,8 @@ const DoctorCreate = () => {
             }
         }
         catch (e) {
-            console.log(e)
-            alert(e.response.data)
+            console.log(e.response)
+            setError(e.response.data)
         }
        
     };
@@ -93,7 +101,7 @@ const DoctorCreate = () => {
         navigator.clipboard.writeText(url).then(() => {
             setOpen(true);
         }, (err) => {
-            console.error('Could not copy text: ', err);
+            console.error('Невозможно скопировать текст: ', err);
         });
     };
 
@@ -156,9 +164,9 @@ const DoctorCreate = () => {
 
     const savedAction = (
         <React.Fragment>
-            <Button color="secondary" size="small" onClick={handleSaveClose}>
+            {/* <Button color="secondary" size="small" onClick={handleSaveClose}>
                 Отмена (не работает)
-            </Button>
+            </Button> */}
             <IconButton
                 size="small"
                 aria-label="close"
@@ -177,6 +185,7 @@ const DoctorCreate = () => {
             <Container>
                 <h2>Создать врача</h2>
                 <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {error?.length > 0 ? <h4 style={{color: 'red'}}>{error.split('\n').map(str => <div>{str}</div>)}</h4> : ''}
                     <TextField label="Фамилия" variant="outlined" fullWidth value={secondName} onChange={handleSecondNameChange}/>
                     <TextField label="Имя" variant="outlined" fullWidth value={name} onChange={handleNameChange}/>
                     <TextField label="Отчество" variant="outlined" fullWidth value={patrinomicName} onChange={handlePatronomicNameChange}/>
@@ -190,6 +199,7 @@ const DoctorCreate = () => {
                             value={birthDate}
                             onChange={(newValue) => setBirthDate(newValue)}
                             renderInput={(params) => <TextField {...params} fullWidth />}
+                            disableFuture 
                         />
                     </LocalizationProvider>
                     <TextField
@@ -198,7 +208,7 @@ const DoctorCreate = () => {
                         variant="outlined"
                         fullWidth
                         value={password}
-                        onChange={(newValue) => setPassword(newValue)}
+                        onChange={(newValue) => setPassword(newValue.target.value)}
                         InputProps={{
                             endAdornment: (
                             <InputAdornment position="end">

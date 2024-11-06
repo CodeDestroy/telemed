@@ -1,7 +1,7 @@
 // controllers/scheduleController.js
 const SchedulerService = require('../Services/SchedulerService')
 const { Op } = require('sequelize');
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 class SchedulerController {
     // Создание нового временного промежутка для расписания врача
     async createOrUpdateSchedule(req, res) {
@@ -10,7 +10,7 @@ class SchedulerController {
         const endTime = (new Date(scheduleEndTime)).getHours() + ':' + (new Date(scheduleEndTime)).getMinutes();
 
         try {
-            const weekDay = await database.models.WeekDays.findOne({
+            const weekDay = await database["WeekDays"].findOne({
                 where: {
                     name: scheduleDay
                 }

@@ -25,12 +25,12 @@ function AdminButtons() {
 
     return (
         <>
-            <Button
+            {/* <Button
                 onClick={handleAdminDashboard}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Панель администратора
-            </Button>
+            </Button> */}
             <Button
                 onClick={handleDoctorManagement}
                 sx={{ my: 2, color: 'white', display: 'block' }}

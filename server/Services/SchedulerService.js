@@ -1,11 +1,11 @@
 const { where, Op } = require('sequelize');
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 
 const moment = require('moment-timezone')
 class SchedulerService {
     async findOverlappingSchedules (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
         try {
-            const overlappingSchedules = await database.models.Schedule.findOne({
+            const overlappingSchedules = await database["Schedule"].findOne({
                 where: {
                     doctorId,
                     scheduleDayId: scheduleDay,
@@ -31,7 +31,7 @@ class SchedulerService {
 
     async createSchedule (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, scheduleStatus = 1) {
         try {
-            const newSchedule = await database.models.Schedule.create({
+            const newSchedule = await database["Schedule"].create({
                 doctorId,
                 scheduleDayId: scheduleDay,
                 scheduleStartTime,
@@ -48,7 +48,7 @@ class SchedulerService {
 
     async getDoctorScheduleByDay (doctorId, dayOfWeek) {
         try {
-            const doctorSchedule = await database.models.Schedule.findAll({
+            const doctorSchedule = await database["Schedule"].findAll({
                 where: {
                     doctorId,
                     scheduleDay: dayOfWeek,
@@ -65,13 +65,13 @@ class SchedulerService {
 
     async getDoctorSchedule (doctorId) {
         try {
-            const schedule = await database.models.Schedule.findAll({
+            const schedule = await database["Schedule"].findAll({
                 where: {
                     doctorId
                 },
                 include: [
                     { 
-                        model: database.models.WeekDays,
+                        model: database["WeekDays"],
                         required: true 
                     }
                 ],
@@ -87,13 +87,13 @@ class SchedulerService {
 
     async getDoctorScheduleByDay (doctorId, dayId) {
         try {
-            const schedule = await database.models.Schedule.findAll({
+            const schedule = await database["Schedule"].findAll({
                 where: {
                     doctorId
                 },
                 include: [
                     { 
-                        model: database.models.WeekDays,
+                        model: database["WeekDays"],
                         required: true ,
                         where: {
                             id: dayId
@@ -112,7 +112,7 @@ class SchedulerService {
 
     async deleteDoctorSchedule (id) {
         try {
-            const schedule = await database.models.Schedule.destroy({
+            const schedule = await database["Schedule"].destroy({
                 where: {
                     id
                 }

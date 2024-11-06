@@ -19,7 +19,7 @@ const columns = [
         headerName: '', 
         width: 70 ,
         renderCell: (cellValues) => {
-            return <Avatar sx={{mt: 0.5}} alt="Remy Sharp" src={cellValues.row.user.avatar} />
+            return <Avatar sx={{mt: 0.5}} alt="Remy Sharp" src={cellValues.row.User.avatar} />
             
         } 
     },

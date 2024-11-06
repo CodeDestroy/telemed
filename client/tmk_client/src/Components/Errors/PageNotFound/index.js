@@ -6,7 +6,8 @@ const PageNotFound = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate(-1);
+    /* navigate(-1); */
+    window.location = '/'
   };
 
   return (
@@ -37,7 +38,7 @@ const PageNotFound = () => {
             }
           }}
         >
-          Назад
+          Домой
         </Button>
       </Box>
     </Container>

@@ -1,4 +1,4 @@
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 const { Op } = require('sequelize')
 const DateTimeManager = require('../Utils/DateTimeManager')
 const moment = require('moment-timezone');
@@ -11,13 +11,13 @@ class ConsultationService {
     //Все слоты (лучше не использовать)
     async getAllSlots () {
         try {
-            /* const slots = await database.models.Slots.findAll({
+            /* const slots = await database["Slots.findAll({
                 include: [{
-                    model: database.models.Rooms,
+                    model: database["Rooms,
                     required: false
                 },
                 {
-                    model: database.models.Patients,
+                    model: database["Patients,
                     required: false
                 }]
             }); */
@@ -31,12 +31,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", *
-                from slots s 
-                left join rooms r  on s.id = r."slotId" 
-                left join patients p on p.id  = s."patientId" 
-                join doctors d on d.id = s."doctorId" 
-                join urls url on url."userId" = d."userId" 
-                join urls url2 on url2."userId" = p."userId" 
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id `, 
@@ -52,14 +52,14 @@ class ConsultationService {
 
     async getAllSlotsInMO (userId) {
         try {
-            const user = await database.models.Users.findByPk(userId, {
+            const user = await database["Users"].findByPk(userId, {
                 include: [{
-                    model: database.models.Admins,
+                    model: database["Admins"],
                     required: true,
                 }]
             })
 
-            if (user.admin.medOrgId) {
+            if (user.Admin.medOrgId) {
                 const slots = await database.sequelize.query(`
                     select s.id as "id" , 
                         p."firstName" as "pFirstName", 
@@ -70,14 +70,14 @@ class ConsultationService {
                         d."patronomicName" as "dPatronomicName", 
                         url."shortUrl" as "dUrl", 
                         url2."shortUrl" as "pUrl", *
-                    from slots s 
-                    left join rooms r  on s.id = r."slotId" 
-                    left join patients p on p.id  = s."patientId" 
-                    join doctors d on d.id = s."doctorId" 
-                    join urls url on url."userId" = d."userId" 
-                    join urls url2 on url2."userId" = p."userId" 
+                    from "Slots" s 
+                    left join "Rooms" r  on s.id = r."slotId" 
+                    left join "Patients" p on p.id  = s."patientId" 
+                    join "Doctors" d on d.id = s."doctorId" 
+                    join "Urls" url on url."userId" = d."userId" 
+                    join "Urls" url2 on url2."userId" = p."userId" 
                     where 
-                        d."medOrgId" = ${user.admin.medOrgId} and
+                        d."medOrgId" = ${user.Admin.medOrgId} and
                         url2."roomId" = r.id 
                         and url."roomId" = r.id `, 
                 {
@@ -97,13 +97,13 @@ class ConsultationService {
 
     async getAllDoctorSlotsRaw(doctorId) {
         try {
-            /* const slots = await database.models.Slots.findAll({
+            /* const slots = await database["Slots.findAll({
                 include: [{
-                    model: database.models.Rooms,
+                    model: database["Rooms,
                     required: false
                 },
                 {
-                    model: database.models.Patients,
+                    model: database["Patients,
                     required: false
                 }]
             }); */
@@ -117,12 +117,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", *
-                from slots s 
-                left join rooms r  on s.id = r."slotId" 
-                left join patients p on p.id  = s."patientId" 
-                join doctors d on d.id = s."doctorId" 
-                join urls url on url."userId" = d."userId" 
-                join urls url2 on url2."userId" = p."userId" 
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -142,7 +142,7 @@ class ConsultationService {
     async getAllActiveSlots () {
         try {
             const currTime = await DateTimeManager.getCurrentDateTimeWithTimezone(3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
-            const slots = await database.models.Slots.findAll({ 
+            const slots = await database["Slots"].findAll({ 
                 where: {
                     doctorId: { 
                         [Op.ne]: null
@@ -154,11 +154,11 @@ class ConsultationService {
                 },
                 include: [
                     {
-                        model: database.models.Rooms,
+                        model: database["Rooms"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     }
                 ]
@@ -175,16 +175,16 @@ class ConsultationService {
     //Возвращаем все слоты по врачу
     async getAllDoctorSlots(doctorId) {
         try {
-            const slots = await database.models.Slots.findAll({
+            const slots = await database["Slots"].findAll({
                 where: {
                     doctorId: doctorId
                 },
                 include: [{
-                    model: database.models.Rooms,
+                    model: database["Rooms"],
                     required: false
                 },
                 {
-                    model: database.models.Patients,
+                    model: database["Patients"],
                     required: false
                 }]
             })
@@ -211,12 +211,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", *
-                from slots s 
-                left join rooms r  on s.id = r."slotId" 
-                left join patients p on p.id  = s."patientId" 
-                join doctors d on d.id = s."doctorId" 
-                join urls url on url."userId" = d."userId" 
-                join urls url2 on url2."userId" = p."userId" 
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -227,7 +227,7 @@ class ConsultationService {
                 replacements: { doctorId: doctorId, currTime: currTime }, 
                 raw: true
             })
-            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join rooms r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
+            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
             /* console.log(slots) */
             return slots;
         }
@@ -251,12 +251,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", *
-                from slots s 
-                left join rooms r  on s.id = r."slotId" 
-                left join patients p on p.id  = s."patientId" 
-                join doctors d on d.id = s."doctorId" 
-                join urls url on url."userId" = d."userId" 
-                join urls url2 on url2."userId" = p."userId" 
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -266,7 +266,7 @@ class ConsultationService {
                 replacements: { doctorId: doctorId}, 
                 raw: true
             })
-            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join rooms r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
+            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
             /* console.log(slots) */
             return slots;
         }
@@ -289,12 +289,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", *
-                from slots s 
-                left join rooms r  on s.id = r."slotId" 
-                left join patients p on p.id  = s."patientId" 
-                join doctors d on d.id = s."doctorId" 
-                join urls url on url."userId" = d."userId" 
-                join urls url2 on url2."userId" = p."userId" 
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -317,7 +317,7 @@ class ConsultationService {
         try {
             const startParsedDate = await DateTimeManager.getDateTimeWithTimezone(startDateTime, 3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
             const endParsedDate = await DateTimeManager.getDateTimeWithTimezone(endDateTime, 3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
-            const slots = await database.models.Slots.findAll({
+            const slots = await database["Slots"].findAll({
                 where: {
                     doctorId: doctorId,
                     slotStartDateTime: {
@@ -328,11 +328,11 @@ class ConsultationService {
                     }
                 },
                 include: [{
-                    model: database.models.Rooms,
+                    model: database["Rooms"],
                     required: false
                 },
                 {
-                    model: database.models.Patients,
+                    model: database["Patients"],
                     required: false
                 }]
             });
@@ -346,14 +346,14 @@ class ConsultationService {
     //Слот по id
     async getSlotById (slotId) {
         try {
-            const slot = await database.models.Slots.findByPk(slotId, {
+            const slot = await database["Slots"].findByPk(slotId, {
                     include: [
                     {
-                        model: database.models.Rooms,
+                        model: database["Rooms"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     }
                 ]
@@ -368,15 +368,15 @@ class ConsultationService {
     //Слот по id комнаты
     async getSlotByRoomId (roomId) {
         try {
-            const room = await database.models.Rooms.findByPk(roomId);
-            const slot = await database.models.Slots.findByPk(room.slotId, {
+            const room = await database["Rooms"].findByPk(roomId);
+            const slot = await database["Slots"].findByPk(room.slotId, {
                 include: [
                     {
-                        model: database.models.Rooms,
+                        model: database["Rooms"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     }
                 ]
@@ -391,19 +391,19 @@ class ConsultationService {
     //Слот по названию комнаты
     async getSlotByRoomName (roomName) {
         try {
-            const room =  await database.models.Rooms.findOne({
+            const room =  await database["Rooms"].findOne({
                 where: {
                     roomName: roomName
                 }
             })
-            const slot = await database.models.Slots.findByPk(room.slotId, {
+            const slot = await database["Slots"].findByPk(room.slotId, {
                 include: [
                     {
-                        model: database.models.Rooms,
+                        model: database["Rooms"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     }
                 ]
@@ -417,7 +417,7 @@ class ConsultationService {
 
     async getRoomById (roomId) {
         try {
-            const room = await database.models.Rooms.findByPk(roomId);
+            const room = await database["Rooms"].findByPk(roomId);
             return room;
         }
         catch (e) {
@@ -427,7 +427,7 @@ class ConsultationService {
 
     async createSlot (doctorId, patientId, startDateTime, duration) {
         try {
-            const newSlot = await database.models.Slots.create({
+            const newSlot = await database["Slots"].create({
                 doctorId: doctorId, 
                 slotStartDateTime: moment(new Date(startDateTime)).toDate(), 
                 slotEndDateTime: moment(new Date(startDateTime)).add(duration, 'm').toDate(), 
@@ -444,10 +444,10 @@ class ConsultationService {
 
     async createRoom (slotId, roomName) {
         try {
-            const slot = await database.models.Slots.findByPk(slotId)
+            const slot = await database["Slots"].findByPk(slotId)
             /* const roomName = await UserManager.translit(`${testDoctor.secondName}_${testPatient.secondName}_${testSlot.slotStartDateTime.getTime()}`)
         */
-            const newRoom = await database.models.Rooms.create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id})
+            const newRoom = await database["Rooms"].create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id})
             return newRoom
         }
         catch(e) {
@@ -459,12 +459,12 @@ class ConsultationService {
 
     async createPayloadDoctor (doctorId, roomId) {
         try {
-            const doctor = await database.models.Doctors.findByPk(doctorId, {include: [{
-                model: database.models.Users,
+            const doctor = await database["Doctors"].findByPk(doctorId, {include: [{
+                model: database["Users"],
                 required: true
             }]})
-            const room = await database.models.Rooms.findByPk(roomId)
-            const slot = await database.models.Slots.findByPk(room.slotId)
+            const room = await database["Rooms"].findByPk(roomId)
+            const slot = await database["Slots"].findByPk(room.slotId)
             const payload = {
                 aud: room.roomName, // аудитория (аудитория приложения, например jitsi)
                 iss: JITSI_APP_ID, // издатель токена
@@ -477,8 +477,8 @@ class ConsultationService {
                     user: {
                         id: doctor.userId,
                         name: `${doctor.secondName} ${doctor.firstName}`, // имя пользователя
-                        email: doctor.user.email, // email пользователя
-                        avatar: doctor.user.avatar, // URL аватара пользователя (необязательно)
+                        email: doctor.User?.email, // email пользователя
+                        avatar: doctor.User.avatar, // URL аватара пользователя (необязательно)
                     }
                 }
             };
@@ -491,12 +491,12 @@ class ConsultationService {
 
     async createPayloadPatient (patientId, roomId) {
         try {
-            const patinet = await database.models.Patients.findByPk(patientId, {include: [{
-                model: database.models.Users,
+            const patinet = await database["Patients"].findByPk(patientId, {include: [{
+                model: database["Users"],
                 required: true
             }]})
-            const room = await database.models.Rooms.findByPk(roomId)
-            const slot = await database.models.Slots.findByPk(room.slotId)
+            const room = await database["Rooms"].findByPk(roomId)
+            const slot = await database["Slots"].findByPk(room.slotId)
             const payload = {
                 aud: room.roomName, // аудитория (аудитория приложения, например jitsi)
                 iss: JITSI_APP_ID, // издатель токена
@@ -509,8 +509,8 @@ class ConsultationService {
                     user: {
                         id: patinet.userId,
                         name: `${patinet.secondName} ${patinet.firstName}`, // имя пользователя
-                        email: patinet.user.email, // email пользователя
-                        avatar: patinet.user.avatar, // URL аватара пользователя (необязательно)
+                        email: patinet.User?.email, // email пользователя
+                        avatar: patinet.User?.avatar, // URL аватара пользователя (необязательно)
                         
                     }
                 }

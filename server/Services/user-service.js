@@ -5,163 +5,18 @@ const bcrypt = require('bcryptjs')
 /* const ApiError = require('../Errors/api-error'); */
 
 /* const UserDto = require('../dtos/user-dto'); */
-const database = require('../Database/setDatabase');
+/* const database = require('../Database/setDatabase'); */
 const ApiError = require('../Errors/api-error');
 const UserDto = require('../Dtos/UserDto');
 const {Op} = require('sequelize')
+const database = require('../models/index')
 
 class UserService {
-    
-   /*  async registrationPatient (login, password, patient_id) {
-        try {
-            //find candidate            
-            const candidate = await prisma.uirs_users_db.findMany({
-                where: {
-                    login: login,
-                },
-              })
-              
-            //if user already exists
-            if (candidate.length > 0) {
-                //send error
-                throw ApiError.BadRequest(`Пользователь ${login} уже существует`)
-            }
-
-            //hash password
-            const pass_to_hash = password.valueOf();
-            const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
-            
-            const uirs_users_db =  await prisma.uirs_users_db.create({
-                data: {
-                    login: login,
-                    password: hashPassword
-                },
-            })
-            const uirs_users = await prisma.uirs_users.create({
-                data: {
-                    role_id: 2,
-                    uirs_users_db_id: uirs_users_db.id
-                }
-            })
-            await prisma.uirs_users_db.update({
-                where: {
-                    id: uirs_users_db.id,
-                },
-                data: {
-                    uirs_users_id: uirs_users.id,
-                },
-              })
-
-            const uirs_users_patients_doctors = await prisma.uirs_users_patients_doctors.create({
-                data: {
-                    patient_id: patient_id,
-                    uirs_users_id: uirs_users.id,
-                }
-            });
-            await prisma.uirs_users.update({
-                where: {
-                    id: uirs_users.id,
-                },
-                data: {
-                    uirs_users_patients_doctors_id: uirs_users_patients_doctors.id,
-                },
-              })
-
-            //return userDto and tokens
-            return { user: uirs_users_db }
-        }
-        catch (e) {
-            console.log(e)
-        }
-    }
-    //registration method
-    async registration (Doctor_id, login, password, role_id) {
-        try {
-            //find candidate            
-            const candidate = await prisma.uirs_users_db.findMany({
-                where: {
-                    login: login,
-                },
-              })
-              
-            //if user already exists
-            if (candidate.length > 0) {
-                //send error
-                throw ApiError.BadRequest(`Пользователь ${login} уже существует`)
-            }
-
-            //hash password
-            const pass_to_hash = password.valueOf();
-            const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
-            
-            const uirs_users_db =  await prisma.uirs_users_db.create({
-                data: {
-                    login: login,
-                    password: hashPassword
-                },
-            })
-            const uirs_users = await prisma.uirs_users.create({
-                data: {
-                    role_id: parseInt(role_id),
-                    uirs_users_db_id: uirs_users_db.id
-                }
-            })
-            await prisma.uirs_users_db.update({
-                where: {
-                    id: uirs_users_db.id,
-                },
-                data: {
-                    uirs_users_id: uirs_users.id,
-                },
-              })
-            let doctor;
-            let uirs_users_patients_doctors;
-            if (Doctor_id ) {
-                doctor = await prisma.doctor.findUnique({
-                    where: {
-                        id: parseInt(Doctor_id)
-                    }
-                })
-                uirs_users_patients_doctors = await prisma.uirs_users_patients_doctors.create({
-                    data: {
-                        uirs_users_id: uirs_users.id,
-                        doctor_id: doctor.id
-                    }
-                })
-            }
-            else {
-                uirs_users_patients_doctors = await prisma.uirs_users_patients_doctors.create({
-                    data: {
-                        uirs_users_id: uirs_users.id,
-                    }
-                })
-            }
-            await prisma.uirs_users.update({
-                where: {
-                    id: uirs_users.id,
-                },
-                data: {
-                    uirs_users_patients_doctors_id: uirs_users_patients_doctors.id,
-                },
-              })
-            const userDto = await UserDto.deserialize(uirs_users_db, uirs_users, uirs_users_patients_doctors, doctor)
-            const tokens = tokenService.generateTokens({...userDto});
-            //save token to DB
-            await tokenService.saveToken(userDto.id, tokens.refreshToken);
-            
-            //return userDto and tokens
-            return { ...tokens, user: userDto }
-        }
-        catch (e) {
-            console.log(e)
-        }
-    } */
-
 
     async createUser (roleId, login, password, avatar, email, phone  ) {
         try {
             
-            const candidate = await database.models.Users.findOne({
+            const candidate = await database["Users"].findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -183,11 +38,11 @@ class UserService {
             const hashPassword = await bcrypt.hash(pass_to_hash, 8);
             let newUser = null
             if (avatar)
-                newUser = await database.models.Users.create({
+                newUser = await database["Users"].create({
                     login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email, avatar
                 })
             else 
-                newUser = await database.models.Users.create({
+                newUser = await database["Users"].create({
                     login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email
                 })
             return newUser
@@ -204,18 +59,17 @@ class UserService {
     async login(login, password) {
         try {
             //find user
-            const user = await database.models.Users.findOne({
+            const user = await database["Users"].findOne({
                 where: {
                     login: login
                 },
                 include: [
                     {
-                        model: database.models.UsersRoles,
+                        model: database["UsersRoles"],
                         required: true
                     }
                 ],
             })
-            /* console.log(user) */
 
             if (!user) {
                 return ApiError.AuthError(`Пользователь ${login} не найден`)
@@ -228,15 +82,15 @@ class UserService {
             if (!isPassEquals) {
                 return ApiError.AuthError(`Неверный пароль`)
             }
-            switch (user.users_role.accessLevel) {
+            switch (user.UsersRole.accessLevel) {
                 case 1: 
-                    let patient = await database.models.Patients.findOne({
+                    let patient = await database["Patients"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
                     
-                    const userDtoPatient = await UserDto.deserialize(user, user.users_role, patient)
+                    const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
                     const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
                     /* console.log(tokensPatient) */
                     await tokenService.saveToken(user.id, tokensPatient.refreshToken);
@@ -244,39 +98,37 @@ class UserService {
                     return { ...tokensPatient, user: userDtoPatient } 
                     break;
                 case 2:
-                    let doctor = await database.models.Doctors.findOne({
+                    let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
-                    
-                    const userDto = await UserDto.deserialize(user, user.users_role, doctor)
+                    const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     /* console.log({...userDto}) */
                     const tokens = await tokenService.generateTokens({...userDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: userDto } 
                 case 3:
-                    let admin = await database.models.Admins.findOne({
+                    let admin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
                     
-                    const userDtoAdmin = await UserDto.deserialize(user, user.users_role, admin)
+                    const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
                     /* console.log({...userDtoAdmin}) */
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin } 
                 case 4:
-                    let superAdmin = await database.models.Admins.findOne({
+                    let superAdmin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
-                    
-                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.users_role, superAdmin)
+                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
                     /* console.log({...userDtoAdmin}) */
                     const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
@@ -313,58 +165,58 @@ class UserService {
                 console.log('не валидный токен или нет в БД')
                 throw ApiError.UnauthorizedError();
             }
-            const user = await database.models.Users.findOne({
+            const user = await database["Users"].findOne({
                 where: {
                     id: userData.id,
                 },
                 include: [{
-                    model: database.models.UsersRoles,
+                    model: database["UsersRoles"],
                     required: true
                 }]
             })
-            switch (user.users_role.accessLevel) {
+            switch (user.UsersRole.accessLevel) {
                 case 1: 
-                    let patient = await database.models.Patients.findOne({
+                    let patient = await database["Patients"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
-                    const userDtoPatient = await UserDto.deserialize(user, user.users_role, patient)
+                    const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
                     const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
                     await tokenService.saveToken(userDtoPatient.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
                 case 2:
-                    let doctor = await database.models.Doctors.findOne({
+                    let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
                     
-                    const userDto = await UserDto.deserialize(user, user.users_role, doctor)
+                    const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const tokens = await tokenService.generateTokens({...userDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: userDto } 
                 case 3:
-                    let admin = await database.models.Admins.findOne({
+                    let admin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
-                    const userDtoAdmin = await UserDto.deserialize(user, user.users_role, admin)
+                    const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin }
                 case 4:
-                    let superAdmin = await database.models.Admins.findOne({
+                    let superAdmin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
                         }
                     })
                     
-                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.users_role, superAdmin)
+                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
                     /* console.log({...userDtoAdmin}) */
                     const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
@@ -383,20 +235,20 @@ class UserService {
 
     async checkPhone (phone) {
         try {
-            const user = await database.models.Users.findOne({
+            const user = await database["Users"].findOne({
                 where: {
                     login: phone,
                     phone: phone
                 },
                 include: [
                     {
-                        model: database.models.Doctors,
+                        model: database["Doctors"],
                         required: false
                     },{
-                        model: database.models.Admins,
+                        model: database["Admins"],
                         required: false
                     },{
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     },
 

@@ -9,3 +9,4 @@ client/tmk_client/public/assets
 server/package-lock.json
 client/tmk_client/package-lock.json
 healthyChildService/
+serverCopy/

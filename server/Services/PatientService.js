@@ -1,11 +1,11 @@
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 const moment = require('moment-timezone')
 class PatientService {
     async getAllPatients() {
         try {
-            const patients = await database.models.Patients.findAll({
+            const patients = await database["Patients"].findAll({
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -18,9 +18,9 @@ class PatientService {
 
     async getPatient(id) {
         try {
-            const patient = await database.models.Patients.findByPk(id, {
+            const patient = await database["Patients"].findByPk(id, {
                 include: [{
-                    model: database.models.Users,
+                    model: database["Users"],
                     required: true
                 }]
             })
@@ -33,7 +33,7 @@ class PatientService {
     //newUser.id, secondName, name, patrinomicName, phone, email, password, formattedDate, info
     async createPatient(userId, secondName, firstName, patronomicName, birthDate, info, snils = null) {
         try {
-            const patient = await database.models.Patients.create({
+            const patient = await database["Patients"].create({
                 
                 userId, secondName, firstName, patronomicName, birthDate, snils, info
             })
