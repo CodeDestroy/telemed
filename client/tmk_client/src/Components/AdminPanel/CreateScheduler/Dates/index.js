@@ -1,66 +1,94 @@
 import {useEffect, useState, useContext} from 'react'
-import Header from '../Header'
+import Header from '../../Header'
 import { Scheduler } from "@aldabil/react-scheduler";
 import {ru } from "date-fns/locale";
-import russianTranslition from '../../../Assets/translate/russianTranslition';
-import CustomEditor from "./CutomEditor";
-import AdminService from '../../../Services/AdminService';
+import russianTranslition from '../../../../Assets/translate/russianTranslition';
+
 import dayjs from 'dayjs';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Context } from '../../../';
+import { Context } from '../../../../';
 import { IconButton, Snackbar } from "@mui/material";
-function Schedule() {
+import DoctorService from '../../../../Services/DoctorService';
+
+function CreateDateSchedule() {
     const {store} = useContext(Context)
     let [events, setEvents] = useState([
     ])
-    
-    const handleCellClick = (event, row, day) => {
-      // Do something...
-    }
-    
-    const handleEventClick = (event, item) => {
-      // Do something...
-    }
-        
-    const handleAlertCloseButtonClicked = (item) => {
-      // Do something...
-    }
+
     const handleEventDelete = (event) => {
         
         let newEvents = events.filter((item) => item.event_id !== event)
         setEvents(newEvents)
     }
 
+    /* useEffect(() => {
+        async function fetchSchedule() {
+            console.log(store.user)
+            if (store.user?.personId) {
+                const response = await DoctorService.getSchedule(store.user.personId);
+                const newSchedule = { ...schedule };
+    
+                response.data.forEach(el => {
+                    const day = el.WeekDay.name;
+                    const start = el.scheduleStartTime.substring(0,5);
+                    const end = el.scheduleEndTime.substring(0,5);
+                    const id = el.id
+                    
+                    if (!newSchedule[day]) newSchedule[day] = [];
+                    newSchedule[day].push({ start, end, id });
+                });
+    
+                setSchedule(newSchedule);
+            }
+        }
+        fetchSchedule();
+    }, [store]); */
+
     useEffect(() => {
-        async function fetchDataSlots() {
+        async function fetchSchedule() {
             try {
-                const response = await AdminService.getConsultations();
-                response.data[0].map((slot) => {
-                    const newEvent = {
-                        event_id: slot.id || Math.random(),
-                        title: `Конференция ${slot?.dSecondName} ${slot?.dFirstName}`,
-                        start: new Date(slot.slotStartDateTime),
-                        end: new Date(slot.slotEndDateTime),
-                        description: `Конференция. Врач: ${slot?.dSecondName} ${slot?.dFirstName}. Пациент: ${slot?.pSecondName} ${slot?.pFirstName}`,
-                        patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + slot.pUrl,
-                        doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + slot.dUrl,
-                        doctorId: slot.doctorId,
-                        patientId: slot.patientId,
-                        dotorSecondName: slot?.dSecondName,
-                        dotorFirstName: slot?.dFirstName,
-                        patientSecondName: slot?.pSecondName,
-                        patientFirstName: slot?.pFirstName,
-                    }
-                    setEvents((prevEvents) => [...prevEvents, newEvent]);
-                })
-                return response.data[0]
+                if (store.user?.personId) {
+                    const response = await DoctorService.getSchedule(store.user.personId);
+                    /* const newSchedule = { ...events }; */
+                    console.log(response)
+                    response.data.forEach(el => {
+                        const day = el.WeekDay.name;
+                        const start = el.scheduleStartTime.substring(0,5);
+                        const end = el.scheduleEndTime.substring(0,5);
+                        const date = el.Date
+                        const id = el.id
+                        
+                        /* if (!newSchedule[day]) newSchedule[day] = [];
+                        newSchedule[day].push({ start, end, id }); */
+                    });
+                    /* response.data[0].map((slot) => {
+                        const newEvent = {
+                            event_id: slot.id || Math.random(),
+                            title: `Конференция ${slot?.dSecondName} ${slot?.dFirstName}`,
+                            start: new Date(slot.slotStartDateTime),
+                            end: new Date(slot.slotEndDateTime),
+                            description: `Конференция. Врач: ${slot?.dSecondName} ${slot?.dFirstName}. Пациент: ${slot?.pSecondName} ${slot?.pFirstName}`,
+                            patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + slot.pUrl,
+                            doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + slot.dUrl,
+                            doctorId: slot.doctorId,
+                            patientId: slot.patientId,
+                            dotorSecondName: slot?.dSecondName,
+                            dotorFirstName: slot?.dFirstName,
+                            patientSecondName: slot?.pSecondName,
+                            patientFirstName: slot?.pFirstName,
+                        }
+                        setEvents((prevEvents) => [...prevEvents, newEvent]);
+                    }) */
+                    return response.data[0]
+                }
+                
             }
             catch (e) {
                 alert(e.response.data.error)
             }
             
         }
-        fetchDataSlots()
+        fetchSchedule()
     }, [])
 
 
@@ -122,9 +150,7 @@ function Schedule() {
                 /* disableViewNavigator={true} */
                 locale={ru}
                 translations={russianTranslition}
-                /* resourceViewMode="tabs" */
                 hourFormat='24'
-                /* agenda={false} */
                 month={
                     {
                         weekDays: [0, 1, 2, 3, 4, 5], 
@@ -141,17 +167,17 @@ function Schedule() {
                     weekStartOn: 1, 
                     startHour: 8, 
                     endHour: 22,
-                    step: 30,
+                    step: 60,
                     navigation: true,
                     disableGoToDay: false
                 }}      
                 day={{
                     startHour: 8, 
                     endHour: 22, 
-                    step: 30,
+                    step: 60,
                     navigation: true
                 }}
-                fields={[
+                /* fields={[
                     {
                         name: "patientUrl",
                         type: "input",
@@ -178,14 +204,14 @@ function Schedule() {
                         name: "patientId",
                         type: "input"
                     }
-                ]}
+                ]} */
                 deletable={false}
                 draggable={false}
                 events={events}
-                editable={store.user?.accessLevel > 3 ? true: false}
+                editable={true}
                 onConfirm={handleConfirm}
                 onDelete={handleEventDelete} 
-                customEditor={(scheduler) => <CustomEditor scheduler={scheduler} onStateChange={handleEventsChange} onConfirm={handleConfirm}/>}
+                /* customEditor={(scheduler) => <CustomEditor scheduler={scheduler} onStateChange={handleEventsChange} onConfirm={handleConfirm}/>}
                 viewerExtraComponent={(fields, event) => {
                     return (
                       <div>
@@ -212,7 +238,7 @@ function Schedule() {
                             </IconButton></p>
                       </div>
                     );
-                }}
+                }} */
             />
             <Snackbar
                 anchorOrigin={{
@@ -229,5 +255,5 @@ function Schedule() {
     )
 }
 
-export default Schedule
+export default CreateDateSchedule
 

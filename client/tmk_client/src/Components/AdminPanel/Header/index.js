@@ -56,6 +56,11 @@ function AdminHeader() {
         setAnchorElUser(null);
     };
 
+    const handleSettings = () => {
+        window.location.href = doctorLocations.settings
+
+    }
+
     return (
         <AppBar position="static" style={{padding: 0}}>
             <Container maxWidth="xl">
@@ -155,6 +160,9 @@ function AdminHeader() {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                     >
+                        <MenuItem onClick={handleSettings}>
+                            <Typography textAlign="center">Настройки</Typography>
+                        </MenuItem>
                         <MenuItem onClick={handleLogout}>
                             <Typography textAlign="center">Выйти</Typography>
                         </MenuItem>

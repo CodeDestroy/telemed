@@ -65,18 +65,50 @@ class SchedulerService {
 
     async getDoctorSchedule (doctorId) {
         try {
-            const schedule = await database["Schedule"].findAll({
-                where: {
-                    doctorId
-                },
-                include: [
-                    { 
-                        model: database["WeekDays"],
-                        required: true 
-                    }
-                ],
-                order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
+            const doctor = await database["Doctors"].findByPk(doctorId, {
+                include: [{
+                    model: database["Users"],
+                    required: true
+                }]
             })
+            let schedule = null
+            switch (doctor.User.schedulerType) {
+                case "weekDay": 
+                    schedule = await database["Schedule"].findAll({
+                        where: {
+                            doctorId,
+                            date: null
+                        },
+                        include: [
+                            { 
+                                model: database["WeekDays"],
+                                required: true 
+                            }
+                        ],
+                        order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
+                    })
+                    break
+                case "dates":
+                    schedule = await database["Schedule"].findAll({
+                        where: {
+                            doctorId,
+                            date: {
+                                [Op.ne]: null
+                            }
+                        },
+                        include: [
+                            { 
+                                model: database["WeekDays"],
+                                required: true 
+                            }
+                        ],
+                        order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
+                    })
+                    break
+                default:
+                    throw new Error("Неизвестный тип расписания")
+
+            }
             return schedule
         }
         catch (e) {

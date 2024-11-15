@@ -20,10 +20,10 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { blue, grey } from '@mui/material/colors';
 import { format } from 'date-fns';
-import Header from '../Header';
+import Header from '../../Header';
 import {ru} from 'date-fns/locale/ru';
-import DoctorService from '../../../Services/DoctorService';
-import { Context } from '../../../';
+import DoctorService from '../../../../Services/DoctorService';
+import { Context } from '../../../..';
 
 const white = '#fff'
 // Дни недели для отображения
@@ -129,12 +129,13 @@ const CreateSchedule = () => {
 
     useEffect(() => {
         async function fetchSchedule() {
+            console.log(store.user)
             if (store.user?.personId) {
                 const response = await DoctorService.getSchedule(store.user.personId);
                 const newSchedule = { ...schedule };
     
                 response.data.forEach(el => {
-                    const day = el.week_day.name;
+                    const day = el.WeekDay.name;
                     const start = el.scheduleStartTime.substring(0,5);
                     const end = el.scheduleEndTime.substring(0,5);
                     const id = el.id
@@ -187,7 +188,7 @@ const CreateSchedule = () => {
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
                     <Box sx={{ p: 4 }}>
                         <Typography variant="h4" align="center" gutterBottom>
-                            Календарь врача
+                            Ваше распиание
                         </Typography>
                         <Button variant="contained" color="primary" onClick={handleOpenModal} startIcon={<AddIcon />}>
                             Добавить время работы

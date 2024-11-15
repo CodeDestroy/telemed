@@ -44,7 +44,8 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
     confirmed: DataTypes.BOOLEAN,
-    confirmCode: DataTypes.TEXT
+    confirmCode: DataTypes.TEXT,
+    schedulerType: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Users',

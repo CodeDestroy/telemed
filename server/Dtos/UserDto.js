@@ -10,6 +10,7 @@ class UserDto {
             avatar: user.avatar,
             email: user.email,
             phone: user.phone,
+            schedulerType: user.schedulerType,
             //payload2
             roleName: user_role.roleName,
             secondName: person.secondName,

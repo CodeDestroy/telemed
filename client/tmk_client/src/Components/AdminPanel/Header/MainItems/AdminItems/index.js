@@ -25,9 +25,9 @@ function AdminItems() {
 
     return (
         <>
-            <MenuItem onClick={handleAdminDashboard}>
+            {/* <MenuItem onClick={handleAdminDashboard}>
                 <Typography textAlign="center">Панель администратора</Typography>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleDoctorManagement}>
                 <Typography textAlign="center">Управление врачами</Typography>
             </MenuItem>

@@ -12,8 +12,8 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert('Patients', [
-      {serviceShortName: 'ТМК', serviceName: 'Телемедицинская консультация', price: 1500}
+    return queryInterface.bulkInsert('Services', [
+      {serviceShortName: 'ТМК', serviceName: 'Телемедицинская консультация', price: 1500, createdAt: new Date(), updatedAt: new Date()}
     ]);
   },
 
@@ -24,6 +24,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    return queryInterface.bulkDelete('Patients', null, {});
+    return queryInterface.bulkDelete('Services', null, {});
   }
 };
