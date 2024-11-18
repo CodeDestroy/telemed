@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Schedule.init({
     doctorId: DataTypes.INTEGER,
+    date: DataTypes.DATEONLY,
     scheduleDayId: DataTypes.INTEGER,
     scheduleStartTime: DataTypes.TIME,
     scheduleEndTime: DataTypes.TIME,
