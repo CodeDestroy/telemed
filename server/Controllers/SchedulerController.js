@@ -6,9 +6,10 @@ class SchedulerController {
     // Создание нового временного промежутка для расписания врача
     async createOrUpdateSchedule(req, res) {
         const { doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, scheduleStatus = 1 } = req.body;
-        const startTime = (new Date(scheduleStartTime)).getHours() + ':' + (new Date(scheduleStartTime)).getMinutes();
-        const endTime = (new Date(scheduleEndTime)).getHours() + ':' + (new Date(scheduleEndTime)).getMinutes();
+        const startTime = ((new Date(scheduleStartTime)).getHours() + 3) + ':' + (new Date(scheduleStartTime)).getMinutes();
+        const endTime = ((new Date(scheduleEndTime)).getHours() + 3) + ':' + (new Date(scheduleEndTime)).getMinutes();
 
+        console.log(startTime, endTime)
         try {
             const weekDay = await database["WeekDays"].findOne({
                 where: {

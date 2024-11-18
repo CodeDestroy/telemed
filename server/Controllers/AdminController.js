@@ -71,7 +71,7 @@ class AdminController {
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
             if (patient.User.email) {
-                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink)
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
                 transporter.sendMail(mailOptionsPatinet, (error, info) => {
                     if (error) {
                         throw new Error(error)
@@ -82,7 +82,7 @@ class AdminController {
                 });
             }
             if (doctor.User.email) {
-                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink)
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime)
                 transporter.sendMail(mailOptionsDoctor, (error, info) => {
                     if (error) {
                         throw new Error(error)
@@ -282,7 +282,7 @@ class AdminController {
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             
-            const newUser = await userService.createUser(3, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+            const newUser = await userService.createUser(1, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
             const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info)
 
             res.status(201).json({ message: 'Пациент создан успешно', userId: newUser.id, patientId: newPatient.id });

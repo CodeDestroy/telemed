@@ -19,13 +19,14 @@ const upload = multer({ storage: storage });
 router.get('/consultations/all', AdminController.getAllConsultations)
 router.get('/consultations/ended', AdminController.getEndedConsultations)
 router.post('/consultations/create', AdminController.createConsultation)
+
+router.post('/doctors/create', upload.single('avatar'), AdminController.createDoctor)
+
+router.post('/patients/create', upload.single('avatar'), AdminController.createPatient)
 router.get('/patients/all', AdminController.getAllPatients)
 router.get('/patients/:id', AdminController.getPatient)
 router.post('/patients/:id', AdminController.editPatient)
 router.get('/doctors/all', AdminController.getAllDoctors)
 router.get('/doctors/:id', AdminController.getDoctor)
 router.post('/doctors/:id', AdminController.editDoctor)
-router.post('/doctors/create', upload.single('avatar'), AdminController.createDoctor)
-
-router.post('/patients/create', upload.single('avatar'), AdminController.createPatient)
 module.exports = router;

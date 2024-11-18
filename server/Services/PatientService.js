@@ -31,7 +31,7 @@ class PatientService {
         }
     }
     //newUser.id, secondName, name, patrinomicName, phone, email, password, formattedDate, info
-    async createPatient(userId, secondName, firstName, patronomicName, birthDate, info, snils = null) {
+    async createPatient(userId, secondName, firstName, patronomicName, birthDate, info, snils = '') {
         try {
             const patient = await database["Patients"].create({
                 

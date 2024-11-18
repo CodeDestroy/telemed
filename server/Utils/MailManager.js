@@ -102,7 +102,20 @@ class MailManager {
         return mailOptions
     }
 
-    async getMailOptionsTMKLink(to, link) {
+    async getMailOptionsTMKLink(to, link, dateString = null) {
+        let formattedDateTime = dateString
+        if (dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+    
+            const hours = String(date.getHours() + 3).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+            formattedDateTime = `${day}.${month}.${year} ${hours}:${minutes}`;
+        }
+
         let mailOptions = {
             from: '"ТМК" <tmk@clinicode.ru>', // Отправитель
             to: to, // Получатель
@@ -162,7 +175,9 @@ class MailManager {
                     <div class="container">
                         <div class="content">
                             <p style="text-align: center; font-size: 2.5rem;">Здравствуйте!</p>
-                            Пожалуйста, используйте следующую ссылку для подключения к телемедицинской консультации:
+                            ${formattedDateTime != null ? `<p style="text-align: center; font-size: 1.5rem;">Время начала телемедицинской конференции: ${formattedDateTime}</p>`: ''}
+ 
+                            Пожалуйста, используйте следующую ссылку для подключения:
                         </div>
                         <div class="code">
                             <a style="font-size: larger; color: red;" href="${link}" class="link">Подключится</a>

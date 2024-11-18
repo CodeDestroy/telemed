@@ -470,7 +470,7 @@ class ConsultationService {
                 iss: JITSI_APP_ID, // издатель токена
                 sub: JITSI_SERVER_URL, // цель токена (обычно URL сервера)
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
-                nbf: moment(slot.slotStartDateTime).add(-20, 'm').unix(),
+                nbf: moment(slot.slotStartDateTime).add(-20, 'd').unix(),
                 exp: moment(slot.slotEndDateTime).add(20, 'm').unix(), // время истечения срока действия токена (например, через час)
                 moderator: true, // установить true, если пользователь является модератором
                 context: {
@@ -502,7 +502,7 @@ class ConsultationService {
                 iss: JITSI_APP_ID, // издатель токена
                 sub: JITSI_SERVER_URL, // цель токена (обычно URL сервера)
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
-                nbf: moment(slot.slotStartDateTime).add(-20, 'm').unix(),
+                nbf: moment(slot.slotStartDateTime).add(-20, 'd').unix(),
                 exp: moment(slot.slotEndDateTime).add(20, 'm').unix(), // время истечения срока действия токена (например, через час)
                 moderator: false, // установить true, если пользователь является модератором
                 context: {

@@ -10,10 +10,10 @@ const ApiError = require('./Errors/api-error');
 const { app, HTTP_PORT, HOST, HTTPS_PORT } = require('.');
 const {httpSocket, httpsSocket} = require('./Sockets/mainSocket');
 const healthyChildApi = require("./Api/healthyChildApi");
-/* var options = {
+var options = {
     key: fs.readFileSync('/etc/letsencrypt/live/clinicode.ru/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/clinicode.ru/fullchain.pem')
-  }; */
+  };
 const start = async () => {
     try {
         /* const testData = await healthyChildApi.getOnlineSched() 
@@ -28,7 +28,7 @@ const start = async () => {
             await database.sync({ force: true });
         else
             await database.sync(); */
-        /* const httpsServer = https.createServer(options, app); */
+        const httpsServer = https.createServer(options, app);
         const db = require('./models/index')
         /* console.log(await db["Users"].findByPk(1)) */
         const httpServer = http.createServer(app);
@@ -37,11 +37,11 @@ const start = async () => {
         httpServer.listen(HTTP_PORT, () => {
             console.log(`HTTP Server started on port ${HTTP_PORT} URL ${HOST}`);
         });
-        /* httpsServer.listen(HTTPS_PORT, () => {
+        httpsServer.listen(HTTPS_PORT, () => {
             console.log(`Server started on port ${HTTPS_PORT} URL ${HOST}`) 
-        }); */
+        });
         await httpSocket(httpServer, [process.env.CLIENT_URL, 'https://www.clinicode.ru/' , 'http://localhost:3000', 'http://localhost:3000/', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru', 'https://clinicode.ru', 'http://clinicode.ru:3000'])
-        //await httpsSocket(httpsServer, [process.env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru', 'https://clinicode.ru', 'http://clinicode.ru:3000'])
+        await httpsSocket(httpsServer, [process.env.CLIENT_URL, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru', 'https://clinicode.ru', 'http://clinicode.ru:3000'])
     }
     catch (e) {
         console.log(e);

@@ -6,7 +6,7 @@ const { writeFile } = require("fs");
 const bcrypt = require('bcryptjs');
 const UserManager = require("../Utils/UserManager");
 let map = new Map();
-const database = require('../Database/setDatabase');
+const database = require('../models/index');
 const MessageDto = require('../Dtos/MessageDto');
 const rooms = require('../Utils/RoomManager')
 const httpSocket = async (httpServer, [cors]) => {
@@ -22,22 +22,22 @@ const httpSocket = async (httpServer, [cors]) => {
             try {
                 var decoded = jwt.verify(token, process.env.JITSI_SECRET);
                 const decodedUser = decoded.context.user;
-                const user = await database.models.Users.findByPk(decodedUser.id, {
+                const user = await database["Users"].findByPk(decodedUser.id, {
                     include: [
                         {
-                            model: database.models.UsersRoles,
+                            model: database["UsersRoles"],
                             required: true,
                         },
                         {
-                            model: database.models.Doctors,
+                            model: database["Doctors"],
                             required: false
                         },
                         {
-                            model: database.models.Patients,
+                            model: database["Patients"],
                             required: false
                         },
                         {
-                            model: database.models.Admins,
+                            model: database["Admins"],
                             required: false
                         },
                     ]
@@ -57,7 +57,7 @@ const httpSocket = async (httpServer, [cors]) => {
                     const userRole = decoded.moderator == 'true' ? 2 : 1 ;
                     const pass_to_hash = decoded.context.user.name.valueOf();
                     const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
-                    const newUser = await database.models.Users.create({login: decoded.context.user.name, password: decoded.context.user.hashPassword, userRoleId: userRole, avatar: decodedUser.avatar, email: decodedUser.email  })
+                    const newUser = await database["Users"].create({login: decoded.context.user.name, password: decoded.context.user.hashPassword, userRoleId: userRole, avatar: decodedUser.avatar, email: decodedUser.email  })
                     const fio = await UserManager.parseFullName(decodedUser.name);
                     
                     if (userRole == 2) {
@@ -67,22 +67,22 @@ const httpSocket = async (httpServer, [cors]) => {
                         await this.models.Patients.create({userId: newUser.id, secondName: fio.secondName, firstName: fio.firstName, patronomicName: fio.patronomicName, birthDate: new Date(), info: decodedUser.name})
                     }
 
-                    const newFindedUser = await database.models.Users.findByPk(newUser.id, {
+                    const newFindedUser = await database["Users"].findByPk(newUser.id, {
                         include: [
                             {
-                                model: database.models.UsersRoles,
+                                model: database["UsersRoles"],
                                 required: true,
                             },
                             {
-                                model: database.models.Doctors,
+                                model: database["Doctors"],
                                 required: false
                             },
                             {
-                                model: database.models.Patients,
+                                model: database["Patients"],
                                 required: false
                             },
                             {
-                                model: database.models.Admins,
+                                model: database["Admins"],
                                 required: false
                             },
                         ]
@@ -104,7 +104,7 @@ const httpSocket = async (httpServer, [cors]) => {
 
 
         socket.on('room:join', async (roomName, userId, jwt) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomName
                 }
@@ -117,7 +117,7 @@ const httpSocket = async (httpServer, [cors]) => {
             const ids = room.usersId;
             let arr = [];
             
-            const messages = await database.models.Messages.findAll({
+            const messages = await database["Messages"].findAll({
                 where: {
                     roomId: room.id
                 },
@@ -127,27 +127,27 @@ const httpSocket = async (httpServer, [cors]) => {
             });
             
             for (const message of messages) {
-                let files = await database.models.Files.findAll({ where: { messageId: message.id } });
+                let files = await database["Files"].findAll({ where: { messageId: message.id } });
 
-                const user = await database.models.Users.findOne({
+                const user = await database["Users"].findOne({
                     where: {
                         id: message.userId,
                     },
                     include: [
                         {
-                            model: database.models.UsersRoles,
+                            model: database["UsersRoles"],
                             required: true,
                         },
                         {
-                            model: database.models.Doctors,
+                            model: database["Doctors"],
                             required: false
                         },
                         {
-                            model: database.models.Patients,
+                            model: database["Patients"],
                             required: false
                         },
                         {
-                            model: database.models.Admins,
+                            model: database["Admins"],
                             required: false
                         },
                     ]
@@ -163,9 +163,9 @@ const httpSocket = async (httpServer, [cors]) => {
             let i = 0;
             const files_created = [];
             /* console.log(`text: ${text} roomId: ${roomId} userId: ${userId}` ) */
-            let room = await database.models.Rooms.findByPk(roomId);
+            let room = await database["Rooms"].findByPk(roomId);
             /* console.log(text) */
-            const message = await database.models.Messages.create({ text: text, roomId: room.id, userId });
+            const message = await database["Messages"].create({ text: text, roomId: room.id, userId });
             if (file) {
 
 
@@ -178,26 +178,26 @@ const httpSocket = async (httpServer, [cors]) => {
                     console.log({ message: err ? "failure" : "success" });
                 });
 
-                const file_created = await database.models.Files.create({ path: `/files/${room.id}/${fileName}`, name: name, type: type, messageId: message.id });
+                const file_created = await database["Files"].create({ path: `/files/${room.id}/${fileName}`, name: name, type: type, messageId: message.id });
                 files_created.push(file_created);
             }
 
-            const user = await database.models.Users.findByPk(userId, {
+            const user = await database["Users"].findByPk(userId, {
                 include: [
                     {
-                        model: database.models.UsersRoles,
+                        model: database["UsersRoles"],
                         required: true,
                     },
                     {
-                        model: database.models.Doctors,
+                        model: database["Doctors"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     },
                     {
-                        model: database.models.Admins,
+                        model: database["Admins"],
                         required: false
                     },
                 ]
@@ -205,7 +205,7 @@ const httpSocket = async (httpServer, [cors]) => {
             ioHTTP.to(room.id).emit('message:return', message, user, files_created, 1);
         });
         socket.on('room:leave', async (roomId) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomId
                 }
@@ -222,7 +222,7 @@ const httpSocket = async (httpServer, [cors]) => {
         });
 
         socket.on('leave', async (roomId) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomId
                 }
@@ -257,22 +257,22 @@ const httpsSocket = async (httpsServer, [cors]) => {
             try {
                 var decoded = jwt.verify(token, process.env.JITSI_SECRET);
                 const decodedUser = decoded.context.user;
-                const user = await database.models.Users.findByPk(decodedUser.id, {
+                const user = await database["Users"].findByPk(decodedUser.id, {
                     include: [
                         {
-                            model: database.models.UsersRoles,
+                            model: database["UsersRoles"],
                             required: true,
                         },
                         {
-                            model: database.models.Doctors,
+                            model: database["Doctors"],
                             required: false
                         },
                         {
-                            model: database.models.Patients,
+                            model: database["Patients"],
                             required: false
                         },
                         {
-                            model: database.models.Admins,
+                            model: database["Admins"],
                             required: false
                         },
                     ]
@@ -289,7 +289,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
                     const userRole = decoded.moderator == 'true' ? 2 : 1 ;
                     const pass_to_hash = decoded.context.user.name.valueOf();
                     const hashPassword = bcrypt.hashSync(pass_to_hash, 8);
-                    const newUser = await database.models.Users.create({login: decoded.context.user.name, password: decoded.context.user.hashPassword, userRoleId: userRole, avatar: decodedUser.avatar, email: decodedUser.email  })
+                    const newUser = await database["Users"].create({login: decoded.context.user.name, password: decoded.context.user.hashPassword, userRoleId: userRole, avatar: decodedUser.avatar, email: decodedUser.email  })
                     const fio = await UserManager.parseFullName(decodedUser.name);
                     
                     if (userRole == 2) {
@@ -299,22 +299,22 @@ const httpsSocket = async (httpsServer, [cors]) => {
                         await this.models.Patients.create({userId: newUser.id, secondName: fio.secondName, firstName: fio.firstName, patronomicName: fio.patronomicName, birthDate: new Date(), info: decodedUser.name})
                     }
 
-                    const newFindedUser = await database.models.Users.findByPk(newUser.id, {
+                    const newFindedUser = await database["Users"].findByPk(newUser.id, {
                         include: [
                             {
-                                model: database.models.UsersRoles,
+                                model: database["UsersRoles"],
                                 required: true,
                             },
                             {
-                                model: database.models.Doctors,
+                                model: database["Doctors"],
                                 required: false
                             },
                             {
-                                model: database.models.Patients,
+                                model: database["Patients"],
                                 required: false
                             },
                             {
-                                model: database.models.Admins,
+                                model: database["Admins"],
                                 required: false
                             },
                         ]
@@ -336,7 +336,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
 
 
         socket.on('room:join', async (roomName, userId, jwt) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomName
                 }
@@ -349,7 +349,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
             const ids = room.usersId;
             let arr = [];
             
-            const messages = await database.models.Messages.findAll({
+            const messages = await database["Messages"].findAll({
                 where: {
                     roomId: room.id
                 },
@@ -357,29 +357,29 @@ const httpsSocket = async (httpsServer, [cors]) => {
                     ['createdAt', 'ASC']
                 ]
             });
-            
+            console.log(messages)
             for (const message of messages) {
-                let files = await database.models.Files.findAll({ where: { messageId: message.id } });
+                let files = await database["Files"].findAll({ where: { messageId: message.id } });
 
-                const user = await database.models.Users.findOne({
+                const user = await database["Users"].findOne({
                     where: {
                         id: message.userId,
                     },
                     include: [
                         {
-                            model: database.models.UsersRoles,
+                            model: database["UsersRoles"],
                             required: true,
                         },
                         {
-                            model: database.models.Doctors,
+                            model: database["Doctors"],
                             required: false
                         },
                         {
-                            model: database.models.Patients,
+                            model: database["Patients"],
                             required: false
                         },
                         {
-                            model: database.models.Admins,
+                            model: database["Admins"],
                             required: false
                         },
                     ]
@@ -394,9 +394,9 @@ const httpsSocket = async (httpsServer, [cors]) => {
         socket.on('message:upload', async (text, file, name, type, roomId, userId) => {
             let i = 0;
             const files_created = [];
-            let room = await database.models.Rooms.findByPk(roomId);
-            /* console.log(text) */
-            const message = await database.models.Messages.create({ text: text, roomId: room.id, userId });
+            let room = await database["Rooms"].findByPk(roomId);
+            console.log(roomId)
+            const message = await database["Messages"].create({ text: text, roomId: room.id, userId });
             if (file) {
 
 
@@ -409,26 +409,26 @@ const httpsSocket = async (httpsServer, [cors]) => {
                     console.log({ message: err ? "failure" : "success" });
                 });
 
-                const file_created = await database.models.Files.create({ path: `/files/${room.id}/${fileName}`, name: name, type: type, messageId: message.id });
+                const file_created = await database["Files"].create({ path: `/files/${room.id}/${fileName}`, name: name, type: type, messageId: message.id });
                 files_created.push(file_created);
             }
 
-            const user = await database.models.Users.findByPk(userId, {
+            const user = await database["Users"].findByPk(userId, {
                 include: [
                     {
-                        model: database.models.UsersRoles,
+                        model: database["UsersRoles"],
                         required: true,
                     },
                     {
-                        model: database.models.Doctors,
+                        model: database["Doctors"],
                         required: false
                     },
                     {
-                        model: database.models.Patients,
+                        model: database["Patients"],
                         required: false
                     },
                     {
-                        model: database.models.Admins,
+                        model: database["Admins"],
                         required: false
                     },
                 ]
@@ -436,7 +436,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
             io.to(room.id).emit('message:return', message, user, files_created, 1);
         });
         socket.on('room:leave', async (roomId) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomId
                 }
@@ -447,7 +447,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
         /* socket.on('timer:start', async (conferenceEvent) => {
             console.log(conferenceEvent)
             const userList = rooms.getUsersInRoom(conferenceEvent.roomName)
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms.findOne({
                 where: {
                     roomName: conferenceEvent.roomName
                 }
@@ -459,7 +459,7 @@ const httpsSocket = async (httpsServer, [cors]) => {
         }); */
 
         socket.on('leave', async (roomId) => {
-            const room = await database.models.Rooms.findOne({
+            const room = await database["Rooms"].findOne({
                 where: {
                     roomName: roomId
                 }

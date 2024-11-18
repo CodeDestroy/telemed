@@ -64,8 +64,8 @@ class CodeService {
             if (!user) {
                 return ApiError.AuthError(`Пользователь ${login} не найден`)
             }
-
-            switch (user.users_role.accessLevel) {
+            console.log(user)
+            switch (user.UsersRole.accessLevel) {
                 case 1: 
                     let patient = await database["Patients"].findOne({
                         where: {
@@ -73,7 +73,7 @@ class CodeService {
                         }
                     })
                     
-                    const userDtoPatient = await UserDto.deserialize(user, user.users_role, patient)
+                    const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
                     const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
                     /* console.log(tokensPatient) */
                     await tokenService.saveToken(user.id, tokensPatient.refreshToken);
@@ -86,7 +86,7 @@ class CodeService {
                         }
                     })
                     
-                    const userDto = await UserDto.deserialize(user, user.users_role, doctor)
+                    const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     /* console.log({...userDto}) */
                     const tokens = await tokenService.generateTokens({...userDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
@@ -99,7 +99,7 @@ class CodeService {
                         }
                     })
                     
-                    const userDtoAdmin = await UserDto.deserialize(user, user.users_role, admin)
+                    const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
                     /* console.log({...userDtoAdmin}) */
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);

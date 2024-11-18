@@ -92,7 +92,7 @@ class AuthController {
                 console.log('Сообщение отправленно: %s', info.messageId);
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
             });
-            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patronomicName, parsedDate, null, snils)
+            const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patronomicName, parsedDate, null, snils, 1)
             
             res.status(200).send([newUser, newDoctor])
         }

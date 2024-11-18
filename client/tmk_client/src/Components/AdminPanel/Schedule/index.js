@@ -181,7 +181,7 @@ function Schedule() {
                 deletable={false}
                 draggable={false}
                 events={events}
-                editable={true}
+                editable={store.user?.accessLevel > 2 ? true: false}
                 onConfirm={handleConfirm}
                 onDelete={handleEventDelete} 
                 customEditor={(scheduler) => <CustomEditor scheduler={scheduler} onStateChange={handleEventsChange} onConfirm={handleConfirm}/>}
