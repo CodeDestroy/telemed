@@ -115,7 +115,7 @@ const httpSocket = async (httpServer, [cors]) => {
             }
             socket.join(room.id);
             
-            console.log(room)
+            /* console.log(room) */
             /* const ids = room.usersId; */
             let arr = [];
             
@@ -127,10 +127,10 @@ const httpSocket = async (httpServer, [cors]) => {
                     ['createdAt', 'ASC']
                 ]
             });
-            console.log(messages)
+            /* console.log(messages) */
             for (const message of messages) {
-                let files = await database["Files"].findAll(/* { where: { messageId: message.id } } */);
-                console.log(files)
+                let files = await database["Files"].findAll({ where: { messageId: message.id } });
+                /* console.log(files) */
                 const user = await database["Users"].findOne({
                     where: {
                         id: message.userId,

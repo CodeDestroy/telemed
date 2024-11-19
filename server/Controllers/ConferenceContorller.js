@@ -12,27 +12,24 @@ class ConferenceController {
             console.log(rooms.getUsersInRoom(room))
         }) */
         const userList = rooms.getUsersInRoom(conferenceEvent.roomName.toLowerCase())
+        
         if (!userList.includes(conferenceEvent.id)) {
             rooms.addUserToRoom(conferenceEvent.roomName.toLowerCase(), conferenceEvent.id)
         }
-        /* if (userList.length > 1) {
-            const time = Date.now()
-            if ( rooms.getStartedTimeInRoom(conferenceEvent.roomName) == 0) {
-                rooms.setStartedTimeInRoom(conferenceEvent.roomName, time)
-            }
-            return res.json({timer: 'start', data: conferenceEvent, time: time})
-        } */
-        /* console.log('room info on join: ', rooms.getRoomInfo(conferenceEvent.roomName.toLowerCase())) */
+        console.log('join')
+        console.log(console.log(rooms))
         if (userList.length > 1) {
-            /* console.log(`UserList on join: ${userList.length}`) */
             const time = Date.now()
             
             if ( rooms.getStartedTimeInRoom(conferenceEvent.roomName.toLowerCase()) == 0) {
                 rooms.setStartedTimeInRoom(conferenceEvent.roomName.toLowerCase(), time)
                 return res.json({timer: 'start', data: conferenceEvent, time: time})
             }
+            else {
+                return res.json({timer: 'start', data: conferenceEvent, time: rooms.getStartedTimeInRoom(conferenceEvent.roomName.toLowerCase())})
+            }
             /* console.log('join return: ',{timer: 'start', data: conferenceEvent, time: rooms.getStartedTimeInRoom(conferenceEvent.roomName)}) */
-            return res.json({timer: 'start', data: conferenceEvent, time: rooms.getStartedTimeInRoom(conferenceEvent.roomName.toLowerCase())})
+            
         }
         else {
             res.json({data: conferenceEvent});
@@ -56,6 +53,8 @@ class ConferenceController {
         /* console.log('leave event: ', conferenceEvent) */
         /* console.log('time in conf: ', rooms.getStartedTimeInRoom(conferenceEvent.roomName)) */
         /* console.log('leave room info: ', rooms.getRoomInfo(conferenceEvent.roomName.toLowerCase())) */
+        console.log('leave')
+        console.log(console.log(rooms))
         if (userList.length == 0) 
             rooms.removeRoom(conferenceEvent.roomName.toLowerCase())
         /* if (userList.length  < 2) {
@@ -80,7 +79,8 @@ class ConferenceController {
         /* console.log('event: ', conferenceEvent) */
         /* console.log('time in conf: ', rooms.getStartedTimeInRoom(conferenceEvent.roomName)) */
         /* console.log('room info: ', rooms.getRoomInfo(conferenceEvent.roomName.toLowerCase())) */
-        
+        console.log('participantJoined')
+        console.log(console.log(rooms))
         if (userList.length > 1) {
             /* console.log(`UserList length: ${userList.length}`) */
             const time = Date.now()
@@ -88,9 +88,11 @@ class ConferenceController {
                 rooms.setStartedTimeInRoom(conferenceEvent.roomName.toLowerCase(), time)
                 return res.json({timer: 'start', data: conferenceEvent, time: time})
             }
+            else {
+                return res.json({timer: 'start', data: conferenceEvent, time: rooms.getStartedTimeInRoom(conferenceEvent.roomName.toLowerCase())})
+            }
             /* console.log(`Time started: ${rooms.getStartedTimeInRoom(conferenceEvent.roomName)}`)
             console.log(`Time current: ${Date.now()}`) */
-            return res.json({timer: 'start', data: conferenceEvent, time: rooms.getStartedTimeInRoom(conferenceEvent.roomName.toLowerCase())})
         }
         else {
             res.json({data: conferenceEvent});
