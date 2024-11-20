@@ -359,7 +359,6 @@ const httpsSocket = async (httpsServer, [cors]) => {
                     ['createdAt', 'ASC']
                 ]
             });
-            console.log(messages)
             for (const message of messages) {
                 let files = await database["Files"].findAll({ where: { messageId: message.id } });
 
@@ -397,7 +396,6 @@ const httpsSocket = async (httpsServer, [cors]) => {
             let i = 0;
             const files_created = [];
             let room = await database["Rooms"].findByPk(roomId);
-            console.log(roomId)
             const message = await database["Messages"].create({ text: text, roomId: room.id, userId });
             if (file) {
 
