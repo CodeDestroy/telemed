@@ -27,6 +27,7 @@ class RoomManager {
             if (!this.rooms.get(roomName).users.includes(user))
                 this.rooms.get(roomName).users.push(user);
         } else {
+            console.log(`Doesnt have ${roomName} added ${user} time ${time}`)
             this.rooms.set(roomName, { users: [user], started: time });
         }
     }

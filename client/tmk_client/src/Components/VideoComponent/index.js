@@ -27,7 +27,7 @@ function Index() {
 
     const loginByJWT = () => {
         socket.emit('user:login', jwt)
-        console.log('login')
+        /* console.log('login') */
     }
 
     useLayoutEffect(() => {
@@ -46,7 +46,7 @@ function Index() {
     }, [store])
 
     socket.on('room:joined', (joined, roomName, user) => {
-        console.log('JOINED', roomName)
+        /* console.log('JOINED', roomName) */
         if (!joined)  {
             window.location.href='/'; 
             return
@@ -56,7 +56,7 @@ function Index() {
     })
 
     socket.on('user:logined', (bool, user) => {
-        console.log(bool, user)
+        /* console.log(bool, user) */
         if (!bool) {
           /* console.log(bool, user) */
           /* window.location.href='/';  */
@@ -71,15 +71,22 @@ function Index() {
     const [isTimerRunning, setIsTimerRunning] = useState(false);
 
     const handleConferenceJoin = (time = 0) => {
+        console.log(time)
+        console.log(new Date(time))
         if (time != 0) {
+            
             const startedTime  = new Date(time);
+            console.log(`started time ${startedTime}`)
             const currentTime = new Date();
+            
+            console.log(`started time ${currentTime}`)
             const seconds = Math.abs((currentTime - startedTime)/1000)
             
             
             currentTime.setSeconds(currentTime.getSeconds() + seconds)
             handleUpdateTotalSeconds(currentTime)
             setIsTimerRunning(true);
+            console.log(`Timer started ${seconds}`)
         }
         else {
             handleUpdateTotalSeconds(0)

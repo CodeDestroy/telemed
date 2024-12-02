@@ -31,9 +31,7 @@ class AuthController {
     async refresh (req, res) {
         try {
             const {refreshToken} = req.cookies;
-            /* console.log(refreshToken) */
             const userData = await userService.refresh(refreshToken);
-            
 
             await res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'none', secure: true, httpOnly: true})
             res.status(200).json(userData);
@@ -86,7 +84,6 @@ class AuthController {
             const mailOptions = await MailManager.getMailOptionsCode(email, newCode.code, link)
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
-                    /* throw new Error(error) */
                     return console.log(error);
                 }
                 console.log('Сообщение отправленно: %s', info.messageId);

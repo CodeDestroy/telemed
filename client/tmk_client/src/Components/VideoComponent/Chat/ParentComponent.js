@@ -27,7 +27,7 @@ const ParentComponent = ({ roomID, token, show, onHide }) => {
 
     useLayoutEffect(() => {
         socket.on('room:joined', (state, roomId) => {
-            console.log(`sendform roomJoined ${roomId}`);
+            /* console.log(`sendform roomJoined ${roomId}`); */
             children.length = 0;
             setData([]);
             setRoomId(roomId);

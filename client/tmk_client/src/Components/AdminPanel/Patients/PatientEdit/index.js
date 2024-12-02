@@ -26,8 +26,8 @@ const PatientEdit = () => {
         try {
             const response = await AdminService.editPatient(id, patient);
             if (response.status == 200) {
-                /* window.location = adminLocations.patientManagement */
-                console.log(response.data)
+                window.location = adminLocations.patientManagement
+                /* console.log(response.data) */
             }
             else {
                 setError(response.data.message)
