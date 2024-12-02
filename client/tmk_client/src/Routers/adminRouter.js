@@ -1,7 +1,7 @@
-import AdminMain from '../Components/AdminPanel/Main/AdminDashboard'
-import CreateSlot from '../Components/AdminPanel/ServicesList/CreateSlot'
+import AdminMain from '../Components/AdminPanel/Main/AdminDashboard';
+import CreateSlot from '../Components/AdminPanel/ServicesList/CreateSlot';
 import adminLocations from '../Locations/AdminLocations';
-import AllSlots from '../Components/AdminPanel/ServicesList/AllSlots'
+import AllSlots from '../Components/AdminPanel/ServicesList/AllSlots';
 import {
   createBrowserRouter,
 } from "react-router-dom";
@@ -13,6 +13,9 @@ import DoctorList from '../Components/AdminPanel/Doctors/DoctorList';
 import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
 import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 import Schedule from '../Components/AdminPanel/Schedule';
+import generalLocations from '../Locations/GeneralLocations';
+import Settings from '../Components/AdminPanel/Profile/Settings';
+import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 
 const adminRouter = createBrowserRouter([
     {
@@ -58,6 +61,14 @@ const adminRouter = createBrowserRouter([
     {
       path: adminLocations.calendar,
       element: <Schedule/>
+    },
+    {
+      path: generalLocations.settings,
+      element: <Settings/>
+    },
+    {
+      path: generalLocations.profile,
+      element: <GeneralInfo/>
     }
     /* {
         path: '/test',

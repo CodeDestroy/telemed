@@ -24,7 +24,7 @@ const AttachmentMenu = ({ selectFile, className }) => {
     const file = event.target.files[0];
     if (file) {
       selectFile(file);
-      console.log(file);
+      /* console.log(file); */
     }
   };
 

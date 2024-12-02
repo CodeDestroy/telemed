@@ -24,6 +24,7 @@ import SuperAdminButtons from './MainButtons/SuperAdminButtons'
 import AdminItems from './MainItems/AdminItems';
 import SuperAdminItems from './MainItems/SuperAdminItems'
 import DoctorItems from './MainItems/DoctorItems';
+import generalLocations from '../../../Locations/GeneralLocations';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 
@@ -55,6 +56,15 @@ function AdminHeader() {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+
+    const handleSettings = () => {
+        window.location.href = generalLocations.settings
+    }
+
+    const handleProfile = () => {
+        window.location.href = generalLocations.profile
+
+    }
 
     return (
         <AppBar position="static" style={{padding: 0}}>
@@ -155,6 +165,12 @@ function AdminHeader() {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                     >
+                        <MenuItem onClick={handleProfile}>
+                            <Typography textAlign="center">Профиль</Typography>
+                        </MenuItem>
+                        <MenuItem onClick={handleSettings}>
+                            <Typography textAlign="center">Настройки</Typography>
+                        </MenuItem>
                         <MenuItem onClick={handleLogout}>
                             <Typography textAlign="center">Выйти</Typography>
                         </MenuItem>

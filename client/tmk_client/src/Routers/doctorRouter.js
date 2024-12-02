@@ -12,6 +12,10 @@ import doctorLocations from '../Locations/DoctorLocations'
 import VideoComponent from "../Components/VideoComponent";
 import CreateSchedule from "../Components/AdminPanel/CreateScheduler";
 import Schedule from "../Components/AdminPanel/Schedule";
+import Settings from "../Components/AdminPanel/Profile/Settings";
+import GeneralInfo from "../Components/AdminPanel/Profile/GeneralInfo";
+import generalLocations from '../Locations/GeneralLocations';
+
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -37,6 +41,14 @@ const doctorRouter = createBrowserRouter([
       path: doctorLocations.schedule,
       element: <Schedule/>
 
+    },
+    {
+      path: generalLocations.settings,
+      element: <Settings/>
+    },
+    {
+      path: generalLocations.profile,
+      element: <GeneralInfo/>
     }
 
 

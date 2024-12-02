@@ -13,7 +13,9 @@ import DoctorList from '../Components/AdminPanel/Doctors/DoctorList';
 import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
 import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 import Schedule from '../Components/AdminPanel/Schedule';
-
+import Settings from '../Components/AdminPanel/Profile/Settings';
+import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
+import generalLocations from '../Locations/GeneralLocations';
 const superAdminRouter = createBrowserRouter([
     {
         path: "*",
@@ -58,6 +60,14 @@ const superAdminRouter = createBrowserRouter([
     {
       path: adminLocations.calendar,
       element: <Schedule/>
+    },
+    {
+      path: generalLocations.settings,
+      element: <Settings/>
+    },
+    {
+      path: generalLocations.profile,
+      element: <GeneralInfo/>
     }
     /* {
         path: '/test',

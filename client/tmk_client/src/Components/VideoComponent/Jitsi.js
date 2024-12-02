@@ -109,9 +109,9 @@ function Jitsi(props) {
     //https://distant-assistant.ru:9443/room/room?token=
 
 
-    useEffect(() => {
+    /* useEffect(() => {
         console.log(store.user)
-    }, [store])
+    }, [store]) */
 
     const onConferenceCreatedTimestamp = (nativeEvent) => {
         /* Conference terminated event */
@@ -123,26 +123,17 @@ function Jitsi(props) {
     //Срабатывает у входящего
     const onConferenceJoined = async (nativeEvent) => {
         try {
-/*             console.log(nativeEvent); */
-            /* console.log(nativeEvent); */
             
             const result = await ConferenceService.joinConference({...nativeEvent}); 
-            console.log(result)
-/*             console.log(result.data); */
+            
             /* socket.emit('timer:start', {...nativeEvent, time}) */
             if (result.data.timer == 'start') {
+                var date = new Date(result.data.time);
+                console.log(date)
                 props.onJoin(result.data?.time);
             }
-            
-            /* console.log('result:')
-            console.log(result.data)
-            console.log(`joined by id: ${result.data.data.id}`) */
 
             localId = result.data.data.id 
-            /* console.log(`localId: ${localId}`) */
-/*             const div = document.getElementsById('autoHide')
-            console.log(div)
-            div.innerHTML(<Test/>) */
             
         }
         catch (e) {
@@ -156,13 +147,13 @@ function Jitsi(props) {
     //Срабатывает у всех
     const onParticipantLeft = async (nativeEvent) => {
         try {
-            console.log(nativeEvent, localId)
+            /* console.log(nativeEvent, localId) */
             /* const currTime = Date.now(); */
-            /* const result = await ConferenceService.leaveConference({...nativeEvent, roomName});
+            const result = await ConferenceService.leaveConference({...nativeEvent, roomName});
 
             if (result.data.timer == 'stop') {
                 props.onLeave();
-            } */
+            }
             
         }
         catch (e) {
@@ -176,27 +167,20 @@ function Jitsi(props) {
         try {
             /* const currTime = Date.now(); */
             const result = await ConferenceService.participantJoined({...nativeEvent, roomName});
-            console.log(result)
-            if (result.data.timer == 'start') {
-                /* console.log(result.data) */
+            /* if (result.data.timer == 'start') {
+                console.log(result.data)
                 props.onJoin(result.data?.time);
-            }
+            } */
         }
         catch (e) {
 
         }
-        /* console.log(nativeEvent) */
     }
 
     //Срабатывает только у выходящего
     const handleEndCall = async (event) => {
-        
-        /* console.log(event)
-        console.log('Ending call for localId: ',  localId) */
         try {
             /* const currTime = Date.now(); */
-            /* console.log(time) */
-            /* console.log(localId) */
             const nativeEvent = { id: localId, roomName: roomName}
             const result = await ConferenceService.leaveConference(nativeEvent);
             /* JitsiRef.current.style.display = 'none' */
@@ -218,9 +202,7 @@ function Jitsi(props) {
         /* setIsFullScreen(!isFullScreen) */
     }
     const openModelChat = () => {
-        console.log(store.user.id)
         props.openModalChat()
-        console.log('chat')
     }
     return (
         <div ref={JitsiRef}>
