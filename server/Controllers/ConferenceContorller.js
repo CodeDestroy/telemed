@@ -34,9 +34,19 @@ class ConferenceController {
 
         rooms.removeUserFromRoom(conferenceEvent.roomName.toLowerCase(), conferenceEvent.id)
         const userList = rooms.getUsersInRoom(conferenceEvent.roomName.toLowerCase())
-        if (userList.length == 0) 
+        if (userList.length == 0) {
+            const tmk = await ConsultationService.getSlotByRoomName(conferenceEvent.roomName)
+            //Оставить на потом
+            /* if (roomInfo.started === 0)
+                return res.status(406).json({message: 'Консультация не была инициирована'}) */
+            tmk.Room.ended = true;
+            tmk.Room.meetingEnd = new Date();
+            /* tmk.Room.protocol = protocol */
+            tmk.slotStatusId = 4
+            tmk.Room.save()
+            tmk.save()
             rooms.removeRoom(conferenceEvent.roomName.toLowerCase())
-
+        }
         res.json({data: conferenceEvent});
     }
 
@@ -71,15 +81,15 @@ class ConferenceController {
             const roomName =  (req.body.roomName)
             const protocol = req.body.protocol
             /* const roomInfo = rooms.getRoomInfo(roomName.toLowerCase()) */
-            const tmk = await ConsultationService.getSlotByRoomName(roomName.toLowerCase())
+            const tmk = await ConsultationService.getSlotByRoomName(roomName)
             //Оставить на потом
             /* if (roomInfo.started === 0)
                 return res.status(406).json({message: 'Консультация не была инициирована'}) */
-            tmk.room.ended = true;
-            tmk.room.meetingEnd = new Date();
-            tmk.room.protocol = protocol
+            tmk.Room.ended = true;
+            tmk.Room.meetingEnd = new Date();
+            tmk.Room.protocol = protocol
             tmk.slotStatusId = 4
-            tmk.room.save()
+            tmk.Room.save()
             tmk.save()
             rooms.removeRoom(roomName.toLowerCase())
             res.status(200).json(tmk)

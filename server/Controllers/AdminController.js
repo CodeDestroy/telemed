@@ -229,7 +229,7 @@ class AdminController {
                 throw ApiError.BadRequest(errors)
 
             if (req.user.accessLevel == 4) {
-                const newUser = await userService.createUrsser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
+                const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
                 const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
 
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
