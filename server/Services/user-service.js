@@ -39,11 +39,11 @@ class UserService {
             let newUser = null
             if (avatar)
                 newUser = await database["Users"].create({
-                    login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email, avatar
+                    login: phone.trim(), password: hashPassword, userRoleId: roleId, phone: phone.trim(), email: email.trim(), avatar
                 })
             else 
                 newUser = await database["Users"].create({
-                    login: phone, password: hashPassword, userRoleId: roleId, phone: phone, email
+                    login: phone.trim(), password: hashPassword, userRoleId: roleId, phone: phone.trim(), email: email.trim()
                 })
             return newUser
         }
