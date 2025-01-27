@@ -14,7 +14,7 @@ import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
 import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 import Schedule from '../Components/AdminPanel/Schedule';
 import generalLocations from '../Locations/GeneralLocations';
-import Settings from '../Components/AdminPanel/Profile/Settings';
+import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 
 const adminRouter = createBrowserRouter([

@@ -56,7 +56,7 @@ const Index = (props) => {
             const response = await ConferenceService.endConference(roomName, inputValue)
             if (response.status == 200)
                 handleOpenAlert()
-            /* console.log(response.data) */
+            console.log(response.data)
         }
         catch (e) {
             alert(e.message)

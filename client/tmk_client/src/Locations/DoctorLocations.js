@@ -5,7 +5,9 @@ const doctorLocations = {
     tmk: '/room/:roomId',
     endedConsultations: '/consultations/ended',
     createSchedule: '/profile/schedule',
+    createDateSchedule: '/profile/dateSchedule',
     schedule: '/profile/calendar',
+    settings: '/profile/settings'
     
 };
 

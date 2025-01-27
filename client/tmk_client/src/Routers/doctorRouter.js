@@ -10,12 +10,14 @@ import AdminServicesList from '../Components/AdminPanel/ServicesList/ActiveList'
 import EndedList from '../Components/AdminPanel/ServicesList/EndedList'
 import doctorLocations from '../Locations/DoctorLocations'
 import VideoComponent from "../Components/VideoComponent";
-import CreateSchedule from "../Components/AdminPanel/CreateScheduler";
+/* import CreateSchedule from "../Components/AdminPanel/CreateScheduler"; */
+import CreateSchedule from "../Components/AdminPanel/CreateScheduler/WeekDays";
 import Schedule from "../Components/AdminPanel/Schedule";
-import Settings from "../Components/AdminPanel/Profile/Settings";
+/* import Settings from "../Components/AdminPanel/Profile/Settings"; */
 import GeneralInfo from "../Components/AdminPanel/Profile/GeneralInfo";
 import generalLocations from '../Locations/GeneralLocations';
-
+import Settings from "../Components/AdminPanel/Profile/Settings/DoctorSettings";
+import CreateDateSchedule from "../Components/AdminPanel/CreateScheduler/Dates";
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -36,6 +38,10 @@ const doctorRouter = createBrowserRouter([
     {
       path: doctorLocations.createSchedule,
       element: <CreateSchedule/>
+    },
+    {
+      path: doctorLocations.createDateSchedule,
+      element: <CreateDateSchedule/>
     },
     {
       path: doctorLocations.schedule,

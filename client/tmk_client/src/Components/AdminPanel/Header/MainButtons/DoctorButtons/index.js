@@ -1,8 +1,11 @@
-import React from 'react';
+
+import React, {useContext} from 'react';
 import Button from '@mui/material/Button';
 import doctorLocations from '../../../../../Locations/DoctorLocations';
 
+import { Context } from '../../../../..';
 function DoctorButtons() {
+    const { store } = useContext(Context)
     const handleConsultations = () => {
         window.location.href = doctorLocations.consultations;
     };
@@ -12,7 +15,13 @@ function DoctorButtons() {
     };
 
     const handleCreateSchedule = () => {
-        window.location.href = doctorLocations.createSchedule
+        /* window.location.href = doctorLocations.createSchedule */
+
+        if (store.user.schedulerType == 'weekDay')
+            window.location.href = doctorLocations.createSchedule
+        else {
+            window.location.href = doctorLocations.createDateSchedule
+        }
     }
 
     const handleSchedule = () => {

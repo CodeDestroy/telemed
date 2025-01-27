@@ -38,6 +38,27 @@ class SchedulerController {
         
     }
 
+    async setScheduleType (req, res) {
+        try {
+            const {type, userId} = req.body;
+            const user = await database["Users"].findOne({where: {id: userId}})
+            switch (type) {
+                case 'byDate':
+                    user.schedulerType = 'byDate';
+                    break;
+                case 'daysOfWeek':
+                    user.schedulerType = 'daysOfWeek';
+                    break;
+                
+            }
+            user.save();
+            res.status(200).json(user);
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
     //Не используется
     async getAvailableSlots(req, res) {
         const { doctorId, date, slotDuration } = req.query;

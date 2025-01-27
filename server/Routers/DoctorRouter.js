@@ -8,4 +8,5 @@ router.get('/scheduler/:id', SchedulerController.getDoctorScheduler)
 router.post('/scheduler', SchedulerController.createOrUpdateSchedule)
 /* router.get('/scheduler', SchedulerController.getDoctorScheduler) */
 router.post('/scheduler/delete', SchedulerController.deleteDoctorScheduler)
+router.post('/scheduler/setScheduleType', SchedulerController.setScheduleType)
 module.exports = router;
