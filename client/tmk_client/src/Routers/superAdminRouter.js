@@ -13,7 +13,7 @@ import DoctorList from '../Components/AdminPanel/Doctors/DoctorList';
 import DoctorEdit from '../Components/AdminPanel/Doctors/DoctorEdit';
 import DoctorCreate from '../Components/AdminPanel/Doctors/DoctorCreate'
 import Schedule from '../Components/AdminPanel/Schedule';
-import Settings from '../Components/AdminPanel/Profile/Settings';
+import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 import generalLocations from '../Locations/GeneralLocations';
 const superAdminRouter = createBrowserRouter([

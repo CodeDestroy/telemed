@@ -10,7 +10,8 @@ const adminLocations = {
     slotsManagement: '/slots',
     createPatient: '/patients/create',
     editPatient: '/patients/edit/:id',
-    calendar: '/calendar'
+    calendar: '/calendar',
+    settings: '/profile/settings'
 };
   
 export default adminLocations;

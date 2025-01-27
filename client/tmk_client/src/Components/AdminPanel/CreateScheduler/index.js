@@ -18,7 +18,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { blue, grey } from '@mui/material/colors';
+import { blue, grey, red } from '@mui/material/colors';
 import { format } from 'date-fns';
 import Header from '../Header';
 import {ru} from 'date-fns/locale/ru';
@@ -27,7 +27,7 @@ import { Context } from '../../../';
 
 const white = '#fff'
 // Дни недели для отображения
-const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
 // Тема по умолчанию
 const defaultTheme = createTheme({
@@ -192,7 +192,7 @@ const CreateSchedule = () => {
                         <Button variant="contained" color="primary" onClick={handleOpenModal} startIcon={<AddIcon />}>
                             Добавить время работы
                         </Button>
-                        <Button variant="outlined" color="secondary" onClick={toggleTheme} sx={{ ml: 2 }}>
+                        <Button variant="outlined" color="success" onClick={toggleTheme} sx={{ ml: 2 }}>
                             Сменить тему
                         </Button>
 
@@ -220,7 +220,7 @@ const CreateSchedule = () => {
                                                     alignItems: 'center',
                                                     mb: 1,
                                                     p: 1,
-                                                    backgroundColor: blue[300],
+                                                    backgroundColor: theme.palette.primary.main,
                                                     borderRadius: '4px',
                                             }}
                                             >

@@ -307,7 +307,7 @@ function Jitsi(props) {
                 containerStyles = {{display: 'flex', flex: 1}}
             />
 
-            { roomName && store.user?.doctor ?
+            { roomName && store.user?.Doctor ?
                 <ConferenceProtocol 
                     show={showProtocolModal} 
                     onHide={handleProtocolModalClose}

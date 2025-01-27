@@ -2,7 +2,7 @@ import {useEffect, useState, useContext} from 'react'
 import Header from '../Header'
 import { Scheduler } from "@aldabil/react-scheduler";
 import {ru } from "date-fns/locale";
-import russianTranslition from './russianTranslition';
+import russianTranslition from '../../../Assets/translate/russianTranslition';
 import CustomEditor from "./CutomEditor";
 import AdminService from '../../../Services/AdminService';
 import dayjs from 'dayjs';
@@ -36,6 +36,20 @@ function Schedule() {
             try {
                 const response = await AdminService.getConsultations();
                 response.data[0].map((slot) => {
+                    let color = "red"
+                    switch (slot.slotStatusId) {
+                        case 1:
+                            break;
+                        case 2:
+                            color = "#e5de00"
+                            break;
+                        case 3:
+                            color = "#0ee500"
+                            break;
+                        case 4:
+                            color = "#007aff"
+                            break;
+                    }
                     const newEvent = {
                         event_id: slot.id || Math.random(),
                         title: `Конференция ${slot?.dSecondName} ${slot?.dFirstName}`,
@@ -50,7 +64,10 @@ function Schedule() {
                         dotorFirstName: slot?.dFirstName,
                         patientSecondName: slot?.pSecondName,
                         patientFirstName: slot?.pFirstName,
+                        color: color,
+                        slotStatus: slot.slotStatusId
                     }
+                    console.log(newEvent)
                     setEvents((prevEvents) => [...prevEvents, newEvent]);
                 })
                 return response.data[0]
@@ -181,7 +198,7 @@ function Schedule() {
                 deletable={false}
                 draggable={false}
                 events={events}
-                editable={store.user?.accessLevel > 2 ? true: false}
+                editable={store.user?.accessLevel >= 3 ? true: false}
                 onConfirm={handleConfirm}
                 onDelete={handleEventDelete} 
                 customEditor={(scheduler) => <CustomEditor scheduler={scheduler} onStateChange={handleEventsChange} onConfirm={handleConfirm}/>}

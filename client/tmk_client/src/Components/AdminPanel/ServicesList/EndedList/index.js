@@ -5,7 +5,7 @@ import { Context } from '../../../..';
 import DataGrid from '../../../DataGrid'; // Здесь изменил импорт
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Box, IconButton, Input, FormControl, InputLabel, InputAdornment, Snackbar } from "@mui/material";
+import { Box, IconButton, Input, FormControl, InputLabel, InputAdornment, Snackbar, Button } from "@mui/material";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import moment from 'moment-timezone';
 import { LocalizationContext } from '../../../../Utils/LocalizationContext';
@@ -61,6 +61,19 @@ function Index() {
                 }
                 return cellValues.value;
             },
+            /* width: 30, */
+            disableColumnSort: true
+        },
+        { 
+            field: "slotStartEndTime", 
+            headerName: "Конец конференции", 
+            renderCell: (cellValues) => {
+                if (!cellValues.row.detail) {
+                    return moment(cellValues.row.slotEndDateTime).format('DD.MM.YYYY HH:mm');
+                }
+                return cellValues.value;
+            },
+            /* width: 30, */
             disableColumnSort: true
         },
         { 
@@ -75,6 +88,24 @@ function Index() {
                 }
                 return cellValues.value;
             },
+            disableColumnSort: true
+        },
+        { 
+            field: "button", 
+            headerName: "Изменить", 
+            renderCell: (cellValues) => {
+                /* if (!cellValues.row.detail) {
+                    return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
+                } */
+                return (
+                    <Button>Изменить</Button>
+                )
+                /* if (cellValues.row.protocol) {
+                    return cellValues.row.protocol;
+                }
+                return cellValues.value; */
+            },
+            width: 100,
             disableColumnSort: true
         },
     ];
@@ -136,6 +167,11 @@ function Index() {
                         {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
+                slotEndDateTime: (
+                    <Box>
+                        {moment(row.slotEndDateTime).format('DD.MM.YYYY HH:mm')}
+                    </Box>
+                ),
                 protocol: (
                     <></>
                 )
@@ -151,6 +187,11 @@ function Index() {
                 slotStartDateTime: (
                     <Box>
                         {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
+                    </Box>
+                ),
+                slotStartEndTime: (
+                    <Box>
+                        {moment(row.slotEndDateTime).format('DD.MM.YYYY HH:mm')}
                     </Box>
                 ),
                 protocol: (
