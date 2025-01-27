@@ -5,6 +5,8 @@ const DateTimeManager = require("../Utils/DateTimeManager");
 const ApiError = require('../Errors/api-error');
 const MailManager = require("../Utils/MailManager");
 const nodemailer = require('nodemailer');
+
+const database = require('../models/index')
 const CLIENT_URL =  process.env.CLIENT_URL;
 class AuthController {
 
@@ -60,6 +62,8 @@ class AuthController {
         try {
             const phone = req.query.phone;
             const userData = await userService.checkPhone(phone);
+            if (userData)
+                throw ApiError.BadRequest('Пользователь с данным номером телефона уже зарегистрирован')
             res.status(200).json(userData);
         }
         catch (e) {
@@ -72,7 +76,10 @@ class AuthController {
     async confirmRegistration (req, res) {
         try {
             const {secondName, name, patronomicName, birthDate, email, phone, password, snils} = req.body
-           
+            const candidate = await database['Users'].findOne({where: {email: email}})
+            if (candidate) {
+                throw ApiError.BadRequest('Пользователь с данным email уже зарегистрирован')
+            }
             const parsedDate = await DateTimeManager.parseDateFromRussian(birthDate)
             const newUser = await userService.createUser(2, phone, password, null ,email, phone)
             newUser.confirmed = false;
