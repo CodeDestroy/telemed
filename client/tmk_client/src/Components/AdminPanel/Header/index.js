@@ -166,9 +166,9 @@ function AdminHeader() {
                         <MenuItem onClick={handleProfile}>
                             <Typography textAlign="center">Профиль</Typography>
                         </MenuItem>
-                        <MenuItem onClick={handleSettings}>
+                        {/* <MenuItem onClick={handleSettings}>
                             <Typography textAlign="center">Настройки</Typography>
-                        </MenuItem>
+                        </MenuItem> */}
                         <MenuItem onClick={handleLogout}>
                             <Typography textAlign="center">Выйти</Typography>
                         </MenuItem>

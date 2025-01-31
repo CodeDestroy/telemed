@@ -87,11 +87,17 @@ const RegistratinStep2 = () => {
             let newSnils = snils
             newSnils = newSnils.replaceAll('-', '')
             newSnils = newSnils.replaceAll(' ', '')
-            const response = await AuthService.confirmRegistration(secondName, name, patronomicName, birthDate, email, phone, password, newSnils)
-            console.log(response)
-            if (response.status == 200) {
-                window.location.href = authLocations.registrationStep3 + `?phone=${(phone).trim()}`
+            try {
+                const response = await AuthService.confirmRegistration(secondName, name, patronomicName, birthDate, email, phone, password, newSnils)
+                console.log(response)
+                if (response.status == 200) {
+                    window.location.href = authLocations.registrationStep3 + `?phone=${(phone).trim()}`
+                }
             }
+            catch (e) {
+                alert(e.response.data)
+            }
+            
         }
         else {
             alert('Не все поля заполнены')
