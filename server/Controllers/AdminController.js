@@ -261,6 +261,7 @@ class AdminController {
                 name,
                 patrinomicName,
                 phone,
+                snils,
                 email,
                 password,
                 birthDate,
@@ -283,7 +284,7 @@ class AdminController {
             const avatar = req.file;
             
             const newUser = await userService.createUser(1, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-            const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info)
+            const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
 
             res.status(201).json({ message: 'Пациент создан успешно', userId: newUser.id, patientId: newPatient.id });
         }
