@@ -21,11 +21,20 @@ function RegistratinStep1() {
     const handleNext = async (event) => {
         event.preventDefault()
         /* console.log(phone) */
-        const response = await AuthService.checkPhone(phone.trim())
-        if (response.status === 200) {
-            window.location.href = authLocations.registrationStep2 + `?phone=${(phone).trim()}`
+        try {
+            const response = await AuthService.checkPhone(phone.trim())
+            if (response.status === 200) {
+                window.location.href = authLocations.registrationStep2 + `?phone=${(phone).trim()}`
+            }
+            else {
+                alert(response.data)
+            }
+            console.log(response)
         }
-        console.log(response)
+        catch (e) {
+            alert(e.response.data)
+        }
+        
     }
     return (
         <main>
