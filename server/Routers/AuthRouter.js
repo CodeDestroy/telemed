@@ -9,4 +9,6 @@ router.get('/logout', AuthController.logout)
 router.get('/check-phone', AuthController.checkPhone)
 router.post('/confirm-registration', AuthController.confirmRegistration)
 router.post('/confirm-email', AuthController.confirmEmail)
+//user/${userId}/setPassword
+router.post('/user/:userId/setPassword', AuthController.setPassword)
 module.exports = router;

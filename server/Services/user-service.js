@@ -264,6 +264,25 @@ class UserService {
         }
     }
 
+    async setPassword (userId, password) {
+        try {
+            const pass_to_hash = password.valueOf();
+            const hashPassword = await bcrypt.hash(pass_to_hash, 8);
+            await database["Users"].update({
+                password: hashPassword,
+            },
+            {
+                where: {
+                    id: userId
+                }
+            })
+            return true
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
 }
 
 
