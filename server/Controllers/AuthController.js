@@ -129,6 +129,20 @@ class AuthController {
             return res.status(500).json(e.message)
         }
     }
+
+    async setPassword(req, res) {
+        try {
+            const userId = req.params.userId
+            const {password} = req.body
+            const newUser = await userService.setPassword(userId, password)
+            res.status(200).json(newUser)
+            
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+        
+    }
 }
 
 module.exports = new AuthController()
