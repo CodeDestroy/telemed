@@ -163,12 +163,12 @@ function AdminHeader() {
                         open={Boolean(anchorElUser)}
                         onClose={handleCloseUserMenu}
                     >
-                        <MenuItem onClick={handleProfile}>
+                        {/* <MenuItem onClick={handleProfile}>
                             <Typography textAlign="center">Профиль</Typography>
-                        </MenuItem>
-                        {/* <MenuItem onClick={handleSettings}>
-                            <Typography textAlign="center">Настройки</Typography>
                         </MenuItem> */}
+                        <MenuItem onClick={handleSettings}>
+                            <Typography textAlign="center">Настройки</Typography>
+                        </MenuItem>
                         <MenuItem onClick={handleLogout}>
                             <Typography textAlign="center">Выйти</Typography>
                         </MenuItem>

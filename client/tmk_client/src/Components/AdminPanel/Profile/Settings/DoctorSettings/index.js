@@ -17,6 +17,7 @@ import { blue, grey } from '@mui/material/colors';
 import Header from '../../../Header';
 import { Context } from '../../../../..';
 import SettingService from '../../../../../Services/SettingService';
+import AuthService from '../../../../../Services/AuthService';
 const white = '#fff';
 const defaultTheme = createTheme({
   palette: {
@@ -81,6 +82,33 @@ const SettingsPage = () => {
     console.log(store.user)
   },[store])
 
+  const handleSavePassword = async () => {
+    try {
+      if (validatePassword(password)) {
+        const response = await AuthService.setPassword(store.user.id, password)
+        if (response.status === 200) {
+          setPassword('')
+          alert("Пароль успешно сохранен");
+        } else {
+          alert("Ошибка сохранения пароля");
+        }
+      }
+      else {
+        alert("Пароль должен содержать от 4 до 20 символов");
+      }
+      
+    }
+    catch (e) {
+      alert("Ошибка сохранения пароля");
+    }
+  }
+
+  // Проверка пароля перед отправкой на сервер
+  const validatePassword = (password) => {
+    // Логика проверки пароля
+    return password.length >= 4 && password.length <= 20;
+    
+  }
   return (
     <>
       <Header/>
@@ -181,15 +209,25 @@ const SettingsPage = () => {
 
               <Grid container spacing={2}>
                 {/* Поле для смены пароля */}
-                <Grid item xs={12}>
+                <Grid item xs={8}>
                   <TextField
-                    label="Пароль"
+                    label="Новый пароль"
                     type="password"
                     fullWidth
-                    name="password"
+                    name="newPassword"
                     value={password}
                     onChange={handleChangePassword}
                   />
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSavePassword}
+                    sx={{ width: '100%', minHeight: '56px' }}
+                  >
+                    Сохранить 
+                  </Button>
                 </Grid>
 
                 {/* Поле для изменения номера телефона */}
@@ -231,6 +269,7 @@ const SettingsPage = () => {
               {/* Кнопка Сохранить */}
               <Box sx={{ mt: 4, textAlign: 'center' }}>
                 <Button
+                  disabled
                   variant="contained"
                   color="primary"
                   onClick={handleSave}
