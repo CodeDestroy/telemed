@@ -63,6 +63,26 @@ class SchedulerService {
         }
     }
 
+    async getDoctorScheduleByDate (doctorId, date) {
+        try {
+            const doctorSchedule = await database["Schedule"].findAll({
+                where: {
+                    doctorId,
+                    date: {
+                        [Op.eq]: date
+                    },
+                    scheduleStatus: 1,
+
+                }
+            })
+            return doctorSchedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async getDoctorSchedule (doctorId) {
         try {
             const doctor = await database["Doctors"].findByPk(doctorId, {
