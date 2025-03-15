@@ -83,6 +83,27 @@ class SchedulerService {
         }
     }
 
+    async getDoctorScheduleByDates (doctorId, startDate, endDate) {
+        try {
+            console.log(startDate)
+            console.log(endDate)
+            const doctorSchedule = await database["Schedule"].findAll({
+                where: {
+                    doctorId,
+                    date: {
+                        [Op.between]: [startDate, endDate]
+                    }, 
+                    scheduleStatus: 1,  
+                }
+            })
+            return doctorSchedule;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async getDoctorSchedule (doctorId) {
         try {
             const doctor = await database["Doctors"].findByPk(doctorId, {
