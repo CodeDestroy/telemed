@@ -33,4 +33,10 @@ export default class AuthService {
     static async confirmEmail (phone, code ) {
         return $api.post('/api/confirm-email', {phone, code});
     }
+
+    static async setPassword(userId, password) {
+        return $api.post(`/api/user/${userId}/setPassword`, {password});
+    }
+
+    
 }

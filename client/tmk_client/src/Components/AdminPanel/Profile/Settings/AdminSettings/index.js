@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Box,
   Grid,
@@ -17,7 +17,9 @@ import {
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { blue, grey } from '@mui/material/colors';
 import Header from '../../../Header';
+import AuthService from '../../../../../Services/AuthService';
 
+import { Context } from '../../../../..';
 const white = '#fff';
 const defaultTheme = createTheme({
   palette: {
@@ -28,15 +30,18 @@ const defaultTheme = createTheme({
 });
 
 const SettingsPage = () => {
+  const {store} = useContext(Context)
   const [theme, setTheme] = useState(defaultTheme);
   const [scheduleType, setScheduleType] = useState('daysOfWeek');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [userData, setUserData] = useState({
-    password: '',
-    phoneNumber: '',
-    email: '',
-    avatar: '',
-  });
+  
+    const [password, setPassword] = useState('')
+  const [userData, setUserData] = useState(store.user);
+
+
+  const handleChangePassword = (event) => {
+    setPassword(event.target.value)
+  }
 
   // Смена темы
   const toggleTheme = () => {
@@ -64,6 +69,34 @@ const SettingsPage = () => {
     // Логика сохранения данных
     console.log("User data saved:", userData);
   };
+
+  const handleSavePassword = async () => {
+    try {
+      if (validatePassword(password)) {
+        const response = await AuthService.setPassword(store.user.id, password)
+        if (response.status === 200) {
+          setPassword('')
+          alert("Пароль успешно сохранен");
+        } else {
+          alert("Ошибка сохранения пароля");
+        }
+      }
+      else {
+        alert("Пароль должен содержать от 4 до 20 символов");
+      }
+      
+    }
+    catch (e) {
+      alert("Ошибка сохранения пароля");
+    }
+  }
+
+  // Проверка пароля перед отправкой на сервер
+  const validatePassword = (password) => {
+    // Логика проверки пароля
+    return password.length >= 4 && password.length <= 20;
+    
+  }
 
   return (
     <>
@@ -153,14 +186,25 @@ const SettingsPage = () => {
                 {/* Поле для смены пароля */}
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Пароль"
+                    label="Новый пароль"
                     type="password"
                     fullWidth
-                    name="password"
-                    value={userData.password}
-                    onChange={handleUserDataChange}
+                    name="newPassword"
+                    value={password}
+                    onChange={handleChangePassword}
                   />
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSavePassword}
+                    sx={{ width: '50%' }}
+                  >
+                    Сохранить
+                  </Button>
+                </Grid>
+                
 
                 {/* Поле для изменения номера телефона */}
                 <Grid item xs={12} sm={6}>
@@ -168,8 +212,8 @@ const SettingsPage = () => {
                     label="Номер телефона"
                     type="tel"
                     fullWidth
-                    name="phoneNumber"
-                    value={userData.phoneNumber}
+                    name="phone"
+                    value={userData.phone}
                     onChange={handleUserDataChange}
                   />
                 </Grid>
@@ -192,7 +236,7 @@ const SettingsPage = () => {
                   <TextField
                     label="Другие данные"
                     fullWidth
-                    name="otherInfo"
+                    name="info"
                     onChange={handleUserDataChange}
                   />
                 </Grid>
@@ -201,6 +245,7 @@ const SettingsPage = () => {
               {/* Кнопка Сохранить */}
               <Box sx={{ mt: 4, textAlign: 'center' }}>
                 <Button
+                  disabled
                   variant="contained"
                   color="primary"
                   onClick={handleSave}
