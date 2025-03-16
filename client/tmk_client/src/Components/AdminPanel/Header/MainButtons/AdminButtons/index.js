@@ -23,6 +23,9 @@ function AdminButtons() {
         window.location.href = adminLocations.calendar
     }
 
+    const handleScheduleManagement = () => {
+        window.location.href = adminLocations.scheduleByDates
+    }
     return (
         <>
             {/* <Button
@@ -42,6 +45,12 @@ function AdminButtons() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Управление пациентами
+            </Button>
+            <Button
+                onClick={handleScheduleManagement}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+                Управление расписанием
             </Button>
             {/* <Button
                 onClick={handleSlotsManagement}

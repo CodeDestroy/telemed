@@ -138,7 +138,7 @@ const SettingsPage = () => {
 
               {/* Переключатели для настроек расписания и уведомлений */}
               <FormGroup>
-                <FormControl sx={{ mb: 3 }} component="fieldset">
+                {/* <FormControl sx={{ mb: 3 }} component="fieldset">
                   <FormControlLabel
                     control={
                       <Switch
@@ -150,16 +150,18 @@ const SettingsPage = () => {
                     }
                     label="Использовать расписание по датам"
                   />
-                </FormControl>
+                </FormControl> */}
 
                 <FormControl sx={{ mb: 3 }} component="fieldset">
                   <FormControlLabel
                     control={
                       <Switch
-                        checked={notificationsEnabled}
+                      
+                        /* checked={notificationsEnabled} */
                         onChange={(e) => setNotificationsEnabled(e.target.checked)}
                       />
                     }
+                    disabled
                     label="Отправлять уведомления на почту"
                   />
                 </FormControl>
@@ -171,6 +173,7 @@ const SettingsPage = () => {
                 color="secondary"
                 onClick={toggleTheme}
                 fullWidth
+                disabled
               >
                 Сменить тему
               </Button>

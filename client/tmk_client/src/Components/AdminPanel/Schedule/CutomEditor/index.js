@@ -14,6 +14,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import adminLocations from "../../../../Locations/AdminLocations";
 
+import PatientCreateModal from '../../Modals/Patients/Create';
 const white = '#fff'
 function CustomEditor ({ scheduler, onStateChange }) {
 
@@ -57,6 +58,11 @@ function CustomEditor ({ scheduler, onStateChange }) {
         patientId: selectedPatient?.id || (scheduler.state.patientId.value),
     });
     const [error, setError] = useState("");
+
+    const [open, setOpen] = useState(false);
+
+    const handleClose = () => {setOpen(false);};
+    const handleOpen = () => {setOpen(true);};
   
     const handleChange = (value, name) => {
         setState((prev) => {
@@ -104,21 +110,23 @@ function CustomEditor ({ scheduler, onStateChange }) {
         }
     };
 
+    async function fetchDoctors() {
+        let response = await AdminService.getDoctors();
+        response.data.map((doc) => {
+            doc.label = doc.secondName + " " + doc.firstName + " " + doc.patronomicName;
+        })
+        return response.data
+    }
+    async function fetchPatients() {
+        let response = await AdminService.getPatients()
+        response.data.map((doc) => {
+            doc.label = doc.secondName + " " + doc.firstName + " " + doc.patronomicName;
+        })
+        return response.data
+    }
     useEffect(() => {
-        async function fetchDoctors() {
-            let response = await AdminService.getDoctors();
-            response.data.map((doc) => {
-                doc.label = doc.secondName + " " + doc.firstName + " " + doc.patronomicName;
-            })
-            return response.data
-        }
-        async function fetchPatients() {
-            let response = await AdminService.getPatients()
-            response.data.map((doc) => {
-                doc.label = doc.secondName + " " + doc.firstName + " " + doc.patronomicName;
-            })
-            return response.data
-        }
+        
+        
         fetchDoctors()
         .then((data) => {
             setDoctors(data)
@@ -187,9 +195,24 @@ function CustomEditor ({ scheduler, onStateChange }) {
 
     const getDoctorSchedule = async (doctor) => {
         
+        
+        console.log(doctor)
         if (dayjs(state.start).isBefore(dayjs(new Date()), 'date')) {
             setError('Невозмжно создать консультацию на прошедшую дату')
             return setGroupedSchedule([])
+        }
+        if (doctor.User.schedulerType = "dates" ) {
+            let response = await SchedulerService.getDcotorScheduleDates(doctor.id, dayjs(state.start))
+            const schedule = (response.data || []).map(slot => ({
+                ...slot,
+                start: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleStartTime}`),
+                end: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleEndTime}`)
+
+            }));
+            console.log(schedule)
+            let grouped = Object.groupBy(schedule, ({ WeekDay }) => WeekDay.name)
+            setGroupedSchedule(sortSchedule(grouped))
+            return
         }
         let response = await SchedulerService.getDcotorSchedule(doctor.id, (state.start).getDay())
         const schedule = (response.data || []).map(slot => ({
@@ -210,10 +233,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
             const end = dayjs(consultation.slotEndDateTime).subtract(2, 'minute');
             
             const timeToCheck = dayjs(selectedDate).hour(hour).minute(minute);
-            /* console.log(`start ${start} end ${end} timeToCheck ${timeToCheck}`)
-            console.log(timeToCheck.isBetween(start, end, "second", '[)')) */
-            /* return timeToCheck.isBetween(start, end, "minute", '[)'); */
-            /* console.log(`timeToCheck: ${timeToCheck} start: ${start} ${timeToCheck.isSame(start, 'minute')}`) */
             return timeToCheck.isSame(start, 'minute')
         });
     };
@@ -228,13 +247,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
             return timeInMinutes >= startTimeInMinutes && timeInMinutes < endTimeInMinutes;
         });
     };
-
-    /* const handleChangeTime = (newValue) => {
-        if (isTimeInSchedule(newValue)) {
-            setSelectedTime(newValue);
-        }
-    }; */
-
     const handleChangeTime = (newValue) => {
         if (isTimeInSchedule(dayjs(newValue).hour(), dayjs(newValue).minute()) && !isTimeUnavailable(dayjs(newValue).hour(), dayjs(newValue).minute())) {
             setSelectedTime(newValue);
@@ -242,7 +254,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     };
 
     const getDoctorActiveConsultations = async (doctor) => {
-        console.log(selectedTime)
+        /* console.log(selectedTime) */
         const response = await DoctorService.getConsultations(doctor.User.id, state.start)
         setActiveConsultations(response.data[0])
     }
@@ -393,8 +405,8 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             disablePortal
                             options={patients}
                             sx={{ mt: 2 }}
-                            renderInput={(params) => <TextField key={`doctor_${params.id}`} {...params} label="Врач" />}
-                            getOptionLabel={(option) => option.secondName + ' ' + option.firstName || ""}
+                            renderInput={(params) => <TextField key={`doctor_${params.id}`} {...params} label="Пациент" />}
+                            getOptionLabel={(option) => option.secondName + ' ' + option.firstName + ' (' + option.snils + ')' || ""}
                             value={selectedPatient}
                             isOptionEqualToValue={(option, value) => option.value === value.value}
                             onChange={handleChangePatient}
@@ -404,7 +416,8 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             }}
                         />
                         <p style={{fontSize: '0.8rem'}}>
-                            Нет нужного пациента? <a href={adminLocations.createPatient} target="_blank" rel="noopener noreferrer">Добавить</a>
+                            Нет нужного пациента? {/* <a href={adminLocations.createPatient} target="_blank" rel="noopener noreferrer">Добавить</a> */}
+                            <a onClick={handleOpen} style={{color: '#d30d15', cursor: 'pointer' }} rel="noopener noreferrer">Добавить</a>
                         </p>
                     </>
                     :
@@ -412,6 +425,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                 }
                 
             </div>
+            <PatientCreateModal show={open} onHide={() => setOpen(false)} />
             <DialogActions>
                 <Button onClick={scheduler.close}>Отмена</Button>
                 <Button onClick={handleSubmit}>Сохранить</Button>
