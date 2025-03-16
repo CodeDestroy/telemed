@@ -102,7 +102,7 @@ class SchedulerService {
         }
     }
 
-    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleStatus = 1) {
+    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1) {
         try {
             const newSchedule = await database["Schedule"].create({
                 doctorId,
@@ -110,6 +110,7 @@ class SchedulerService {
                 scheduleStartTime,
                 scheduleEndTime,
                 scheduleStatus,
+                scheduleDayId: scheduleDay,
             });
             return newSchedule
         }
@@ -119,14 +120,15 @@ class SchedulerService {
         }
     }
 
-    async editScheduleDate (slotId, date, scheduleStartTime, scheduleEndTime, scheduleStatus) {
+    async editScheduleDate (slotId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus) {
         try {
             const newslot = await database["Schedule"].update(
                 { 
                     date,
                     scheduleStartTime,
                     scheduleEndTime,
-                    scheduleStatus
+                    scheduleStatus,
+                    scheduleDayId: scheduleDay,
                 },
                 { 
                     where: { id: slotId } 
