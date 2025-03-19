@@ -254,7 +254,7 @@ return (
                             Сохранить
                         </Button>
                 </Box>
-                <ThemeProvider theme={theme}>
+                {/* <ThemeProvider theme={theme}>
                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
                         <Box sx={{ p: 4 }}>
                             <Typography variant="h4" align="center" gutterBottom>
@@ -305,7 +305,7 @@ return (
                                 ))}
                             </Grid>
 
-                        {/* Модальное окно для добавления временных интервалов */}
+                       
                             <Modal open={modalOpen} onClose={handleCloseModal}>
                                 <Box
                                     sx={{
@@ -349,7 +349,6 @@ return (
                                             maxTime={maxDate}
                                             sx={{width: '100%'}}
                                             skipDisabled={true}
-                                            /* renderInput={(params) => <TextField {...params} />} */
                                         />
                                     </Box>
                                     <Box sx={{ mb: 2 }}>
@@ -364,7 +363,6 @@ return (
                                             maxTime={maxDate}
                                             sx={{width: '100%'}}
                                             skipDisabled={true}
-                                            /* renderInput={(params) => <TextField {...params} />} */
                                         />
                                     </Box>
                                     <Button variant="contained" color="primary" fullWidth onClick={handleAddSlot}>
@@ -374,7 +372,7 @@ return (
                             </Modal>
                         </Box>
                     </LocalizationProvider>
-                </ThemeProvider>
+                </ThemeProvider> */}
             </Container>
             
         :

@@ -27,9 +27,9 @@ function DoctorItems() {
             <MenuItem onClick={handleEndedConsultations}>
                 <Typography textAlign="center">Проведенные консультации</Typography>
             </MenuItem>
-            <MenuItem onClick={handleCreateSchedule}>
+            {/* <MenuItem onClick={handleCreateSchedule}>
                 <Typography textAlign="center">Моё расписание</Typography>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleSchedule}>
                 <Typography textAlign="center">Календарь</Typography>
             </MenuItem>

@@ -128,9 +128,20 @@ class SchedulerController {
     async getDoctorScheduler (req, res) {
         try {
             const {id} = req.params
-            const {dayid} = req.query
-            const {date} = req.query
-            let schedule
+            const {startDate} = req.query
+            const {endDate} = req.query
+            console.log(req.query)
+            const schedule = await SchedulerService.getDoctorScheduleBetweenDays(id, startDate, endDate)
+            return res.status(200).json(schedule)
+            /* if (startDate && endDate) {
+                
+            }
+            else if (startDate && !endDate) {
+
+            }
+            else if (!startDate && endDate) {
+
+            }
             if (!dayid && !date) {
 
                 schedule = await SchedulerService.getDoctorSchedule(id)
@@ -145,7 +156,7 @@ class SchedulerController {
             else {
                 throw new Error('Не указано ни дата, ни день недели.')
             }
-            res.status(200).json(schedule)
+            res.status(200).json(schedule) */
         }
         catch (e) {
             res.status(404).json({error: e.message})
@@ -182,7 +193,9 @@ class SchedulerController {
             res.status(404).json({error: e.message})
         }
     }
-
+/* 
+http://localhost:8080/api/doctor/scheduler/14?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT
+http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT */
     async addScheduleDate (req, res) {
         try {
             const slotData = req.body;

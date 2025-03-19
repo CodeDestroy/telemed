@@ -42,12 +42,12 @@ function DoctorButtons() {
             >
                 Проведенные консультации
             </Button>
-            <Button
+            {/* <Button
                 onClick={handleCreateSchedule}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Моё расписание
-            </Button>
+            </Button> */}
             <Button
                 onClick={handleSchedule}
                 sx={{ my: 2, color: 'white', display: 'block' }}

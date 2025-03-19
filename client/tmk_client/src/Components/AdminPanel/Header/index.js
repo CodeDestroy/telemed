@@ -25,7 +25,7 @@ import AdminItems from './MainItems/AdminItems';
 import SuperAdminItems from './MainItems/SuperAdminItems'
 import DoctorItems from './MainItems/DoctorItems';
 import generalLocations from '../../../Locations/GeneralLocations';
-
+import './header.css'
 function AdminHeader() {
     
     const {store} = useContext(Context)

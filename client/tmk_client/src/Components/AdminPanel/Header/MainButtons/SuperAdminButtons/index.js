@@ -23,6 +23,10 @@ function SuperAdminButtons() {
         window.location.href = adminLocations.calendar
     }
 
+    const handleScheduleManagement = () => {
+            window.location.href = adminLocations.scheduleByDates
+    }
+
     return (
         <>
             <Button
@@ -48,6 +52,12 @@ function SuperAdminButtons() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Управление слотами
+            </Button>
+            <Button
+                onClick={handleScheduleManagement}
+                sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+                Управление расписанием
             </Button>
             <Button
                 onClick={handleCalendarManagement}
