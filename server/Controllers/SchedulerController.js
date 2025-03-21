@@ -124,6 +124,33 @@ class SchedulerController {
         return `${newHour}:${newMinute}`;
     }
 
+    async getDoctorSchedulerDate (req, res) {
+        try {
+            const {id} = req.params
+            const {date} = req.query
+            const {dayid} = req.query
+            let schedule
+            if (!dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorSchedule(id)
+            }
+            else if (!dayid && date) {
+                schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
+            }
+            else if (dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
+            }
+            else {
+                throw new Error('Не указано ни дата, ни день недели.')
+            }
+            res.status(200).json(schedule)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+
+    }
     
     async getDoctorScheduler (req, res) {
         try {

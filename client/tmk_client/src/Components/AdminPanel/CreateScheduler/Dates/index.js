@@ -16,8 +16,8 @@ function CreateDateSchedule() {
     const { store } = useContext(Context);
     const [doctors, setDoctors] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [startDate, setStartDate] = useState(dayjs(new Date()));
+    const [endDate, setEndDate] = useState(dayjs(new Date()).add(7, 'd'));
     const [schedule, setSchedule] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState({ date: null, startTime: null, endTime: null });
@@ -42,7 +42,7 @@ function CreateDateSchedule() {
     }, []);
 
     const handleFetchSchedule = async () => {
-        if (!selectedDoctor || !startDate || !endDate) {
+        if (!selectedDoctor /* || !startDate || !endDate */) {
             alert('Выберите врача и даты');
             return;
         }

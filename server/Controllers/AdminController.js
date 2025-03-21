@@ -21,7 +21,7 @@ class AdminController {
             if (req.user.accessLevel === 4) {
                 allSlots = await ConsultationService.getAllSlots()
             }
-            else if (req.user.accessLevel === 3) {
+            else if (req.user.accessLevel === 3 || req.user.accessLevel === 5) {
                 allSlots = await ConsultationService.getAllSlotsInMO(req.user.id)
             }
             else if (req.user.accessLevel === 2) {
@@ -125,7 +125,7 @@ class AdminController {
             if (req.user.accessLevel == 4) {
                 allDoctors = await DoctorService.getAllDoctors()
             }
-            else if (req.user.accessLevel == 3) {
+            else if (req.user.accessLevel == 3 || req.user.accessLevel == 5) {
                 const medOrg = await MedicalOrgService.getMedOrgByUserId(req.user.id)
                 if (!medOrg) {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')

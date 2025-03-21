@@ -22,10 +22,13 @@ import DoctorButtons from './MainButtons/DoctorButtons'
 import AdminButtons from './MainButtons/AdminButtons'
 import SuperAdminButtons from './MainButtons/SuperAdminButtons'
 import AdminItems from './MainItems/AdminItems';
+import OperatorItems from './MainItems/OperatorItems';
+
 import SuperAdminItems from './MainItems/SuperAdminItems'
 import DoctorItems from './MainItems/DoctorItems';
 import generalLocations from '../../../Locations/GeneralLocations';
 import './header.css'
+import OperatorButtons from './MainButtons/OperatorButtons';
 function AdminHeader() {
     
     const {store} = useContext(Context)
@@ -115,7 +118,11 @@ function AdminHeader() {
                             display: { xs: 'block', md: 'none' },
                         }}
                     >
-                        {store.user.accessLevel === 2 ? <DoctorItems /> : (store.user.accessLevel === 3 ? <AdminItems /> : <SuperAdminItems /> )}
+                        
+                        {store.user.accessLevel === 2 ? <DoctorItems /> : null}
+                        {store.user.accessLevel === 3 ? <AdminItems /> : null}
+                        {store.user.accessLevel === 4 ? <SuperAdminItems /> : null}
+                        {store.user.accessLevel === 5 ? <OperatorItems /> : null}
                     </Menu>
                 </Box>
                 
@@ -137,7 +144,11 @@ function AdminHeader() {
                     
                 </Typography>
                 <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                    {store.user.accessLevel === 2 ? <DoctorButtons /> : (store.user.accessLevel === 3 ? <AdminButtons /> : <SuperAdminButtons /> )}
+                    
+                    {store.user.accessLevel === 2 ? <DoctorButtons /> : null}
+                    {store.user.accessLevel === 3 ? <AdminButtons /> : null}
+                    {store.user.accessLevel === 4 ? <SuperAdminButtons /> : null}
+                    {store.user.accessLevel === 5 ? <OperatorButtons /> : null}
                 </Box>
 
                 <Box sx={{ flexGrow: 0 }}>
