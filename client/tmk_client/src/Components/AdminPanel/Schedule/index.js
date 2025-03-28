@@ -72,7 +72,8 @@ function Schedule() {
                 return response.data[0]
             }
             catch (e) {
-                alert(e.response.data.error)
+                console.log(e)
+                /* alert(e.response.data.error) */
             }
             
         }

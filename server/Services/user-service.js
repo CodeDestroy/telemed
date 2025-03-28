@@ -133,7 +133,19 @@ class UserService {
                     const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
-                    return { ...tokensSuperAdmin, user: userDtoSuperAdmin } 
+                    return { ...tokensSuperAdmin, user: userDtoSuperAdmin }
+                case 5:
+                    let operator = await database["Admins"].findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)
+                    /* console.log({...userDtoAdmin}) */
+                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    await tokenService.saveToken(user.id, tokensOperator.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensOperator, user: userDtoOperator }  
                 default: 
                     return ApiError.AuthError(`Ошибка авторизации`)
             }
@@ -222,6 +234,19 @@ class UserService {
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }  
+                case 5:
+                    let operator = await database["Admins"].findOne({
+                        where: {
+                            userId: user.id
+                        }
+                    })
+                    
+                    const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)
+                    /* console.log({...userDtoAdmin}) */
+                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    await tokenService.saveToken(user.id, tokensOperator.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokensOperator, user: userDtoOperator }  
                 default: 
                 
                     return [] 
