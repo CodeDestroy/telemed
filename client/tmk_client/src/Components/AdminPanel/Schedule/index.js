@@ -67,13 +67,13 @@ function Schedule() {
                         color: color,
                         slotStatus: slot.slotStatusId
                     }
-                    console.log(newEvent)
                     setEvents((prevEvents) => [...prevEvents, newEvent]);
                 })
                 return response.data[0]
             }
             catch (e) {
-                alert(e.response.data.error)
+                console.log(e)
+                /* alert(e.response.data.error) */
             }
             
         }

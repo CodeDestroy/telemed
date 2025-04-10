@@ -28,6 +28,62 @@ class SchedulerService {
             throw e;
         }
     }
+    
+
+    async findOverlappingSchedulesDates (doctorId, date, scheduleStartTime, scheduleEndTime, slotId = null) {
+        try {
+            if (slotId) {
+                
+                console.log(doctorId, date, scheduleStartTime, scheduleEndTime, slotId)
+                const overlappingSchedules = await database["Schedule"].findOne({
+                    where: {
+                        doctorId,
+                        date: date,
+                        id: {[Op.ne]: slotId},
+                        /* [Op.ne]: {
+                            id: slotId
+                        }, */
+                        [Op.or]: [
+                            {
+                            scheduleStartTime: {
+                                [Op.lt]: scheduleEndTime,
+                            },
+                            scheduleEndTime: {
+                                [Op.gt]: scheduleStartTime,
+                            },
+                            },
+                        ],
+                    },
+                });
+                console.log(overlappingSchedules)
+                return overlappingSchedules
+            }
+            else {
+                const overlappingSchedules = await database["Schedule"].findOne({
+                    where: {
+                        doctorId,
+                        date: date,
+                        [Op.or]: [
+                            {
+                            scheduleStartTime: {
+                                [Op.lt]: scheduleEndTime,
+                            },
+                            scheduleEndTime: {
+                                [Op.gt]: scheduleStartTime,
+                            },
+                            },
+                        ],
+                    },
+                });
+                return overlappingSchedules
+            }
+            
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
 
     async createSchedule (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, scheduleStatus = 1) {
         try {
@@ -46,12 +102,55 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleByDay (doctorId, dayOfWeek) {
+    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1) {
+        try {
+            const newSchedule = await database["Schedule"].create({
+                doctorId,
+                date: date,
+                scheduleStartTime,
+                scheduleEndTime,
+                scheduleStatus,
+                scheduleDayId: scheduleDay,
+            });
+            return newSchedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
+
+    async editScheduleDate (slotId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus) {
+        try {
+            const newslot = await database["Schedule"].update(
+                { 
+                    date,
+                    scheduleStartTime,
+                    scheduleEndTime,
+                    scheduleStatus,
+                    scheduleDayId: scheduleDay,
+                },
+                { 
+                    where: { id: slotId } 
+                }
+            )
+                
+            return newslot
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
+
+
+    /* async getDoctorScheduleByDay (doctorId, dayOfWeek) {
         try {
             const doctorSchedule = await database["Schedule"].findAll({
                 where: {
                     doctorId,
                     scheduleDay: dayOfWeek,
+                    date: {[Op.eq]: null},
                     scheduleStatus: 1,
                 },
             });
@@ -61,7 +160,7 @@ class SchedulerService {
             console.log(e)
             throw e;
         }
-    }
+    } */
 
     async getDoctorScheduleByDate (doctorId, date) {
         try {
@@ -71,9 +170,16 @@ class SchedulerService {
                     date: {
                         [Op.eq]: date
                     },
+                    /* date: {[Op.ne]: null}, */
                     scheduleStatus: 1,
 
-                }
+                },
+                include: [
+                    { 
+                        model: database["WeekDays"],
+                        required: true ,
+                    }
+                ],
             })
             return doctorSchedule
         }
@@ -82,6 +188,7 @@ class SchedulerService {
             throw e
         }
     }
+
 
     async getDoctorScheduleByDates (doctorId, startDate, endDate) {
         try {
@@ -97,6 +204,53 @@ class SchedulerService {
                 }
             })
             return doctorSchedule;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleBetweenDays (doctorId, startDate = null, endDate = null) {
+        try {
+            if (startDate && endDate) {
+               const doctorSchedule = await database["Schedule"].findAll({
+                    where: {
+                        doctorId,
+                        date: {
+                            [Op.between]: [startDate, endDate]
+                        }
+                    }
+                }) 
+                return doctorSchedule;
+            }
+            else if (startDate) {
+                const doctorSchedule = await database["Schedule"].findAll({
+                    where: {
+                        doctorId,
+                        date: {
+                            [Op.gte]: startDate
+                        }
+
+                    }
+                })
+                return doctorSchedule
+            }
+            else if (endDate) {
+                const doctorSchedule = await database["Schedule"].findAll({
+                    where: {
+                        doctorId,
+                        date: {
+                            [Op.lte]: endDate
+                        }
+
+                    }
+                })
+                return doctorSchedule
+            }
+            return null
+            
+
         }
         catch (e) {
             console.log(e)
@@ -162,7 +316,8 @@ class SchedulerService {
         try {
             const schedule = await database["Schedule"].findAll({
                 where: {
-                    doctorId
+                    doctorId,
+                    date: {[Op.eq]: null},
                 },
                 include: [
                     { 

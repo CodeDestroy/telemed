@@ -161,29 +161,31 @@ const SettingsPage = () => {
                 </Box>
                 {/* Переключатели для настроек расписания и уведомлений */}
                 <FormGroup sx={{ alignItems: 'left', ml: 2 }}>
-                  <FormControl sx={{ mb: 3 }}>
+                  {/* <FormControl sx={{ mb: 3 }}>
                     <FormControlLabel
                       control={
                         <Switch
                           checked={scheduleType === 'byDate'}
                           onChange={(e) =>
                             handleSheduleType(e.target.checked ? 'byDate' : 'daysOfWeek')
-                            /* setScheduleType(e.target.checked ? 'byDate' : 'daysOfWeek') */
                           }
                         />
                       }
                       label="Использовать расписание по датам"
                     />
-                  </FormControl>
+                  </FormControl> */}
 
                   <FormControl sx={{ mb: 3 }}>
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={notificationsEnabled}
+                          /* checked={notificationsEnabled} */
+                          checked={true}
                           onChange={(e) => setNotificationsEnabled(e.target.checked)}
                         />
                       }
+                      disabled
+                     
                       label="Отправлять уведомления на почту"
                     />
                   </FormControl>

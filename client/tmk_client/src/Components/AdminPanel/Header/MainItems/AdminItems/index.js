@@ -23,6 +23,11 @@ function AdminItems() {
         window.location.href = adminLocations.calendar
     }
 
+    const handleScheduleManagement = () => {
+        window.location.href = adminLocations.scheduleByDates
+    }
+
+
     return (
         <>
             {/* <MenuItem onClick={handleAdminDashboard}>
@@ -33,6 +38,9 @@ function AdminItems() {
             </MenuItem>
             <MenuItem onClick={handlePatientManagement}>
                 <Typography textAlign="center">Управление пациентами</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleScheduleManagement}>
+                <Typography textAlign="center">Управление расписанием</Typography>
             </MenuItem>
             {/* <MenuItem onClick={handleSlotsManagement}>
                 <Typography textAlign="center">Управление слотами</Typography>

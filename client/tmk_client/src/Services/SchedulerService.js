@@ -8,6 +8,11 @@ export default class SchedulerService {
         return $api.get(`/api/doctor/scheduler/${doctorId}`, {params: {dayid}});
     }
 
+    static async getDcotorScheduleDates (doctorId, date) {
+        return $api.get(`/api/doctor/scheduler/date/${doctorId}`, {params: {date}});
+    }
+    
+
     /* static async getEndedConsultations (userId) {
         return $api.get('/api/doctor/consultations/ended', {params: {userId}})
     } */

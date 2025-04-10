@@ -10,7 +10,7 @@ import adminRouter from "./Routers/adminRouter";
 import doctorRouter from "./Routers/doctorRouter";
 import authRouter from './Routers/authRouter'
 import superAdminRouter from "./Routers/superAdminRouter";
-
+import operatorRouter from "./Routers/operatorRouter";
 function App() {
   
   const { store } = useContext(Context);
@@ -59,8 +59,10 @@ function App() {
           return (<RouterProvider router={adminRouter} />)
         case  4: 
           return (<RouterProvider router={superAdminRouter} />)
+        case  5: 
+          return (<RouterProvider router={superAdminRouter} />)
         default: 
-        return (<RouterProvider router={authRouter} />)
+          return (<RouterProvider router={operatorRouter} />)
       }
     }
     else {

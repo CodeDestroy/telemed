@@ -22,6 +22,9 @@ function SuperAdminItems() {
     const handleCalendarManagement = () => {
         window.location.href = adminLocations.calendar
     }
+    const handleScheduleManagement = () => {
+        window.location.href = adminLocations.scheduleByDates
+    }
 
     return (
         <>
@@ -37,7 +40,9 @@ function SuperAdminItems() {
             <MenuItem onClick={handleSlotsManagement}>
                 <Typography textAlign="center">Управление слотами</Typography>
             </MenuItem>
-
+            <MenuItem onClick={handleScheduleManagement}>
+                <Typography textAlign="center">Управление Расписанием</Typography>
+            </MenuItem>
             <MenuItem onClick={handleCalendarManagement}>
                 <Typography textAlign="center">Управление слотами (Календарь)</Typography>
             </MenuItem>

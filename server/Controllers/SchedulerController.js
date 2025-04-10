@@ -124,8 +124,73 @@ class SchedulerController {
         return `${newHour}:${newMinute}`;
     }
 
+    async getDoctorSchedulerDate (req, res) {
+        try {
+            const {id} = req.params
+            const {date} = req.query
+            const {dayid} = req.query
+            let schedule
+            if (!dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorSchedule(id)
+            }
+            else if (!dayid && date) {
+                schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
+            }
+            else if (dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
+            }
+            else {
+                throw new Error('Не указано ни дата, ни день недели.')
+            }
+            res.status(200).json(schedule)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+
+    }
     
     async getDoctorScheduler (req, res) {
+        try {
+            const {id} = req.params
+            const {startDate} = req.query
+            const {endDate} = req.query
+            console.log(req.query)
+            const schedule = await SchedulerService.getDoctorScheduleBetweenDays(id, startDate, endDate)
+            return res.status(200).json(schedule)
+            /* if (startDate && endDate) {
+                
+            }
+            else if (startDate && !endDate) {
+
+            }
+            else if (!startDate && endDate) {
+
+            }
+            if (!dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorSchedule(id)
+            }
+            else if (!dayid && date) {
+                schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
+            }
+            else if (dayid && !date) {
+
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
+            }
+            else {
+                throw new Error('Не указано ни дата, ни день недели.')
+            }
+            res.status(200).json(schedule) */
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
+    
+    /* async getDoctorSchedulerDate (req, res) {
         try {
             const {id} = req.params
             const {dayid} = req.query
@@ -148,8 +213,7 @@ class SchedulerController {
         catch (e) {
             res.status(404).json({error: e.message})
         }
-    }
-    
+    } */
 
     async deleteDoctorScheduler (req, res) {
         try {
@@ -161,6 +225,67 @@ class SchedulerController {
             res.status(404).json({error: e.message})
         }
     }
+/* 
+http://localhost:8080/api/doctor/scheduler/14?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT
+http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT */
+    async addScheduleDate (req, res) {
+        try {
+            const slotData = req.body;
+            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
+            const newDate = new Date(date)
+            const day = newDate.getDay()
+           /*  const startTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
+            const endTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
+             */
+            console.log({ doctorId, date, startTime, endTime, scheduleStatus })
+            const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(doctorId, date, startTime, endTime)
+            if (overlappingSchedules) {
+                return res.status(400).json({
+                    error: 'Временной промежуток пересекается с существующим расписанием.',
+                });
+            }
+
+            const newSchedule = await SchedulerService.createScheduleDate(doctorId, date, startTime, endTime, day, scheduleStatus);
+            console.log(newSchedule)
+            return res.status(200).json(newSchedule)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
+
+    async editScheduleDate (req, res) {
+        try {
+            const slotData = req.body;
+            const { id } = req.params
+            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
+            const newDate = new Date(date)
+            const day = newDate.getDay()
+            
+            const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(doctorId, slotData.date, startTime, endTime, id)
+            if (overlappingSchedules) {
+                return res.status(400).json({
+                    error: 'Временной промежуток пересекается с существующим расписанием.',
+                });
+            }
+            const newSchedule = await SchedulerService.editScheduleDate(id, date, startTime, endTime, day, scheduleStatus);
+            return res.status(200).json(newSchedule)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
+
+    async deleteScheduleDate (req, res) {
+        try {
+            const {id} = req.params
+
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
+
 }
 
 module.exports = new SchedulerController();

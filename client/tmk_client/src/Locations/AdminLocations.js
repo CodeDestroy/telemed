@@ -11,7 +11,8 @@ const adminLocations = {
     createPatient: '/patients/create',
     editPatient: '/patients/edit/:id',
     calendar: '/calendar',
-    settings: '/profile/settings'
+    settings: '/profile/settings',
+    scheduleByDates: '/schedule/dates'
 };
   
 export default adminLocations;

@@ -1,258 +1,234 @@
-import {useEffect, useState, useContext} from 'react'
-import Header from '../../Header'
-import { Scheduler } from "@aldabil/react-scheduler";
-import {ru } from "date-fns/locale";
-import russianTranslition from '../../../../Assets/translate/russianTranslition';
-
+import { useEffect, useState, useContext } from 'react';
+import Header from '../../Header';
+import { Box, Button, Container, Grid, Typography, Modal, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import 'dayjs/locale/ru';
+import { Autocomplete } from '@mui/material';
 import { Context } from '../../../../';
-import { IconButton, Snackbar } from "@mui/material";
 import DoctorService from '../../../../Services/DoctorService';
+import AdminService from '../../../../Services/AdminService';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function CreateDateSchedule() {
-    const {store} = useContext(Context)
-    let [events, setEvents] = useState([
-    ])
-
-    const handleEventDelete = (event) => {
-        
-        let newEvents = events.filter((item) => item.event_id !== event)
-        setEvents(newEvents)
-    }
-
-    /* useEffect(() => {
-        async function fetchSchedule() {
-            console.log(store.user)
-            if (store.user?.personId) {
-                const response = await DoctorService.getSchedule(store.user.personId);
-                const newSchedule = { ...schedule };
-    
-                response.data.forEach(el => {
-                    const day = el.WeekDay.name;
-                    const start = el.scheduleStartTime.substring(0,5);
-                    const end = el.scheduleEndTime.substring(0,5);
-                    const id = el.id
-                    
-                    if (!newSchedule[day]) newSchedule[day] = [];
-                    newSchedule[day].push({ start, end, id });
-                });
-    
-                setSchedule(newSchedule);
-            }
-        }
-        fetchSchedule();
-    }, [store]); */
+    const { store } = useContext(Context);
+    const [doctors, setDoctors] = useState([]);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [startDate, setStartDate] = useState(dayjs(new Date()));
+    const [endDate, setEndDate] = useState(dayjs(new Date()).add(7, 'd'));
+    const [schedule, setSchedule] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalData, setModalData] = useState({ date: null, startTime: null, endTime: null });
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingSlot, setEditingSlot] = useState(null);
 
     useEffect(() => {
-        async function fetchSchedule() {
+        async function fetchDoctors() {
             try {
-                if (store.user?.personId) {
-                    const response = await DoctorService.getSchedule(store.user.personId);
-                    /* const newSchedule = { ...events }; */
-                    console.log(response)
-                    response.data.forEach(el => {
-                        const day = el.WeekDay.name;
-                        const start = el.scheduleStartTime.substring(0,5);
-                        const end = el.scheduleEndTime.substring(0,5);
-                        const date = el.Date
-                        const id = el.id
-                        
-                        /* if (!newSchedule[day]) newSchedule[day] = [];
-                        newSchedule[day].push({ start, end, id }); */
-                    });
-                    /* response.data[0].map((slot) => {
-                        const newEvent = {
-                            event_id: slot.id || Math.random(),
-                            title: `Конференция ${slot?.dSecondName} ${slot?.dFirstName}`,
-                            start: new Date(slot.slotStartDateTime),
-                            end: new Date(slot.slotEndDateTime),
-                            description: `Конференция. Врач: ${slot?.dSecondName} ${slot?.dFirstName}. Пациент: ${slot?.pSecondName} ${slot?.pFirstName}`,
-                            patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + slot.pUrl,
-                            doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + slot.dUrl,
-                            doctorId: slot.doctorId,
-                            patientId: slot.patientId,
-                            dotorSecondName: slot?.dSecondName,
-                            dotorFirstName: slot?.dFirstName,
-                            patientSecondName: slot?.pSecondName,
-                            patientFirstName: slot?.pFirstName,
-                        }
-                        setEvents((prevEvents) => [...prevEvents, newEvent]);
-                    }) */
-                    return response.data[0]
+                const response = await AdminService.getDoctors();
+                if (response.status === 200) {
+                    const arrayDoctors = response.data.map(doctor => ({ label: `${doctor.secondName} ${doctor.firstName}`, id: doctor.id }));
+                    setDoctors(arrayDoctors);
+                } else {
+                    alert('Ошибка загрузки врачей');
                 }
-                
+            } catch (e) {
+                alert('Ошибка загрузки списка врачей');
             }
-            catch (e) {
-                alert(e.response.data.error)
-            }
-            
         }
-        fetchSchedule()
-    }, [])
+        fetchDoctors();
+    }, []);
 
-
-    const handleEventsChange = (event) => {
-        /* console.log(event) */
-    }
-
-    const handleConfirm = async (newEvent, action) => {
-        /* console.log(newEvent) */
-        // Логика для создания нового события
-        if (action === 'create') {
-            setEvents((prevEvents) => [...prevEvents, newEvent]);
-        }
-        // Логика для обновления существующего события
-        else if (action === 'edit') {
-            setEvents((prevEvents) =>
-                prevEvents.map((evt) =>
-                evt.event_id === newEvent.event_id
-                    ? { ...evt, title: newEvent.title, start: newEvent.start, end: newEvent.end, description: newEvent.description, patientUrl: newEvent.patientUrl, doctorUrl: newEvent.doctorUrl }
-                    : evt
-                )
-            );
-        }
-    
-        return newEvent;
-    };
-
-    const handleClickCopy = (event, url) => {
-        navigator.clipboard.writeText(url).then(() => {
-            setOpen(true);
-        }, (err) => {
-            console.error('Could not copy text: ', err);
-        });
-    };
-
-    const [open, setOpen] = useState(false);
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
+    const handleFetchSchedule = async () => {
+        if (!selectedDoctor /* || !startDate || !endDate */) {
+            alert('Выберите врача и даты');
             return;
         }
-        setOpen(false);
+        try {
+            const response = await DoctorService.getScheduleByDates(selectedDoctor.id, startDate, endDate);
+            setSchedule(response.data);
+        } catch (e) {
+            alert('Ошибка загрузки расписания');
+        }
     };
-    const css = `
-        .css-s22wio {
-                    width: 420px;
-                }
-    `
-    useEffect(() => {console.log(store.user)}, [store])
-  
+
+    const handleAddSchedule = async () => {
+        if (!modalData.date || !modalData.startTime || !modalData.endTime) {
+            alert('Заполните все поля');
+            return;
+        }
+        if (!selectedDoctor) {
+            alert('Выберите врача');
+            return;
+        }
+
+        try {
+            if (isEditing && editingSlot) {
+                await DoctorService.updateSchedule(selectedDoctor.id, editingSlot.id, 
+                    modalData.date.add(3, 'h'),
+                    modalData.startTime.format('HH:mm'),
+                    modalData.endTime.format('HH:mm'),
+                );
+                alert('Расписание обновлено');
+            } else {
+                /* console.log({
+                    doctorId: selectedDoctor.id,
+                    date: modalData.date,
+                    startTime: modalData.startTime.format('HH:mm'),
+                    endTime: modalData.endTime.format('HH:mm')
+                }) */
+                await DoctorService.addSchedule(
+                    selectedDoctor.id,
+                    modalData.date.add(3, 'h'),
+                    modalData.startTime.format('HH:mm'),
+                    modalData.endTime.format('HH:mm')
+                );
+                alert('Расписание добавлено');
+            }
+            setModalOpen(false);
+            setIsEditing(false);
+            setEditingSlot(null);
+            handleFetchSchedule();
+        } catch (e) {
+            alert('Ошибка сохранения расписания \r' + e.response.data.error);
+        }
+    };
+
+    const handleEditSlot = (slot) => {
+        if (!selectedDoctor) {
+            alert('Выберите врача');
+            return;
+        }
+        setModalData({
+            date: dayjs(slot.date),
+            startTime: dayjs(slot.scheduleStartTime, 'HH:mm'),
+            endTime: dayjs(slot.scheduleEndTime, 'HH:mm')
+        });
+        console.log((slot.date))
+        setIsEditing(true);
+        setEditingSlot(slot);
+        setModalOpen(true);
+    };
+
+    const handleAddSlot = () => {
+        if (!selectedDoctor) {
+            alert('Выберите врача');
+            return;
+        }
+        setIsEditing(false); 
+        setModalData({ date: null, startTime: null, endTime: null }); 
+        setModalOpen(true); 
+    }
+
+    const handleDeleteSlot = async (slotId) => {
+        
+        try {
+            
+            await DoctorService.deleteSchedule(slotId);
+            alert('Расписание удалено');
+            handleFetchSchedule();
+        } catch (e) {
+            alert('Ошибка удаления расписания');
+        }
+    };
+
     return (
         <>
-            <style>
-                {css}
-            </style>
-            <Header/>
-            <Scheduler
-                view="week"
-                /* disableViewNavigator={true} */
-                locale={ru}
-                translations={russianTranslition}
-                hourFormat='24'
-                month={
-                    {
-                        weekDays: [0, 1, 2, 3, 4, 5], 
-                        weekStartOn: 1, 
-                        startHour: 8, 
-                        endHour: 22,
-                        navigation: true,
-                        disableGoToDay: false,
-                        
-                    }
-                }
-                week={{
-                    weekDays: [0, 1, 2, 3, 4, 5], 
-                    weekStartOn: 1, 
-                    startHour: 8, 
-                    endHour: 22,
-                    step: 60,
-                    navigation: true,
-                    disableGoToDay: false
-                }}      
-                day={{
-                    startHour: 8, 
-                    endHour: 22, 
-                    step: 60,
-                    navigation: true
-                }}
-                /* fields={[
-                    {
-                        name: "patientUrl",
-                        type: "input",
-                        // Should provide options with type:"select"
-                        config: { label: "Ссылка для пациента", required: false, errMsg: "Нет ссылки, обратитесь в поддержку" }
-                    },
-                    {
-                        name: "doctorUrl",
-                        type: "input",
-                        // Should provide options with type:"select"
-                        config: { label: "Ссылка для врача", required: false, errMsg: "Нет ссылки, обратитесь в поддержку" }
-                    },
-                    {
-                        name: "Description",
-                        type: "input",
-                        default: "Описание",
-                        config: { label: "Описание", multiline: true, rows: 4 }
-                    },
-                    {
-                        name: "doctorId",
-                        type: "input"
-                    },
-                    {
-                        name: "patientId",
-                        type: "input"
-                    }
-                ]} */
-                deletable={false}
-                draggable={false}
-                events={events}
-                editable={true}
-                onConfirm={handleConfirm}
-                onDelete={handleEventDelete} 
-                /* customEditor={(scheduler) => <CustomEditor scheduler={scheduler} onStateChange={handleEventsChange} onConfirm={handleConfirm}/>}
-                viewerExtraComponent={(fields, event) => {
-                    return (
-                      <div>
-                        <p style={{fontSize: '1rem'}}>{event.description || ''}</p>
-                        <p style={{fontSize: '1rem'}}>
-                            Ссылка для подключения Врача: 
-                            <a href={event.doctorUrl} target='_blank'>{` ${event.doctorUrl}`}</a>
-                            <IconButton
-                                id={`${event.id}-doctorCopy`}
-                                aria-label="toggle password visibility"
-                                onClick={e => handleClickCopy(e, event.doctorUrl)}
-                            >
-                                <ContentCopyIcon />
-                            </IconButton></p>
-                        <p style={{fontSize: '1rem'}}>
-                            Ссылка для подключения Пациента: 
-                            <a href={event.patientUrl} target='_blank'>{` ${event.patientUrl}`}</a>
-                            <IconButton
-                                id={`${event.id}-patientCopy`}
-                                aria-label="toggle password visibility"
-                                onClick={e => handleClickCopy(e, event.patientUrl)}
-                            >
-                                <ContentCopyIcon />
-                            </IconButton></p>
-                      </div>
-                    );
-                }} */
-            />
-            <Snackbar
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                open={open}
-                autoHideDuration={800}
-                onClose={handleClose}
-                message="Скопировано"
-            />
+            <Header />
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                <Container maxWidth="md" className='mt-5'>
+                    <Grid container spacing={2}>
+                        <Grid item xs={4}>
+                            <Autocomplete
+                                value={selectedDoctor}
+                                onChange={(event, newValue) => setSelectedDoctor(newValue)}
+                                options={doctors}
+                                renderInput={(params) => <TextField {...params} label="Врач" />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DatePicker label="Дата начала" value={startDate} onChange={setStartDate} format="DD.MM.YYYY" />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DatePicker label="Дата конца" value={endDate} onChange={setEndDate} format="DD.MM.YYYY" />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button variant="contained" onClick={handleFetchSchedule}>Загрузить</Button>
+                        </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 3 }}>
+                        <Typography variant="h6">Расписание</Typography>
+                        {schedule.length > 0 ? (
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Дата</TableCell>
+                                            <TableCell>Время</TableCell>
+                                            <TableCell>Действия</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {schedule.map((slot) => (
+                                            <TableRow key={slot.id}>
+                                                <TableCell>{dayjs(slot.date).format('DD.MM.YYYY')}</TableCell>
+                                                <TableCell>{slot.scheduleStartTime.substring(0,5)} - {slot.scheduleEndTime.substring(0,5)}</TableCell>
+                                                <TableCell>
+                                                    <IconButton onClick={() => handleEditSlot(slot)}><EditIcon /></IconButton>
+                                                    <IconButton onClick={() => handleDeleteSlot(slot.id)}><DeleteIcon /></IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        ) : (
+                            <Typography>Нет доступных слотов</Typography>
+                        )}
+                        <Button variant="contained" sx={{ mt: 2 }} onClick={handleAddSlot}>Добавить расписание</Button>
+                    </Box>
+                </Container>
+                <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
+                        <Typography variant="h6">{isEditing ? 'Редактировать' : 'Добавить'} расписание</Typography>
+                        <DatePicker 
+                            label="Дата" 
+                            value={modalData.date} 
+                            onChange={(date) => setModalData({ ...modalData, date })} 
+                            format="DD.MM.YYYY" 
+                            fullWidth 
+                            sx={{ mb: 2, width: '100%' }} 
+                        />
+                        <TimePicker 
+                            label="Время начала" 
+                            value={modalData.startTime} 
+                            onChange={(time) => setModalData({ ...modalData, startTime: time })} 
+                            fullWidth 
+                            sx={{ mb: 2, width: '100%' }} 
+                            minTime={dayjs('07:00:00', 'HH:mm:ss')}
+                            maxTime={dayjs('23:00:00', 'HH:mm:ss')}
+                            minutesStep={30}
+                            skipDisabled={true}
+                        />
+                        <TimePicker 
+                            label="Время конца" 
+                            value={modalData.endTime} 
+                            onChange={(time) => setModalData({ ...modalData, endTime: time })} 
+                            fullWidth 
+                            sx={{ mb: 2, width: '100%' }} 
+                            minTime={dayjs('07:30:00', 'HH:mm:ss')}
+                            maxTime={dayjs('23:30:00', 'HH:mm:ss')}
+                            minutesStep={30}
+                            skipDisabled={true}
+                        />
+                        <Button variant="contained" fullWidth onClick={handleAddSchedule}>{isEditing ? 'Сохранить' : 'Добавить'}</Button>
+                    </Box>
+                </Modal>
+            </LocalizationProvider>
         </>
-      
-    )
+    );
 }
 
-export default CreateDateSchedule
+export default CreateDateSchedule;
