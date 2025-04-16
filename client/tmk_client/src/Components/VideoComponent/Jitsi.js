@@ -22,7 +22,7 @@ const CustomComponent = () => {
 function Jitsi(props) {
     const {store} = React.useContext(Context)
     const roomName = props.room
-    const domain = 'mczr-tmk.ru'
+    const domain = 'clinicode.online'
     /* const [time, setTime] = useState(props.timerSeconds) */
     const jwt = props.token
     let localId = 0;

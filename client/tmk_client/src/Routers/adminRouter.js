@@ -17,6 +17,8 @@ import generalLocations from '../Locations/GeneralLocations';
 import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 import CreateDateSchedule from '../Components/AdminPanel/CreateScheduler/Dates'
+import SlotList from '../Components/AdminPanel/newSchedule/SlotsList'
+
 const adminRouter = createBrowserRouter([
     {
         path: "*",
@@ -73,6 +75,10 @@ const adminRouter = createBrowserRouter([
     {
       path: adminLocations.scheduleByDates,
       element: <CreateDateSchedule/>
+    },
+    {
+      path: "/new",
+      element: <SlotList/>
     }
     /* {
         path: '/test',
