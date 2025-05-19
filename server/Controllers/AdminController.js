@@ -13,7 +13,7 @@ const MailManager = require("../Utils/MailManager");
 const MedicalOrgService = require('../Services/MedicalOrgService')
 const ApiError = require('../Errors/api-error')
 var validator = require("email-validator");
-
+const smsCenterApi = require('../Api/smsCenterApi')
 class AdminController {
     async getAllConsultations(req, res) {
         try {
@@ -37,6 +37,31 @@ class AdminController {
             res.status(404).json({error: e.message})
         }
         
+    }
+
+    async getAllConsultationsDate (req, res) {
+        try {
+            const {date} = req.query
+            let allSlots = []
+            allSlots = await ConsultationService.getAllSlotsByDate(date)
+            /* if (req.user.accessLevel === 4) {
+                allSlots = await ConsultationService.getAllSlotsByDate(date)
+            }
+            else if (req.user.accessLevel === 3 || req.user.accessLevel === 5) {
+                allSlots = await ConsultationService.getAllSlotsInMO(req.user.id)
+            }
+            else if (req.user.accessLevel === 2) {
+                allSlots = await ConsultationService.getAllDoctorSlotsRaw(req.user.personId)
+            }
+            else if (req.user.accessLevel === 1) {
+
+            } */
+            
+            res.status(200).json(allSlots)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
     }
 
     async getEndedConsultations (req, res) {
@@ -91,6 +116,40 @@ class AdminController {
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
             }
+            /* if (patient.User.phone) {
+                const date = new Date(startDateTime);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+        
+                const hours = String(date.getHours() + 3).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+                const formattedDateTime = `${day}.${month}.${year} ${hours}:${minutes}`;
+
+                const data = smsCenterApi.sendSmsMessage(patient.User.phone, `Ссылка для подключения ${patientLink}. Консультация начнётся в ${formattedDateTime}`)
+                const dataWhatsApp = smsCenterApi.sendWhatsAppMessage(patient.User.phone, `Ссылка для подключения ${patientLink}. Консультация начнётся в ${formattedDateTime}`)
+                console.log(data)
+                console.log(dataWhatsApp)
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
+                transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            } */
+            /* if (doctor.User.phone) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime)
+                transporter.sendMail(mailOptionsDoctor, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            } */
             res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom})
         }
         catch (e) {

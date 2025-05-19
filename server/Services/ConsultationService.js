@@ -8,19 +8,45 @@ const JITSI_APP_ID = process.env.JITSI_APP_ID;
 const JITSI_SERVER_URL = process.env.JITSI_SERVER_URL;
 class ConsultationService {
 
+
+    async getAllSlotsByDate (date) {
+        try {
+            console.log(date)
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", *
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and DATE(s."slotStartDateTime") = :date`, 
+                    
+            {
+                raw: false,
+                replacements: { date }
+            })
+            return slots;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
     //Все слоты (лучше не использовать)
     async getAllSlots () {
         try {
-            /* const slots = await database["Slots.findAll({
-                include: [{
-                    model: database["Rooms,
-                    required: false
-                },
-                {
-                    model: database["Patients,
-                    required: false
-                }]
-            }); */
             const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
