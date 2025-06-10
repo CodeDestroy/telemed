@@ -17,6 +17,7 @@ import generalLocations from '../Locations/GeneralLocations';
 import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 import CreateDateSchedule from '../Components/AdminPanel/CreateScheduler/Dates'
+import ProtocolPage from '../Components/Protocol/ProtocolPage';
 const adminRouter = createBrowserRouter([
     {
         path: "*",
@@ -73,6 +74,10 @@ const adminRouter = createBrowserRouter([
     {
       path: adminLocations.scheduleByDates,
       element: <CreateDateSchedule/>
+    },
+    {
+      path: '/protocol/:protocolId',
+      element: <ProtocolPage/>
     }
     /* {
         path: '/test',

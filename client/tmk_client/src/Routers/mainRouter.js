@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import PriateRouter from "./priateRouter";
 import PageNotFound from '../Components/Errors/PageNotFound'
+import ProtocolPage from '../Components/Protocol/ProtocolPage';
 const mainRouter = createBrowserRouter([
     {
       path: "*",
@@ -25,6 +26,10 @@ const mainRouter = createBrowserRouter([
     {
       path: '/room/:roomId',
       element: <VideoCompoent/>
+    },
+    {
+      path: '/protocol/:protocolId',
+      element: <ProtocolPage/>
     }
    /*  {
       path: '/admin',
