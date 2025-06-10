@@ -1,6 +1,10 @@
 const ConsultationService = require('../Services/ConsultationService')
 const rooms = require('../Utils/RoomManager')
+const UrlManager = require('../Utils/UrlManager')
+const MailManager = require('../Utils/MailManager')
 
+const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
+const CLIENT_URL = process.env.CLIENT_URL;
 class ConferenceController {
     async join (req, res) {
         const conferenceEvent = req.body.conferenceEvent
@@ -98,6 +102,71 @@ class ConferenceController {
             res.status(400).send(e.message)
         }
     }
+
+    async setConferenceProtocol (req, res) {
+        try {
+            const {roomId} = req.body
+            const {protocol} = req.body
+            
+            const tmk = await ConsultationService.getSlotByRoomId(roomId)
+           
+            tmk.Room.protocol = protocol
+
+            tmk.Room.save()
+            res.status(200).json(tmk)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
+
+    async sendConferenceProtocol (req, res) {
+        try {
+            const {roomId} = req.body
+            
+            const tmk = await ConsultationService.getSlotByRoomId(roomId)
+            //throw new Error('Ошибка отправки')
+
+            const url = `${CLIENT_URL}/protocol/${tmk.Room.roomName}`
+            const shortUrl = await UrlManager.createShort(url, tmk.Patient.User.id, tmk.Room.id, "protocol")
+            const transporter = await MailManager.getTransporter()
+            const link =  SERVER_DOMAIN + 'short/' + shortUrl;
+            
+            if (tmk.Patient.User.email) {
+                const mailOptionsPatinet = await MailManager.getMailOptionsProtocolLink(tmk.Patient.User.email, link, tmk.Room.protocol)
+                transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                        /* return console.log(error); */
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            }
+            
+            res.status(200).json(tmk)
+            
+        }
+        catch (e) {
+            console.log(e)
+            res.status(404).json({error: e.message})
+        }
+    }
+
+     async getProtocolByRoomName(req, res) {
+            try {
+                const {roomName} = req.query
+                const tmk = await ConsultationService.getSlotByRoomName(roomName)
+                res.status(200).json(tmk.Room.protocol)
+                
+            }
+            catch (e) {
+                res.status(500).json({error: e.message})
+            }
+            
+        }
+
+    
 }
 
 module.exports = new ConferenceController()

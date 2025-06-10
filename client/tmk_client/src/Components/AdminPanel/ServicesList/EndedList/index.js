@@ -9,17 +9,30 @@ import { Box, IconButton, Input, FormControl, InputLabel, InputAdornment, Snackb
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import moment from 'moment-timezone';
 import { LocalizationContext } from '../../../../Utils/LocalizationContext';
+import EditProtocolModal from '../../Modals/Protocol/Edit';
 
 function Index() {
     const { store } = useContext(Context);
     const [consultations, setConsultations] = useState([]);
     const [expandedRowIds, setExpandedRowIds] = useState([]);
 
+    const [selectedConsultation, setSelectedConsultation] = useState(null);
+    const [editProtocolModalOpen, setEditProtocolModalOpen] = useState(false);
+    const handleChangeProtocolModalOpen = () => {setEditProtocolModalOpen(true)}
+    const handleChangeProtocolModalClose = () => {setEditProtocolModalOpen(false)}
+
+
+
     const handleExpandClick = (id) => {
         setExpandedRowIds((prevState) => {
             return (prevState.includes(id) ? prevState.filter(rowId => rowId !== id) : [...prevState, id]);
         });
     };
+
+
+    const handleChangeProtocol = (id) => {
+
+    }
 
     const columns = [
         {
@@ -94,16 +107,24 @@ function Index() {
             field: "button", 
             headerName: "Изменить", 
             renderCell: (cellValues) => {
-                /* if (!cellValues.row.detail) {
-                    return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
-                } */
                 return (
-                    <Button>Изменить</Button>
+                    <>
+                        <Button onClick={() => {
+                            setEditProtocolModalOpen(true);
+                            setSelectedConsultation(cellValues.row);
+                        }}>
+                            Изменить
+                        </Button>
+                        {editProtocolModalOpen && selectedConsultation.id === cellValues.row.id && (
+                            <EditProtocolModal
+                                isOpen={editProtocolModalOpen}
+                                onClose={handleChangeProtocolModalClose}
+                                consultation={selectedConsultation}
+                            />
+                        )}
+                    </>
+                    
                 )
-                /* if (cellValues.row.protocol) {
-                    return cellValues.row.protocol;
-                }
-                return cellValues.value; */
             },
             width: 100,
             disableColumnSort: true
@@ -116,7 +137,7 @@ function Index() {
                 try {
                     const response = await DoctorService.getEndedConsultations(store.user.id);
                     let array = response.data[0]
-
+                    array = array.filter(item => item.type !== "protocol");
                     array.forEach(function(part, index, theArray) {
                         theArray[index].patient = `Пациент: ${theArray[index].pSecondName} ${theArray[index].pFirstName}`;
                         /* theArray[index].url = theArray[index].dUrl; */

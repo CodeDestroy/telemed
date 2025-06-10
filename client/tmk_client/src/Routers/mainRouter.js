@@ -25,7 +25,7 @@ const mainRouter = createBrowserRouter([
     {
       path: '/room/:roomId',
       element: <VideoCompoent/>
-    },
+    }
    /*  {
       path: '/admin',
       element: <AdminMain/>,

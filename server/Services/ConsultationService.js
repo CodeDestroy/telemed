@@ -377,7 +377,13 @@ class ConsultationService {
                     },
                     {
                         model: database["Patients"],
-                        required: false
+                        required: false,
+                        include: [
+                            {
+                                model: database["Users"],
+                                required: false
+                            }
+                        ]
                     }
                 ]
             });
@@ -404,7 +410,13 @@ class ConsultationService {
                     },
                     {
                         model: database["Patients"],
-                        required: false
+                        required: false,
+                        include: [
+                            {
+                                model: database["Users"],
+                                required: false
+                            }
+                        ]
                     }
                 ]
             });
