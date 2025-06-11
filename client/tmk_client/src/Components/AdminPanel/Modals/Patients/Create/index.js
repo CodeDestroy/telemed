@@ -174,6 +174,17 @@ const PatientCreateModal = (props) => {
     .modal-backdrop {
         z-index: -1!important;
     }
+    .modal-dialog {
+        height: 90vh !important;
+        max-height: 90vh !important;
+        display: flex;
+        align-items: center;
+    }
+    .modal-content {
+        height: 90vh !important;
+        max-height: 90vh !important;
+        overflow-y: auto;
+    }
 `
     return (
         <Modal
