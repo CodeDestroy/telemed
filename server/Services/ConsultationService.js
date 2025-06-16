@@ -102,6 +102,7 @@ class ConsultationService {
                     join "Doctors" d on d.id = s."doctorId" 
                     join "Urls" url on url."userId" = d."userId" 
                     join "Urls" url2 on url2."userId" = p."userId" 
+                    join "SlotStatuses" sst on sst.id = s."slotStatusId"
                     where 
                         d."medOrgId" = ${user.Admin.medOrgId} and
                         url2."roomId" = r.id 
@@ -557,6 +558,18 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+        }
+    }
+
+    async getSlotStatuses() {
+        try {
+            const statuses = await database["SlotStatus"].findAll(); 
+            return statuses;
+        }
+        catch (e) {
+
+            console.log(e)
+            
         }
     }
     

@@ -4,7 +4,21 @@ const moment = require('moment-timezone')
 class MedicalOrgService {
     async getMedOrgByUserId(id) {
         try {
-            const medorg = await database["MedicalOrgs"].findOne({
+            const user = await database["Users"].findByPk(id, {
+                include: [
+                    {
+                        model: database["Admins"],
+                        required: true,
+                    }
+                ],}
+            )
+
+            let medOrgId = 1;
+            if (user.Admin.medOrgId) {
+                medOrgId = user.Admin.medOrgId;
+            }
+
+            const medorg = await database["MedicalOrgs"].findByPk(medOrgId , {
                 include: [
                     {
                         model: database["Admins"],
@@ -15,12 +29,7 @@ class MedicalOrgService {
                         required: true,
                     }
                 ],
-                /* where: {
-                    [Op.or]: [
-                        {'$Admins.userId$' : id},
-                        {'$Doctors.userId$' : id}
-                    ]
-                }, */
+
             })
             return medorg
         }

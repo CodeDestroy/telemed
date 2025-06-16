@@ -3,6 +3,7 @@ const ConsultationService = require('../Services/ConsultationService')
 const PatientService = require('../Services/PatientService')
 const userService = require('../Services/user-service')
 const moment = require('moment-timezone')
+const database = require('../models/index');
 const UserManager = require('../Utils/UserManager')
 const JITSI_SECRET = process.env.JITSI_SECRET;
 const jwt = require('jsonwebtoken');
@@ -244,6 +245,7 @@ class AdminController {
             patient.firstName = user.firstName
             patient.patronomicName = user.patronomicName
             patient.snils = user.snils
+            patient.birthDate = user.birthDate
             patient.User.email = user.User.email
             patient.User.confirmed = user.User.confirmed
             patient.User.phone = user.User.phone
@@ -348,6 +350,17 @@ class AdminController {
             res.status(201).json({ message: 'Пациент создан успешно', userId: newUser.id, patientId: newPatient.id });
         }
         catch (e) {
+            res.status(500).json(e.message)
+        }
+    }
+
+    async getAllSlotStatuses (req, res) {
+        try {
+            const statuses = await ConsultationService.getSlotStatuses();
+            res.status(200).json(statuses);
+        }
+        catch (e) {
+            console.log(e)
             res.status(500).json(e.message)
         }
     }

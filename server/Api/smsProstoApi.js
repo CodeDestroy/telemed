@@ -17,7 +17,7 @@ const $api = axios.create({
 class smsProstoApi {
     async sendMessage(phone, text) {
         try {
-            const request = await $api.get('', {params: {method: "push_msg", format: 'JSON', key: SMS_RPOSTO_KEY, text: text, phone: phone, sender_name: SMS_PROSTO_SENDER_NAME}})
+            const request = await $api.get('', {params: {method: "push_msg", format: 'JSON', key: SMS_RPOSTO_KEY, text: text, phone: phone, sender_name: SMS_PROSTO_SENDER_NAME, route: "tg-vk-wp-sms"}})
             if (request.data.err_code != 0) {
                 switch (request.data.response.msg.err_code) {
                     case '99':

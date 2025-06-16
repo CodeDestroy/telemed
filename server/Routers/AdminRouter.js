@@ -30,4 +30,5 @@ router.post('/patients/:id', AdminController.editPatient)
 router.get('/doctors/all', AdminController.getAllDoctors)
 router.get('/doctors/:id', AdminController.getDoctor)
 router.post('/doctors/:id', AdminController.editDoctor)
+router.get('/slotStatuses/all', AdminController.getAllSlotStatuses)
 module.exports = router;
