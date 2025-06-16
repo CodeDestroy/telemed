@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    return Promise.all([
+    /* return Promise.all([
       queryInterface.addColumn(
         'Schedules', // table name
         'date', // new field name
@@ -13,12 +13,12 @@ module.exports = {
           comment: 'Дата, если используем даты, а не дни недели'
         },
       ),
-    ]);
+    ]); */
   },
 
   async down (queryInterface, Sequelize) {
-    return Promise.all([
+    /* return Promise.all([
       queryInterface.removeColumn('Schedules', 'date')
-    ]);
+    ]); */
   }
 };

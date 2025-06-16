@@ -20,7 +20,7 @@ function CreateDateSchedule() {
     const [endDate, setEndDate] = useState(dayjs(new Date()).add(7, 'd'));
     const [schedule, setSchedule] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalData, setModalData] = useState({ date: null, startTime: null, endTime: null });
+    const [modalData, setModalData] = useState({ date: dayjs(new Date()), startTime: null, endTime: null });
     const [isEditing, setIsEditing] = useState(false);
     const [editingSlot, setEditingSlot] = useState(null);
 
@@ -196,7 +196,7 @@ function CreateDateSchedule() {
                         <DatePicker 
                             label="Дата" 
                             value={modalData.date} 
-                            onChange={(date) => setModalData({ ...modalData, date })} 
+                            onChange={(date) => {setModalData({ ...modalData, date })}} 
                             format="DD.MM.YYYY" 
                             fullWidth 
                             sx={{ mb: 2, width: '100%' }} 

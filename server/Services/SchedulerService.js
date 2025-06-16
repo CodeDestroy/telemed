@@ -34,7 +34,6 @@ class SchedulerService {
         try {
             if (slotId) {
                 
-                console.log(doctorId, date, scheduleStartTime, scheduleEndTime, slotId)
                 const overlappingSchedules = await database["Schedule"].findOne({
                     where: {
                         doctorId,
@@ -55,7 +54,6 @@ class SchedulerService {
                         ],
                     },
                 });
-                console.log(overlappingSchedules)
                 return overlappingSchedules
             }
             else {

@@ -11,6 +11,8 @@ import authLocations from '../Locations/AuthLocations'
 import AdminRegistrationFirstStep from '../Components/AdminPanel/Registration/RegistrationFirstStep'
 import AdminRegistrationSecondStep from '../Components/AdminPanel/Registration/RegistrationSecondStep'
 import AdminRegistrationThirdStep from '../Components/AdminPanel/Registration/RegistrationThirdStage'
+
+import ProtocolPage from '../Components/Protocol/ProtocolPage';
 const authRouter = createBrowserRouter([
     {
         path: "*",
@@ -39,6 +41,10 @@ const authRouter = createBrowserRouter([
     {
         path: authLocations.registrationStep3,
         element: <AdminRegistrationThirdStep/>
+    },
+    {
+      path: '/protocol/:protocolId',
+      element: <ProtocolPage/>
     }
 ]);
 

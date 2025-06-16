@@ -286,6 +286,8 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
         }
     }
 
+    
+
 }
 
 module.exports = new SchedulerController();

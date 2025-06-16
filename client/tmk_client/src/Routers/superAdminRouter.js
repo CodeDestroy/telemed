@@ -16,6 +16,7 @@ import Schedule from '../Components/AdminPanel/Schedule';
 import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 import generalLocations from '../Locations/GeneralLocations';
+import ProtocolPage from '../Components/Protocol/ProtocolPage';
 const superAdminRouter = createBrowserRouter([
     {
         path: "*",
@@ -68,6 +69,10 @@ const superAdminRouter = createBrowserRouter([
     {
       path: generalLocations.profile,
       element: <GeneralInfo/>
+    },
+    {
+      path: '/protocol/:protocolId',
+      element: <ProtocolPage/>
     }
     /* {
         path: '/test',

@@ -8,7 +8,7 @@ const HOST = process.env.SERVER_URL;
 exports.HOST = HOST;
 const HTTP_PORT = process.env.HTTP_PORT;
 exports.HTTP_PORT = HTTP_PORT;
-const HTTPS_PORT = process.env.HTTPS_PORT;
+const HTTPS_PORT = process.env.HTTPS_PORT; 
 exports.HTTPS_PORT = HTTPS_PORT;
 const cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -27,6 +27,7 @@ const shortUrlRouter = require('./Routers/ShortUrlRouter')
 const integrationRouter = require('./Routers/IntegrationRouter')
 const doctorRouter = require('./Routers/DoctorRouter')
 const outerServicesRouter = require('./Routers/OuterServicesRouter')
+const patientRouter = require('./Routers/PatientRouter')
 const { start } = require('./start');
 const adminRouter = require('./Routers/AdminRouter')
 const AuthMiddleware = require('./middleware/AuthMiddleware')
@@ -49,6 +50,7 @@ app.use('/api/conference', conferenceRouter)
 app.use('/api/integration', integrationRouter)
 app.use('/api/doctor', AuthMiddleware, doctorRouter)
 app.use('/api/admin', AuthMiddleware, adminRouter)
+app.use('/api/patient', patientRouter);
 app.use('/api/service', outerServicesRouter)
 ioConnections = [];
 

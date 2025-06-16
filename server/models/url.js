@@ -18,7 +18,12 @@ module.exports = (sequelize, DataTypes) => {
     originalUrl: DataTypes.TEXT,
     shortUrl: DataTypes.STRING,
     userId: DataTypes.INTEGER,
-    roomId: DataTypes.INTEGER
+    roomId: DataTypes.INTEGER,
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'room',
+    }
   }, {
     sequelize,
     modelName: 'Url',

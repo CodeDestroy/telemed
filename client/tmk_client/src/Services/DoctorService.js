@@ -41,5 +41,12 @@ export default class DoctorService {
         return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime })
     }
 
+    static async setProtocol (roomId, protocol) {
+        return $api.post('/api/doctor/conference/protocol/set', {roomId, protocol})
+    }
+
+    static async sendProtocol (roomId) {
+        return $api.post('/api/doctor/conference/protocol/send', {roomId})
+    }
     
 }
