@@ -45,6 +45,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const [selectedDate, setSelectedDate] = useState(scheduler.state.start.value)
     const [selectedTime, setSelectedTime] = useState(null)
     const [duration, setDuration] = useState('30')
+    const [slotStatuses, setSlotStatuses] = useState([])
     const now = new Date()
     // Make your own form/state
     const [state, setState] = useState({
@@ -56,9 +57,26 @@ function CustomEditor ({ scheduler, onStateChange }) {
         duration: duration || null,
         doctorId: selectedDoctor?.id || (scheduler.state.doctorId.value),
         patientId: selectedPatient?.id || (scheduler.state.patientId.value),
+        slotStatusId: event?.slotStatusId ?? ""
     });
-    const [error, setError] = useState("");
 
+    useEffect(() => {
+        fetchSlotStatuses()
+    }, [])
+
+    const fetchSlotStatuses = async () => {
+        try {
+            const response = await AdminService.getSlotStatuses()
+            console.log(response.data)
+            setSlotStatuses(response.data)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    const [error, setError] = useState("");
+    const [editing, setEditing] = useState(scheduler.state.event_id.value ? true : false)
     const [open, setOpen] = useState(false);
 
     const handleClose = () => {setOpen(false);};
@@ -73,20 +91,29 @@ function CustomEditor ({ scheduler, onStateChange }) {
         });
         
     };
+
+    const handleChangeStatus = (event) => {
+        const newValue = event.target.value;
+        setState(prev => ({
+            ...prev,
+            slotStatusId: newValue
+        }));
+    };
+
     const handleSubmit = async () => {
         if (state.title.length < 3) {
             return setError("Min 3 letters");
         }
     
         try {
-            scheduler.loading(true);
+            /* scheduler.loading(true);
             console.log(state.doctor)
             console.log(state.patient)
             console.log(state.start)
-            console.log(state.duration)
+            console.log(state.duration) */
             
             /* return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration}) */
-           /*  const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration)
+            const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration)
     
             if (response.status == 200) {
                 const addedEvent = {
@@ -105,7 +132,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                 setError("Ошибка сервера: не удалось сохранить событие");
             } else {
                 setError("Не удалось сохранить событие, попробуйте снова");
-            } */
+            }
     
         } catch (error) {
             console.error("Ошибка при отправке данных:", error);
@@ -130,8 +157,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
         return response.data
     }
     useEffect(() => {
-        
-        
+        /* console.log(scheduler.state) */
         fetchDoctors()
         .then((data) => {
             setDoctors(data)
@@ -199,9 +225,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
     }
 
     const getDoctorSchedule = async (doctor) => {
-        
-        
-        console.log(doctor)
         if (dayjs(state.start).isBefore(dayjs(new Date()), 'date')) {
             setError('Невозмжно создать консультацию на прошедшую дату')
             return setGroupedSchedule([])
@@ -214,7 +237,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
                 end: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleEndTime}`)
 
             }));
-            console.log(schedule)
             let grouped = Object.groupBy(schedule, ({ WeekDay }) => WeekDay.name)
             setGroupedSchedule(sortSchedule(grouped))
             return
@@ -226,7 +248,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
             end: dayjs(`${selectedDate.toISOString().split('T')[0]}T${slot.scheduleEndTime}`)
 
         }));
-        console.log(schedule)
         let grouped = Object.groupBy(schedule, ({ WeekDay }) => WeekDay.name)
         setGroupedSchedule(sortSchedule(grouped))
     }
@@ -259,7 +280,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
     };
 
     const getDoctorActiveConsultations = async (doctor) => {
-        /* console.log(selectedTime) */
         const response = await DoctorService.getConsultations(doctor.User.id, state.start)
         setActiveConsultations(response.data[0])
     }
@@ -371,8 +391,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
                                         value={selectedTime}
                                         onChange={handleChangeTime}
                                         shouldDisableTime={(time, clockType) => {
-                                            /* console.log(time) */
-                                            /* console.log(time, clockType) */
                                             if (clockType === 'hours') {
                                                 
                                                 // Проверяем, доступен ли данный час
@@ -424,6 +442,20 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             Нет нужного пациента? {/* <a href={adminLocations.createPatient} target="_blank" rel="noopener noreferrer">Добавить</a> */}
                             <a onClick={handleOpen} style={{color: '#d30d15', cursor: 'pointer' }} rel="noopener noreferrer">Добавить</a>
                         </p>
+                        {/* <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={state.slotStatusId || ""}
+                            disabled={false}
+                            label="Статус"
+                            sx={{ width: '100%', mt: 2 }}
+                            onChange={handleChangeStatus}
+                        >
+                            <MenuItem key={1} value={1}>Свободно</MenuItem>
+                            <MenuItem key={4} value={4}>Завершено</MenuItem>
+                            <MenuItem key={5} value={5}>Отменено</MenuItem>
+                            
+                        </Select> */}
                     </>
                     :
                     <p style={{color: 'red'}}>Нет доступного расписания</p>

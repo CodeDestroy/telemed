@@ -64,7 +64,8 @@ function Schedule() {
                         patientSecondName: slot?.pSecondName,
                         patientFirstName: slot?.pFirstName,
                         color: color,
-                        slotStatus: slot.slotStatusId
+                        slotStatus: slot.slotStatusId,
+                        slotStatusId: slot.slotStatusId
                     }
                     setEvents((prevEvents) => [...prevEvents, newEvent]);
                 })
@@ -192,6 +193,11 @@ function Schedule() {
                     {
                         name: "patientId",
                         type: "input"
+                    },
+                    {
+                        name: "slotStatusId",
+                        type: "input",
+                        config: { label: "Статус", multiline: false, rows: 1  }
                     }
                 ]}
                 deletable={false}

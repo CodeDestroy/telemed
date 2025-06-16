@@ -74,7 +74,7 @@ function Index() {
                 }
                 return cellValues.value;
             },
-            /* width: 30, */
+            maxWidth: 200,
             disableColumnSort: true
         },
         { 
@@ -86,7 +86,7 @@ function Index() {
                 }
                 return cellValues.value;
             },
-            /* width: 30, */
+            maxWidth: 200,
             disableColumnSort: true
         },
         { 
@@ -97,10 +97,12 @@ function Index() {
                     return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
                 } */
                 if (cellValues.row.protocol) {
-                    return cellValues.row.protocol;
+                    return cellValues.row.protocol.slice(0, 30);
                 }
                 return cellValues.value;
             },
+            width: 100,
+            maxWidth: 200,
             disableColumnSort: true
         },
         { 

@@ -60,9 +60,9 @@ const PatientEdit = () => {
             console.log(patient)
     }, [patient])
 
-    const setBirthDate = (event) => {
+    /* const setBirthDate = (event) => {
         setPatient({...patient, birthDate: event.target.value });
-    }
+    } */
     const setName = (event) => {
         setPatient({...patient, firstName: event.target.value });
     }
@@ -90,6 +90,23 @@ const PatientEdit = () => {
             email: event.target.value
          }})
     }
+    const setSnils = (event) => {
+        setPatient({...patient, User: { 
+            ...patient.User, 
+            snils: event.target.value
+         }})
+    }
+    /* const setBirthDate = (date) => {
+        console.log(date)
+        setPatient({...patient, User: { 
+            ...patient.User, 
+            birthDate: date
+         }})
+    } */
+    const setBirthDate = (date) => {
+        setPatient({...patient, birthDate: date });
+    }
+    
 
     
 
@@ -116,6 +133,16 @@ return (
                         </LocalizationProvider> */}
                         <TextField label="Телефон" variant="outlined" fullWidth value={patient.User.phone} onChange={setPhone}/>
                         <TextField label="Email" variant="outlined" fullWidth value={patient.User.email} onChange={setEmail}/>
+                        <TextField label="СНИЛС" variant="outlined" fullWidth value={patient.snils} onChange={setSnils}/>
+                        <LocalizationProvider  dateAdapter={AdapterDayjs} adapterLocale="ru">
+                            <DatePicker
+                                label="Дата рождения"
+                                value={dayjs(patient.birthDate)}
+                                onChange={(newValue) => setBirthDate(newValue)}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                                disableFuture 
+                            />
+                        </LocalizationProvider>
                         <FormGroup>
                             <FormControlLabel control={
                                 <Checkbox checked={patient.User.confirmed}
