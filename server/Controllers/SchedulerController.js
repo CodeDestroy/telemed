@@ -195,14 +195,19 @@ class SchedulerController {
             const {id} = req.params
             const {dayid} = req.query
             const {date} = req.query
+            const {startDate} = req.query
+            const {endDate} = req.query
             let schedule
-            if (!dayid)
-                schedule = await SchedulerService.getDoctorSchedule(id)
+            if (dayid)
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
             else if (date) {
                 schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
             }
+            else if (startDate && endDate) {
+                schedule = await SchedulerService.getDoctorScheduleByDates(id, startDate, endDate)
+            }
             else 
-                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
+                schedule = await SchedulerService.getDoctorSchedule(id)
             res.status(200).json(schedule)
         }
         catch (e) {

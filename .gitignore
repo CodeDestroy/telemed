@@ -5,7 +5,7 @@ server/.env
 server/start.js
 client/tmk_client/.env
 
-client/tmk_client/public/build
+client/tmk_client/build
 client/tmk_client/public/assets
 
 server/package-lock.json

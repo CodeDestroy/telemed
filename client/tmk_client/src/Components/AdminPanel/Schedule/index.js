@@ -11,8 +11,7 @@ import { Context } from '../../../';
 import { IconButton, Snackbar } from "@mui/material";
 function Schedule() {
     const {store} = useContext(Context)
-    let [events, setEvents] = useState([
-    ])
+    let [events, setEvents] = useState([])
     
     const handleCellClick = (event, row, day) => {
       // Do something...

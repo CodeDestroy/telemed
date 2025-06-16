@@ -80,8 +80,13 @@ function CustomEditor ({ scheduler, onStateChange }) {
     
         try {
             scheduler.loading(true);
+            console.log(state.doctor)
+            console.log(state.patient)
+            console.log(state.start)
+            console.log(state.duration)
+            
             /* return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration}) */
-            const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration)
+           /*  const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration)
     
             if (response.status == 200) {
                 const addedEvent = {
@@ -100,7 +105,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                 setError("Ошибка сервера: не удалось сохранить событие");
             } else {
                 setError("Не удалось сохранить событие, попробуйте снова");
-            }
+            } */
     
         } catch (error) {
             console.error("Ошибка при отправке данных:", error);
