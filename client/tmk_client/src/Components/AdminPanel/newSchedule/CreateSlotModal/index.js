@@ -11,8 +11,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { BorderAllRounded } from '@mui/icons-material';
 import dayjs from 'dayjs';
-import AdminService from '../../../../../Services/AdminService';
-import PatientCreateModal from '../../../Modals/Patients/Create';
+import AdminService from '../../../../Services/AdminService';
+import PatientCreateModal from '../../Modals/Patients/Create';
 import { DialogActions } from '@mui/material';
 const style = {
     position: 'absolute',
@@ -110,7 +110,7 @@ const CreateSlotModal = (props) => {
                             </Typography>
                         ) : ('')}
                         <Typography id="transition-modal-title" variant="h5" component="h2">
-                            Создать консультацию на {dayjs(props.item.date).format('DD.MM.YYYY')} {props.item.scheduleStartTime}
+                            Создать консультацию на {dayjs(props.item.date).format('DD.MM.YYYY')} {props.item.scheduleStartTime.slice(0, 5)}
                         </Typography>
                         <Autocomplete
                             disablePortal

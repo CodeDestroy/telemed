@@ -3,6 +3,7 @@ client/tmk_client/node_modules/
 
 server/.env
 server/start.js
+server/config/config.json
 client/tmk_client/.env
 
 client/tmk_client/build

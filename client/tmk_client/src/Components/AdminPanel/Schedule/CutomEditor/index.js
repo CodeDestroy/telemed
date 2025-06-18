@@ -67,7 +67,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const fetchSlotStatuses = async () => {
         try {
             const response = await AdminService.getSlotStatuses()
-            console.log(response.data)
             setSlotStatuses(response.data)
         }
         catch (e) {
@@ -83,6 +82,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const handleOpen = () => {setOpen(true);};
   
     const handleChange = (value, name) => {
+        console.log(value, name)
         setState((prev) => {
             return {
             ...prev,
@@ -91,6 +91,16 @@ function CustomEditor ({ scheduler, onStateChange }) {
         });
         
     };
+
+    const handleChangeDuration = (event) => {
+        console.log(event.target.value)
+        const newValue = event.target.value;
+        //setDuration(newValue);
+        setState(prev => ({
+            ...prev,
+            duration: newValue
+        }));
+    }
 
     const handleChangeStatus = (event) => {
         const newValue = event.target.value;
@@ -120,7 +130,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                     event_id: event?.event_id || Math.random(),
                     title: state.title,
                     start: state.start,
-                    end: dayjs(state.start).add(30, 'minute'),
+                    end: dayjs(state.start).add(state.duration, 'minute'),
                     description: state.description,
                     patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + response.data.patientShortUrl,
                     doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl
@@ -410,14 +420,15 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             </LocalizationProvider>
                         </ThemeProvider>
                         <Select
+                        
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={duration}
-                            disabled={true}
+                            value={state.duration}
+                            /* disabled={true} */
                             label="Длительность"
                             /* inputProps={{ readOnly: true }} */
                             sx={{ width: '100%', mt: 2 }}
-                            onChange={handleChange}
+                            onChange={handleChangeDuration}
                         >
                             <MenuItem key={1} value={'15'}>15 Минут</MenuItem>
                             <MenuItem key={2} value={'30'}>30 минут</MenuItem>
