@@ -80,6 +80,7 @@ class AdminController {
     async createConsultation(req, res) {
         try {
             const {doctor, patient, startDateTime, duration } = req.body
+            console.log(duration)
             /* console.log(patient.user) */
             /* return res.json(patient.user) */
             const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration)

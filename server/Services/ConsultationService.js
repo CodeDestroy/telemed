@@ -474,6 +474,7 @@ class ConsultationService {
                 isBusy: true, 
                 patientId: patientId
             })
+            console.log(newSlot)
             return newSlot
         }
         catch (e) {
@@ -510,7 +511,7 @@ class ConsultationService {
                 sub: JITSI_SERVER_URL, // цель токена (обычно URL сервера)
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
                 nbf: moment(slot.slotStartDateTime).add(-2, 'd').unix(),
-                exp: moment(slot.slotEndDateTime).add(30, 'm').unix(), // время истечения срока действия токена (например, через час)
+                exp: moment(slot.slotEndDateTime).add(2, 'h').unix(), // время истечения срока действия токена (например, через час)
                 moderator: true, // установить true, если пользователь является модератором
                 context: {
                     user: {
@@ -542,7 +543,7 @@ class ConsultationService {
                 sub: JITSI_SERVER_URL, // цель токена (обычно URL сервера)
                 room: room.roomName, // комната, к которой предоставляется доступ, используйте '*' для доступа ко всем комнатам
                 nbf: moment(slot.slotStartDateTime).add(-2, 'd').unix(),
-                exp: moment(slot.slotEndDateTime).add(30, 'm').unix(), // время истечения срока действия токена (например, через час)
+                exp: moment(slot.slotEndDateTime).add(2, 'h').unix(), // время истечения срока действия токена (например, через час)
                 moderator: false, // установить true, если пользователь является модератором
                 context: {
                     user: {
