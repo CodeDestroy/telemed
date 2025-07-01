@@ -186,7 +186,24 @@ function CustomEditor ({ scheduler, onStateChange }) {
             }
             else {
                 const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration, state.slotStatusId)
-        
+                let color = "red"
+                    switch (state.slotStatusId) {
+                        case 1:
+                            color = "#2196F3"
+                            break;
+                        case 2:
+                            color = "#FFC107"
+                            break;
+                        case 3:
+                            color = "#4CAF50"
+                            break;
+                        case 4:
+                            color = "#9E9E9E"
+                            break;
+                        case 5:
+                            color = "#F44336"
+                            break;
+                    }
                 if (response.status == 200) {
                     const addedEvent = {
                         event_id: event?.event_id || Math.random(),
@@ -195,7 +212,9 @@ function CustomEditor ({ scheduler, onStateChange }) {
                         end: dayjs(state.start).add(state.duration, 'minute'),
                         description: state.description,
                         patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + response.data.patientShortUrl,
-                        doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl
+                        doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl,
+                        color: color,
+                        slotStatusId: state.slotStatusId
                     };
         
                     scheduler.onConfirm(addedEvent, event ? "edit" : "create");
@@ -329,6 +348,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
 
     const isTimeUnavailable = (hour, minute = 0) => {
         return activeConsultations.some((consultation) => {
+            if (consultation.slotStatusId == 5) return false
             const start = dayjs(consultation.slotStartDateTime);
             const end = dayjs(consultation.slotEndDateTime).subtract(2, 'minute');
             
@@ -338,6 +358,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     };
 
     const isTimeInSchedule = (hour, minute = 0) => {
+        
         return groupedSchedule[Object.keys(groupedSchedule)[0]].some(({ start, end }) => {
             // Преобразуем время начала и окончания в минуты с начала дня для сравнения
             const startTimeInMinutes = start.hour() * 60 + start.minute();
@@ -432,7 +453,9 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             <p style={{marginBottom: '0.5rem'}}>Занятое время и  даты: </p>
                             <ol style={{ listStyle: "none" }}>
                                 {activeConsultations ? activeConsultations.map((c) => {
-                                    return <li  key={`slots_${c.id}`} style={{paddingLeft: '1rem'}}>{getDate(c.slotStartDateTime)} - {getDate(c.slotEndDateTime)}<br></br></li>    
+                                    if (c.slotStatusId != 5) 
+                                        return <li  key={`slots_${c.id}`} style={{paddingLeft: '1rem'}}>{getDate(c.slotStartDateTime)} - {getDate(c.slotEndDateTime)}<br></br></li>    
+                                    
                                 }) : 'Всё свободно'}
                             </ol>
                         </div>
