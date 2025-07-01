@@ -489,7 +489,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={state.duration}
-                            disabled={true}
+                            /* disabled={true} */
                             label="Длительность"
                             /* inputProps={{ readOnly: true }} */
                             sx={{ width: '100%', mt: 2 }}
