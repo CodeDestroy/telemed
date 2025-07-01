@@ -14,6 +14,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import adminLocations from "../../../../Locations/AdminLocations";
 
+import { IconButton, Snackbar, Checkbox, FormControlLabel, FormGroup  } from "@mui/material";
 import PatientCreateModal from '../../Modals/Patients/Create';
 const white = '#fff'
 function CustomEditor ({ scheduler, onStateChange }) {
@@ -44,11 +45,12 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const [activeConsultations, setActiveConsultations] = useState([])
     const [selectedDate, setSelectedDate] = useState(scheduler.state.start.value)
     const [selectedTime, setSelectedTime] = useState(null)
-    const [duration, setDuration] = useState('30')
+    const [duration, setDuration] = useState('60')
     const [slotStatuses, setSlotStatuses] = useState([])
     const now = new Date()
     // Make your own form/state
     const [state, setState] = useState({
+        slot_id: scheduler.edited?.event_id || null,
         title: event?.title || "",
         description: event?.description || "",
         doctor: selectedDoctor || null,
@@ -57,7 +59,8 @@ function CustomEditor ({ scheduler, onStateChange }) {
         duration: duration || null,
         doctorId: selectedDoctor?.id || (scheduler.state.doctorId.value),
         patientId: selectedPatient?.id || (scheduler.state.patientId.value),
-        slotStatusId: event?.slotStatusId ?? ""
+        slotStatusId: event?.slotStatusId ?? "1",
+        editing: scheduler.edited ? true: false
     });
 
     useEffect(() => {
@@ -82,7 +85,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     const handleOpen = () => {setOpen(true);};
   
     const handleChange = (value, name) => {
-        console.log(value, name)
+
         setState((prev) => {
             return {
             ...prev,
@@ -93,7 +96,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
     };
 
     const handleChangeDuration = (event) => {
-        console.log(event.target.value)
         const newValue = event.target.value;
         //setDuration(newValue);
         setState(prev => ({
@@ -110,6 +112,22 @@ function CustomEditor ({ scheduler, onStateChange }) {
         }));
     };
 
+    const setSlotPaid = () => {
+        if (state.slotStatusId == 3) {
+            setState(prev => ({
+                ...prev,
+                slotStatusId: 2
+            }));
+        }
+        else if (state.slotStatusId == 2 || state.slotStatusId == 1) {
+            setState(prev => ({
+                ...prev,
+                slotStatusId: 3
+            }));
+        }
+        
+    }
+
     const handleSubmit = async () => {
         if (state.title.length < 3) {
             return setError("Min 3 letters");
@@ -123,26 +141,72 @@ function CustomEditor ({ scheduler, onStateChange }) {
             console.log(state.duration) */
             
             /* return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration}) */
-            const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration)
-    
-            if (response.status == 200) {
-                const addedEvent = {
-                    event_id: event?.event_id || Math.random(),
-                    title: state.title,
-                    start: state.start,
-                    end: dayjs(state.start).add(state.duration, 'minute'),
-                    description: state.description,
-                    patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + response.data.patientShortUrl,
-                    doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl
-                };
-    
-                scheduler.onConfirm(addedEvent, event ? "edit" : "create");
-                scheduler.close();
-            } else if (response.status === 500) {
-                setError("Ошибка сервера: не удалось сохранить событие");
-            } else {
-                setError("Не удалось сохранить событие, попробуйте снова");
+            if (state.editing) {
+                console.log(state)
+                console.log(scheduler.edited.event_id)
+                const response = await AdminService.editSlot(state.slot_id ,state.doctor, state.patient, state.start, state.duration, state.slotStatusId)
+                if (response.status == 200) {
+                    let color = "red"
+                    switch (state.slotStatusId) {
+                        case 1:
+                            color = "#2196F3"
+                            break;
+                        case 2:
+                            color = "#FFC107"
+                            break;
+                        case 3:
+                            color = "#4CAF50"
+                            break;
+                        case 4:
+                            color = "#9E9E9E"
+                            break;
+                        case 5:
+                            color = "#F44336"
+                            break;
+                    }
+                    const addedEvent = {
+                        event_id: scheduler.edited.event_id,
+                        title: state.title,
+                        start: state.start,
+                        end: dayjs(state.start).add(state.duration, 'minute'),
+                        description: state.description,
+                        patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + response.data.patientShortUrl,
+                        doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl,
+                        color: color,
+                        slotStatusId: state.slotStatusId
+                    };
+        
+                    scheduler.onConfirm(addedEvent, "edit");
+                    scheduler.close();
+                } else if (response.status === 500) {
+                    setError("Ошибка сервера: не удалось сохранить событие");
+                } else {
+                    setError("Не удалось сохранить событие, попробуйте снова");
+                }
             }
+            else {
+                const response = await AdminService.createSlot(state.doctor, state.patient, state.start, state.duration, state.slotStatusId)
+        
+                if (response.status == 200) {
+                    const addedEvent = {
+                        event_id: event?.event_id || Math.random(),
+                        title: state.title,
+                        start: state.start,
+                        end: dayjs(state.start).add(state.duration, 'minute'),
+                        description: state.description,
+                        patientUrl: process.env.REACT_APP_SERVER_URL + '/short/' + response.data.patientShortUrl,
+                        doctorUrl:  process.env.REACT_APP_SERVER_URL + '/short/' + response.data.doctorShortUrl
+                    };
+        
+                    scheduler.onConfirm(addedEvent, event ? "edit" : "create");
+                    scheduler.close();
+                } else if (response.status === 500) {
+                    setError("Ошибка сервера: не удалось сохранить событие");
+                } else {
+                    setError("Не удалось сохранить событие, попробуйте снова");
+                }
+            }
+            
     
         } catch (error) {
             console.error("Ошибка при отправке данных:", error);
@@ -329,12 +393,13 @@ function CustomEditor ({ scheduler, onStateChange }) {
     return (
         <div>
             <div style={{ padding: "1rem" }}>
-                <p>Создать консультацию на {getDate(selectedDate)}</p>
+                <p>{state.editing ? 'Создать' : 'Отредактировать'} консультацию на {getDate(selectedDate)}</p>
                 {error ? <p style={{color: 'red', fontSize: '1rem'}}>{error}</p> : null}
                 <Autocomplete
                     disablePortal
                     options={doctors}
                     sx={{ mb: 1.5 }}
+                    disabled={(state.slotStatusId == 4 || state.slotStatusId == 5) ?? false}
                     renderInput={(params) => <TextField key={`doctor_${params.id}`} {...params} label="Врач" />}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
                     getOptionLabel={(option) => option.secondName + ' ' + option.firstName || ""}
@@ -394,7 +459,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
                                             width: '100%'
                                         }}
                                         skipDisabled={true}
-
+                                        disabled={(state.slotStatusId == 4 || state.slotStatusId == 5) ?? false}
                                         minutesStep={30}
                                         label="Выберите время начала"
                                         defaultValue={selectedDate}
@@ -424,23 +489,28 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={state.duration}
-                            /* disabled={true} */
+                            disabled={true}
                             label="Длительность"
                             /* inputProps={{ readOnly: true }} */
                             sx={{ width: '100%', mt: 2 }}
                             onChange={handleChangeDuration}
                         >
                             <MenuItem key={1} value={'15'}>15 Минут</MenuItem>
-                            <MenuItem key={2} value={'30'}>30 минут</MenuItem>
-                            <MenuItem key={3} value={'60'}>Час</MenuItem>
+                            <MenuItem key={2} value={'30'}>20 Минут</MenuItem>
+                            <MenuItem key={3} value={'60'}>45 Минут</MenuItem>
                             
                         </Select>
                         <Autocomplete
                             disablePortal
+                            disabled={state.editing}
                             options={patients}
                             sx={{ mt: 2 }}
                             renderInput={(params) => <TextField key={`doctor_${params.id}`} {...params} label="Пациент" />}
-                            getOptionLabel={(option) => option.secondName + ' ' + option.firstName + ' (' + option.snils + ')' || ""}
+                            getOptionLabel={(option) => {
+                                const name = `${option.secondName} ${option.firstName}`;
+                                const snils = option.snils?.trim();
+                                return snils ? `${name} (${snils})` : name;
+                            }}
                             value={selectedPatient}
                             isOptionEqualToValue={(option, value) => option.value === value.value}
                             onChange={handleChangePatient}
@@ -453,20 +523,33 @@ function CustomEditor ({ scheduler, onStateChange }) {
                             Нет нужного пациента? {/* <a href={adminLocations.createPatient} target="_blank" rel="noopener noreferrer">Добавить</a> */}
                             <a onClick={handleOpen} style={{color: '#d30d15', cursor: 'pointer' }} rel="noopener noreferrer">Добавить</a>
                         </p>
-                        {/* <Select
+                        {/* 
+                            state.slotStatusId ? (
+                                <FormControlLabel 
+                                    control={<Checkbox />}
+                                    disabled={state.slotStatusId == 4}
+                                    checked={state.slotStatusId == 3 || state.slotStatusId == 4}
+                                    onChange={setSlotPaid}
+                                    label="Оплачено" 
+                                />
+                            ) : null
+                        } */}
+                        <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value={state.slotStatusId || ""}
-                            disabled={false}
+                            disabled={(state.slotStatusId == 4 || state.slotStatusId == 5) ?? false}
                             label="Статус"
                             sx={{ width: '100%', mt: 2 }}
                             onChange={handleChangeStatus}
                         >
                             <MenuItem key={1} value={1}>Свободно</MenuItem>
+                            <MenuItem key={2} value={2}>Ждёт оплаты</MenuItem>
+                            <MenuItem key={3} value={3}>Оплачено</MenuItem>
                             <MenuItem key={4} value={4}>Завершено</MenuItem>
                             <MenuItem key={5} value={5}>Отменено</MenuItem>
                             
-                        </Select> */}
+                        </Select>
                     </>
                     :
                     <p style={{color: 'red'}}>Нет доступного расписания</p>

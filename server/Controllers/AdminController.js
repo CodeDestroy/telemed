@@ -79,11 +79,9 @@ class AdminController {
 
     async createConsultation(req, res) {
         try {
-            const {doctor, patient, startDateTime, duration } = req.body
+            const {doctor, patient, startDateTime, duration, slotStatusId } = req.body
             console.log(duration)
-            /* console.log(patient.user) */
-            /* return res.json(patient.user) */
-            const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration)
+            const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
             const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)
@@ -158,6 +156,76 @@ class AdminController {
             res.status(500).json(e.message)
         }
     }
+
+    async editConsultation(req, res) {
+        try {
+            const { slotId, doctor, patient, startDateTime, duration, slotStatusId } = req.body;
+            const oldSlot = await ConsultationService.getSlotById(slotId);
+            const oldDoctor = await DoctorService.getDoctor(oldSlot.doctorId);
+            const oldPatient = await PatientService.getPatient(oldSlot.patientId);
+            // Обновляем слот
+            const updatedSlot = await ConsultationService.updateSlot(slotId, 
+                doctor.id,
+                patient.id,
+                startDateTime,
+                duration,
+                slotStatusId
+            );
+
+            // Получаем комнату по слоту
+            const room = (await ConsultationService.getSlotById(slotId)).Room;
+            if (!room) return res.status(404).json({ message: "Комната не найдена" });
+
+            const roomName = room.roomName;
+            console.log(roomName)
+            // Генерация ссылок и токенов
+            const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, room.id);
+            const patientPayload = await ConsultationService.createPayloadPatient(patient.id, room.id);
+            const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
+            const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
+            const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`;
+            const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`;
+
+            // Обновляем короткие ссылки url, userId, roomId, type = 'room'
+            const doctorShortUrl = await UrlManager.updateShort(doctorUrl, doctor.User.id, room.id, 'room', oldDoctor.User.id);
+            const patientShortUrl = await UrlManager.updateShort(patientUrl, patient.User.id, room.id, 'room', oldPatient.User.id);
+
+            // Отправляем почту, если надо
+            const transporter = await MailManager.getTransporter();
+            
+            const patientLink = SERVER_DOMAIN + 'short/' + patientShortUrl;
+            const doctorLink = SERVER_DOMAIN + 'short/' + doctorShortUrl;
+
+            if (patient.User.email) {
+                const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
+                    patient.User.email,
+                    patientLink,
+                    startDateTime
+                );
+                transporter.sendMail(mailOptionsPatient);
+            }
+
+            if (doctor.User.email) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(
+                    doctor.User.email,
+                    doctorLink,
+                    startDateTime
+                );
+                transporter.sendMail(mailOptionsDoctor);
+            }
+
+            res.status(200).json({
+                doctorShortUrl,
+                patientShortUrl,
+                updatedSlot,
+                room
+            });
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: e.message });
+        }
+    }
+
 
     async getAllPatients (req, res) {
         try {

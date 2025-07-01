@@ -50,8 +50,12 @@ export default class AdminService {
         return $apiMultipartData.post('/api/admin/patients/create', formData);
     }
 
-    static async createSlot (doctor, patient, startDateTime, duration) {
-        return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration});
+    static async createSlot (doctor, patient, startDateTime, duration, slotStatusId) {
+        return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration, slotStatusId});
+    }
+    //slotId, doctor, patient, startDateTime, duration, slotStatusId
+    static async editSlot (slotId, doctor, patient, startDateTime, duration, slotStatusId) {
+        return $api.post('/api/admin/consultations/edit', {slotId, doctor, patient, startDateTime, duration, slotStatusId});
     }
 
     static async getSlotStatuses () {

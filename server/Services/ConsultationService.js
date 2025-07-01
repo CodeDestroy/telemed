@@ -464,12 +464,51 @@ class ConsultationService {
         }
     }
 
-    async createSlot (doctorId, patientId, startDateTime, duration) {
+    async getDoctorBySlotId (slotId) {
+        try {
+            const slot = await database["Slots"].findByPk(slotId, {
+                include: [
+                    {
+                        model: database["Doctors"],
+                        required: false,
+                    }
+                ]
+            })
+            return slot.Doctor
+        }
+        catch (e)
+        {
+            next(e)
+            console.log(e)
+        }
+    }
+
+    async getPatientBySlotId (slotId) {
+        try {
+            const slot = await database["Slots"].findByPk(slotId, {
+                include: [
+                    {
+                        model: database["Patients"],
+                        required: false,
+                    }
+                ]
+            })
+            return slot.Doctor
+        }
+        catch (e)
+        {
+            next(e)
+            console.log(e)
+        }
+    }
+
+    async createSlot (doctorId, patientId, startDateTime, duration, slotStatusId = null) {
         try {
             const newSlot = await database["Slots"].create({
                 doctorId: doctorId, 
                 slotStartDateTime: moment(new Date(startDateTime)).toDate(), 
                 slotEndDateTime: moment(new Date(startDateTime)).add(duration, 'm').toDate(), 
+                slotStatusId: slotStatusId == 1 ? 2 : slotStatusId,
                 serviceId: 1, 
                 isBusy: true, 
                 patientId: patientId
@@ -481,6 +520,32 @@ class ConsultationService {
             console.log(e)
         }
     }
+
+    async updateSlot(slotId, doctorId, patientId, startDateTime, duration, slotStatusId = null) {
+        try {
+            const slot = await database["Slots"].findByPk(slotId);
+            const oldDoctor = await this.getDoctorBySlotId(slotId)
+            if (!slot) {
+                throw new Error(`Слот с ID ${slotId} не найден`);
+            }
+            console.log(slotId, doctorId, patientId, startDateTime, duration, slotStatusId)
+            slot.doctorId = doctorId;
+            slot.patientId = patientId;
+            slot.slotStartDateTime = moment(new Date(startDateTime)).toDate();
+            slot.slotEndDateTime = moment(new Date(startDateTime)).add(duration, 'm').toDate();
+            slot.slotStatusId = slotStatusId == 1 ? 2 : slotStatusId;
+            slot.isBusy = true;
+
+            await slot.save();
+
+            return slot;
+        } catch (e) {
+            console.error('Ошибка при обновлении слота:', e);
+            throw e;
+        }
+    }
+
+
 
     async createRoom (slotId, roomName) {
         try {

@@ -20,6 +20,7 @@ router.get('/consultations/all', AdminController.getAllConsultations)
 router.get('/consultations/date', AdminController.getAllConsultationsDate)
 router.get('/consultations/ended', AdminController.getEndedConsultations)
 router.post('/consultations/create', AdminController.createConsultation)
+router.post('/consultations/edit', AdminController.editConsultation)
 
 router.post('/doctors/create', upload.single('avatar'), AdminController.createDoctor)
 

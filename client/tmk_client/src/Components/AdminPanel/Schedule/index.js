@@ -8,7 +8,7 @@ import AdminService from '../../../Services/AdminService';
 import dayjs from 'dayjs';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Context } from '../../../';
-import { IconButton, Snackbar } from "@mui/material";
+import { IconButton, Snackbar, Checkbox } from "@mui/material";
 function Schedule() {
     const {store} = useContext(Context)
     let [events, setEvents] = useState([])
@@ -38,19 +38,23 @@ function Schedule() {
                     let color = "red"
                     switch (slot.slotStatusId) {
                         case 1:
+                            color = "#2196F3"
                             break;
                         case 2:
-                            color = "#e5de00"
+                            color = "#FFC107"
                             break;
                         case 3:
-                            color = "#0ee500"
+                            color = "#4CAF50"
                             break;
                         case 4:
-                            color = "#007aff"
+                            color = "#9E9E9E"
+                            break;
+                        case 5:
+                            color = "#F44336"
                             break;
                     }
                     const newEvent = {
-                        event_id: slot.id || Math.random(),
+                        event_id: slot.slotId || Math.random(),
                         title: `Конференция ${slot?.dSecondName} ${slot?.dFirstName}`,
                         start: new Date(slot.slotStartDateTime),
                         end: new Date(slot.slotEndDateTime),
@@ -86,7 +90,7 @@ function Schedule() {
     }
 
     const handleConfirm = async (newEvent, action) => {
-        /* console.log(newEvent) */
+        
         // Логика для создания нового события
         if (action === 'create') {
             setEvents((prevEvents) => [...prevEvents, newEvent]);

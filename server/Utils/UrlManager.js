@@ -17,6 +17,42 @@ class UrlManager {
         if (!url) {return ''}
         return url.originalUrl;
     }
+
+    async updateShort(url, userId, roomId, type = 'room', oldUserId = null) {
+        let existingUrl = null;
+        if (oldUserId) {
+            existingUrl = await database.models.Url.findOne({
+                where: {
+                    roomId,
+                    userId: oldUserId,
+                    type
+                }
+            });
+            existingUrl.userId = userId; 
+        }
+        else {
+            existingUrl = await database.models.Url.findOne({
+                where: {
+                    roomId,
+                    userId,
+                    type
+                }
+            });
+        }
+
+        if (!existingUrl) {
+            throw new Error('Короткая ссылка не найдена');
+        }
+
+        existingUrl.originalUrl = url;
+        await existingUrl.save();
+
+        return existingUrl.shortUrl;
+        
+        
+    }
+
+
 }
 
 module.exports = new UrlManager();

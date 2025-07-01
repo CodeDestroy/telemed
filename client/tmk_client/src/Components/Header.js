@@ -22,7 +22,7 @@ const Header = () => {
         <header>
             <div className={`${styles.container} ${styles.flexRow} ${styles.alignCenter}`}>
                 <a /* href="/" */ className={styles.logo}>
-                    <img src="/assets/img/logo.png"/>
+                    {/* <img src="/assets/img/logo.png"/> */}
                 </a>
 
                 <div className={`${styles.notifications} ${styles.new}`} onClick={setNotificationsVisible}>
