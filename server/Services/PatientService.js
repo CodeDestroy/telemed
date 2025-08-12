@@ -30,6 +30,28 @@ class PatientService {
             console.log(e)
         }
     }
+
+    async getPatientByUserId(id) {
+        try {
+            const patient = await database["Patients"].findOne({
+                include: [{
+                    model: database["Users"],
+                    where: { id: id },
+                    required: true
+                }]
+            })
+            /* const patient = await database["Patients"].findByPk(id, {
+                include: [{
+                    model: database["Users"],
+                    required: true
+                }]
+            }) */
+            return patient;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
     //newUser.id, secondName, name, patrinomicName, phone, email, password, formattedDate, info
     async createPatient(userId, secondName, firstName, patronomicName, birthDate, info, snils = '') {
         try {

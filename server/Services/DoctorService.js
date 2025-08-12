@@ -139,6 +139,40 @@ class DoctorService {
             throw e
         }
     }
+
+    async getDoctorsWithPosts () {
+        try {
+            const doctors = await database["Doctors"].findAll({
+                include: [
+                    {
+                        model: database["Posts"],
+                        required: true
+                    },
+                    {
+                        model: database["MedicalOrgs"],
+                        required: true
+                    }
+                ]
+            })
+            return doctors
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getPosts () {
+        try {
+            const posts = await database["Posts"].findAll({
+            })
+            return posts
+        }
+        catch {
+            console.log(e)
+            throw e
+        }
+    }
 }
 
 module.exports = new DoctorService();

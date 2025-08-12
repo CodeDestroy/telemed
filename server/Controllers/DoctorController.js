@@ -36,6 +36,30 @@ class DoctorController {
         }
     }
 
+    async getDoctorList (req, res) {
+        try {
+            const doctors = await DoctorService.getDoctorsWithPosts()
+            const wrappedDoctors = doctors.map((doc) => ({
+                doctor: doc
+            }))
+
+            res.status(200).json(wrappedDoctors)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async getPostsList (req, res) {
+        try {
+            const posts = await DoctorService.getPosts()
+            res.status(200).json(posts)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
     
 }
 

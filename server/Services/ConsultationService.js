@@ -263,6 +263,47 @@ class ConsultationService {
         }
     }
 
+    async getEndedPatientSlots (patientId) {
+        try {
+            const currTime = new Date().toISOString();
+                        
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    post."postName" as "postName",
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", *
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
+                join "Posts" post on post.id = d."postId"
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and s."patientId" = :patientId 
+                    and (r."ended" = true) 
+                    and (s."slotStartDateTime" < :currTime or s."slotStatusId" = 4)`, 
+            {
+                replacements: { patientId: patientId, currTime: currTime }, 
+                raw: true
+            })
+            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
+            /* console.log(slots) */
+            return slots;
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
     //Возвращаем все акуальные слоты по врачу
     async getActiveDoctorSlots(doctorId) {
         try {
@@ -382,7 +423,18 @@ class ConsultationService {
                     {
                         model: database["Patients"],
                         required: false
+                    },
+                    {
+                        model: database["Doctors"],
+                        required: false,
+                        include: [
+                            {
+                                model: database["Posts"],
+                                required: true
+                            }
+                        ]
                     }
+
                 ]
             });
             return slot;

@@ -15,3 +15,6 @@ client/tmk_client/package-lock.json
 healthyChildService/
 serverCopy/
 server/config/config.json
+patient_client/.next
+patient_client/node_modules
+patient_client/.env
