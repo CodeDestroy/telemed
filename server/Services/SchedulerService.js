@@ -1,6 +1,6 @@
 const { where, Op } = require('sequelize');
 const database = require('../models/index');
-
+const { fn, col } = require('sequelize');
 const moment = require('moment-timezone')
 class SchedulerService {
     async findOverlappingSchedules (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
@@ -141,25 +141,6 @@ class SchedulerService {
         }
     }
 
-
-    /* async getDoctorScheduleByDay (doctorId, dayOfWeek) {
-        try {
-            const doctorSchedule = await database["Schedule"].findAll({
-                where: {
-                    doctorId,
-                    scheduleDay: dayOfWeek,
-                    date: {[Op.eq]: null},
-                    scheduleStatus: 1,
-                },
-            });
-            return doctorSchedule
-        }
-        catch (e) {
-            console.log(e)
-            throw e;
-        }
-    } */
-
     async getDoctorScheduleByDate (doctorId, date) {
         try {
             const doctorSchedule = await database["Schedule"].findAll({
@@ -187,11 +168,8 @@ class SchedulerService {
         }
     }
 
-
     async getDoctorScheduleByDates (doctorId, startDate, endDate) {
         try {
-            console.log(startDate)
-            console.log(endDate)
             const doctorSchedule = await database["Schedule"].findAll({
                 where: {
                     doctorId,
@@ -350,6 +328,103 @@ class SchedulerService {
             throw e
         }
     }
+
+    async getDoctorScheduleWithBusySlots(doctorId, startDate = null, endDate = null) {
+        try {
+            // Условия для поиска расписания
+            let scheduleWhere = { doctorId };
+            if (startDate && endDate) {
+                scheduleWhere.date = { [Op.between]: [startDate, endDate] };
+            } else if (startDate) {
+                scheduleWhere.date = { [Op.gte]: startDate };
+            } else if (endDate) {
+                scheduleWhere.date = { [Op.lte]: endDate };
+            }
+
+            const schedules = await database["Schedule"].findAll({
+                where: scheduleWhere,
+                include: [
+                    { model: database["WeekDays"], required: false }
+                ],
+                order: [['date', 'ASC'], ['scheduleStartTime', 'ASC']]
+            });
+
+            // Получаем все слоты, которые могут пересекаться
+            let slotsWhere = { doctorId, isBusy: true };
+            if (startDate && endDate) {
+                slotsWhere.slotStartDateTime = { [Op.between]: [startDate, endDate] };
+            } else if (startDate) {
+                slotsWhere.slotStartDateTime = { [Op.gte]: startDate};
+            } else if (endDate) {
+                slotsWhere.slotStartDateTime = { [Op.lte]: endDate };
+            }
+
+            const busySlots = await database["Slots"].findAll({
+                where: slotsWhere
+            });
+
+            // Сопоставляем расписание и занятые слоты
+            const result = schedules.map(sch => {
+            // Приводим дату к YYYY-MM-DD
+            const dateStr = moment(sch.date).format("YYYY-MM-DD");
+
+            const schStart = moment.tz(`${dateStr} ${sch.scheduleStartTime}`, "YYYY-MM-DD HH:mm:ss", "UTC");
+            const schEnd = moment.tz(`${dateStr} ${sch.scheduleEndTime}`, "YYYY-MM-DD HH:mm:ss", "UTC");
+
+
+                const intersectingSlots = busySlots.filter(slot => {
+                    const slotStart = moment(slot.slotStartDateTime);
+                    const slotEnd = moment(slot.slotEndDateTime);
+                    return slotStart.isBefore(schEnd) && slotEnd.isAfter(schStart);
+                });
+
+                return {
+                    ...sch.toJSON(),
+                    isBusy: intersectingSlots.length > 0,
+                    busySlots: intersectingSlots
+                };
+            });
+
+            return result;
+
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
+
+    async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null) {
+        try {
+            let scheduleWhere = { doctorId };
+            if (startDate && endDate) {
+                scheduleWhere.date = { [Op.between]: [startDate, endDate] };
+            } else if (startDate) {
+                scheduleWhere.date = { [Op.gte]: startDate };
+            } else if (endDate) {
+                scheduleWhere.date = { [Op.lte]: endDate };
+            }
+            const weekDays = await database["Schedule"].findAll({
+                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name']],
+                include: [
+                    {
+                        model: database["WeekDays"],
+                        attributes: []
+                    }
+                ],
+                where: scheduleWhere,
+                raw: true
+            });
+
+            // Преобразуем в массив строк
+            const result = weekDays.map(wd => wd.name);
+            return result;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
 
 }
 

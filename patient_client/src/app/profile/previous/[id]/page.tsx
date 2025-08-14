@@ -20,7 +20,6 @@ export default function ConsultationPage() {
         try {
             if (id) {
                 const res = await ConsultationService.getConsultationById(parseInt(id))
-                console.log(res)
                 setConsultation(res.data)
             }
         }

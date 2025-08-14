@@ -4,13 +4,7 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Slots extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
       Slots.belongsTo(models.Doctors, { foreignKey: 'doctorId' });
       Slots.belongsTo(models.Services, { foreignKey: 'serviceId' });
       Slots.belongsTo(models.Patients, { foreignKey: 'patientId' });

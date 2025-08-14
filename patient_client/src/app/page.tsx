@@ -22,7 +22,6 @@ import Box from '@mui/material/Box';
 
 function Home () {
     const [date, setDate] = useState<Dayjs | null>(null);
-    const [doctorsList, setDoctorsList] = useState<DoctorListItemResponse[]>([])
     const [doctorsListIsLoading, setDoctorsListIsLoading] = useState(true)
     
     const [postsList, setPostsList] = useState<Post[]>([])
@@ -32,18 +31,21 @@ function Home () {
 
     const [sortedList, setSortedList] = useState<DoctorListItemResponse[]>([])
     const [doctors, setDoctors] = useState<Doctor[]>([])
+    const [doctorListWithSchedule, setDoctorListWithSchedule] = useState<DoctorListItemResponse[]>([])
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
     const [inputDoctorValue, setinputDoctorValue] = useState('')
     const fetchDoctorsList = async () => {
         try {
-            const response = await main.getDoctorList()
+            const response = await main.getDoctorList(new Date())
+            console.log(response.data)
+            setDoctorListWithSchedule(response.data)
             const data: DoctorListItemResponse[] = response.data
+            
             let list: Doctor[] = []
             data.map((item) => {
                 list.push(item.doctor)
             })
             setDoctors(list)
-            setDoctorsList(data)
             setDoctorsListIsLoading(false)
         } catch (error) {
             console.log(error)
@@ -66,7 +68,13 @@ function Home () {
     }, [])
 
     useEffect(() => {
-        let filtered = [...doctorsList]
+        if (doctorListWithSchedule.length) {
+            console.log(doctorListWithSchedule)
+        }
+    }, [doctorListWithSchedule])
+
+    useEffect(() => {
+        let filtered = [...doctorListWithSchedule]
 
         // Фильтрация по специальности
         if (selectedPost) {
@@ -86,7 +94,7 @@ function Home () {
         })
 
         setSortedList(filtered)
-    }, [selectedPost, selectedDoctor, date, doctorsList])
+    }, [selectedPost, selectedDoctor, date, doctorListWithSchedule])
 
 
     const handleSelectDoctor = (doctor: Event) => {
@@ -189,42 +197,56 @@ function Home () {
                                         return null
                                     }
                                     return (
-                                        <li key={item.doctor.id} className="relative flex justify-between gap-x-6 py-5">
-                                            <div className="flex min-w-0 gap-x-4">
-                                                <img alt="" src='https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80' className="h-12 w-12 flex-none rounded-full bg-gray-50" />
+                                        <li
+                                            key={item.doctor.id}
+                                            className="relative grid grid-cols-12 items-center gap-x-6 py-5"
+                                            >
+                                            {/* Левая часть: фото + ФИО */}
+                                            <div className="col-span-12 sm:col-span-7 flex min-w-0 gap-x-4">
+                                                <img
+                                                    alt=""
+                                                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                                                />
                                                 <div className="min-w-0 flex-auto">
                                                     <p className="text-sm font-semibold leading-6 text-gray-900">
-                                                        <a href={`/doctor/{doctor.doctor.id}`}>
-                                                        <span className="absolute inset-x-0 -top-px bottom-0" />
+                                                        <a href={`/doctor/${item.doctor.id}`}>
+                                                            <span className="absolute inset-x-0 -top-px bottom-0" />
                                                             {item.doctor.secondName} {item.doctor.firstName} {item.doctor.patronomicName}
                                                         </a>
                                                     </p>
                                                     <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                                                        <a href={`/post/${item.doctor.Post.postName}`} className="relative truncate hover:underline">
+                                                        <a
+                                                            href={`/post/${item.doctor.Post.postName}`}
+                                                            className="relative truncate hover:underline"
+                                                        >
                                                             {item.doctor.Post.postName}
                                                         </a>
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex shrink-0 items-center gap-x-4">
+
+                                            {/* СРЕДНЯЯ КОЛОНКА: schedule — один столбец строго по центру */}
+                                            <div className="col-span-12 sm:col-span-3 flex items-center gap-y-2">
+                                                {item.schedule.map((scheduleItem, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="mx-2 px-2 py-1 text-sm font-medium text-gray-800 bg-blue-100 border border-blue-300 rounded-md text-center min-w-[72px]"
+                                                    >
+                                                        {scheduleItem}
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Правая колонка: действие */}
+                                            <div className="col-span-12 sm:col-span-2 flex items-center gap-x-4 sm:justify-self-end">
                                                 <div className="hidden sm:flex sm:flex-col sm:items-end">
-                                                    <p className="text-sm leading-6 text-gray-900">{item.doctor.Post.postName}</p>
-                                                    {/* {doctor.lastSeen ? (
-                                                        <p className="mt-1 text-xs leading-5 text-gray-500">
-                                                            Last seen <time dateTime={doctor.lastSeenDateTime}>{doctor.lastSeen}</time>
-                                                        </p>
-                                                    ) : (
-                                                        <div className="mt-1 flex items-center gap-x-1.5">
-                                                            <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                                                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                                            </div>
-                                                            <p className="text-xs leading-5 text-gray-500">Online</p>
-                                                        </div>
-                                                    )} */}
+                                                    <a href={`/doctor/${item.doctor.id}`} className="cursor-pointer text-sm leading-6 text-gray-900">Записаться</a>
                                                 </div>
                                                 <ChevronRightIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
                                             </div>
                                         </li>
+
                                     )
                                 }
                             )}

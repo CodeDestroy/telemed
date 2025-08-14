@@ -8,6 +8,7 @@ const MainController = require('../Controllers/MainController');
 
 router.get('/consultations/protocol', ConferenceContorller.getProtocolByRoomName)
 router.get('/doctorList', DoctorController.getDoctorList)
+router.get('/doctor', DoctorController.getDoctor)
 router.get('/postsList', DoctorController.getPostsList)
 router.get('/consultations', PatientController.getConsultations)
 router.get('/consultation', MainController.getConsultationById)

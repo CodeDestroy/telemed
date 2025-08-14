@@ -1,5 +1,6 @@
 const DoctorService = require('../Services/DoctorService')
 const ConsultationService = require('../Services/ConsultationService')
+const SchedulerService = require('../Services/SchedulerService')
 
 class DoctorController {
     async getConsultations(req, res) {
@@ -38,12 +39,34 @@ class DoctorController {
 
     async getDoctorList (req, res) {
         try {
+            const {dateStart} = req.query
             const doctors = await DoctorService.getDoctorsWithPosts()
-            const wrappedDoctors = doctors.map((doc) => ({
-                doctor: doc
-            }))
+            const wrappedDoctors = await Promise.all(
+                doctors.map(async (doc) => ({
+                    doctor: doc,
+                    schedule: await SchedulerService.getDoctorScheduleDistinctDays(doc.id, dateStart)
+                }))
+            );
 
             res.status(200).json(wrappedDoctors)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async getDoctor (req, res) {
+        try {
+            const {id} = req.query
+            const {dateStart} = req.query
+            const doctor = await DoctorService.getDoctorWithPost(id)
+            const schedule = await SchedulerService.getDoctorScheduleDistinctDays(doctor.id, dateStart)
+            const data = {
+                doctor: doctor,
+                schedule: schedule
+            }
+
+            res.status(200).json(data)
         }
         catch (e) {
             res.status(500).json({error: e.message})

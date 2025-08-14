@@ -162,6 +162,28 @@ class DoctorService {
         }
     }
 
+    async getDoctorWithPost(doctorId) {
+        try {
+            const doctor = await database["Doctors"].findByPk(doctorId, {
+                include: [
+                    {
+                        model: database["Posts"],
+                        required: true
+                    },
+                    {
+                        model: database["MedicalOrgs"],
+                        required: true
+                    }
+                ]
+            })
+            return doctor
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async getPosts () {
         try {
             const posts = await database["Posts"].findAll({

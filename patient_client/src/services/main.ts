@@ -5,10 +5,14 @@ import { $api } from '../api'
 import DoctorListItemResponse from "@/types/main";
 import Post from "@/types/posts";
 
-export default class AuthService {
+export default class MainService {
 
-    static async getDoctorList(): Promise<AxiosResponse<DoctorListItemResponse[]>> {
-        return $api.get<DoctorListItemResponse[]>('/api/patient/doctorList')
+    static async getDoctorList(date: Date): Promise<AxiosResponse<DoctorListItemResponse[]>> {
+        return $api.get<DoctorListItemResponse[]>('/api/patient/doctorList', {params: {dateStart: date}})
+    }
+
+    static async getDoctor(id: number, date: Date): Promise<AxiosResponse<DoctorListItemResponse>> {
+        return $api.get<DoctorListItemResponse>('/api/patient/doctor', {params: {id, dateStart: date}})
     }
 
     static async getPostsList(): Promise<AxiosResponse<Post[]>> {
