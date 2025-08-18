@@ -35,7 +35,7 @@ app.use(cookieParser());
 app.use(cors({
   credentials: true,
   origin: [process.env.CLIENT_URL, 'http://localhost:3000', 'http://localhost:3000/', 'http://127.0.0.1:3000', 'http://clinicode.ru:9881', 'http://clinicode.ru', 
-          'http://localhost:8180/', 'http://localhost:8180', 'http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3001/', 'http://127.0.0.1:3001/'],
+          'http://localhost:8180/', 'http://localhost:8180', 'http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3001/', 'http://127.0.0.1:3001/', 'https://dr.clinicode.ru'],
 }));
 
 app.use(bodyParser.urlencoded({ 
