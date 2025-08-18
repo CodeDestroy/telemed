@@ -4,12 +4,11 @@ import ConsultationService from '@/services/consultations'
 import { useStore } from '@/store'
 import { ConsultationFull } from '@/types/consultaion'
 import dayjs from 'dayjs'
-import { set } from 'mobx'
 import { useRouter } from 'next/navigation'
 
 import React, { useEffect, useState } from 'react'
 
-function page() {
+const Page = () => {
 
     const router = useRouter()
     const store = useStore()
@@ -115,4 +114,4 @@ function page() {
     )
 }
 
-export default page
+export default Page

@@ -1,14 +1,13 @@
 'use client'
 import Header from '@/components/Header'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { FormEvent, useState } from 'react'
 
 import { useStore } from '@/store'
 import AuthService from '@/services/auth'
-import { AxiosError } from 'axios'
 
 import { useRouter } from 'next/navigation'
-export default function Registration() {
+import { AxiosError } from '@/types/errors'
+const Registration = () => {
 
     
     const store = useStore()
@@ -29,7 +28,7 @@ export default function Registration() {
 
     const chechFormData = () => {
         let currErrorIndicator = false
-        let currError: string[] = []
+        const currError: string[] = []
         if (!secondName || secondName.length < 2) {
             
             currError.push('Введите Фамилию')
@@ -96,9 +95,12 @@ export default function Registration() {
             
             
         }
-        catch (e: any) {
-            if (e.response?.data) {
-                setErrors([e.response.data])
+        catch (e: unknown) {
+            const err = e as AxiosError
+            if (err.response?.data) {
+                setErrors([err.response.data])
+            } else if (e instanceof Error) {
+                setErrors([e.message])
             } else {
                 setErrors(["Неизвестная ошибка"])
             }
@@ -118,7 +120,7 @@ export default function Registration() {
                         <p className="mt-1 text-sm leading-6 text-gray-600">Введите свои данные для регистрации</p>
                     </div>
 
-                    <form className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+                    <form onSubmit={registration} className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
                         <div className="px-4 py-6 sm:p-8">
                             {errors && errors.length > 0 ?
                                     
@@ -278,8 +280,7 @@ export default function Registration() {
                                 Отмена
                             </button>
                             <button
-                                type="button"
-                                onClick={registration}
+                                type="submit"
                                 className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
                                 Зарегистрироваться
@@ -293,3 +294,5 @@ export default function Registration() {
     </>
   )
 }
+
+export default Registration

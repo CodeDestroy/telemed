@@ -70,3 +70,13 @@ export interface Url {
     Room: Room
     
 }
+
+export interface Slot {
+    scheduleStartTime: string
+    scheduleEndTime: string
+    serviceId: number
+    isBusy: boolean
+    patientId: number
+    slotStatusId: number
+    doctorId: number
+}

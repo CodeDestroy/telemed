@@ -8,27 +8,22 @@ import Header from '@/components/Header'
 import { useStore } from '@/store'
 import duration from 'dayjs/plugin/duration'
 dayjs.extend(duration)
-export default function ConsultationPage() {
+const Page = () => {
     const params = useParams() as { id?: string | string[] } | null
     const rawId = params?.id
     const id = Array.isArray(rawId) ? rawId[0] : rawId // теперь id: string | undefined
     const [consultation, setConsultation] = useState<SlotWithRoomPatient | null>(null)
     const [url, setUrl] = useState<Url | null>(null)
     const store = useStore()
-    useEffect(() => {
-        fetchConsultation()
-    }, [id])
 
     const fetchConsultation = async () => {
         try {
             if (id) {
                 const res = await ConsultationService.getConsultationById(parseInt(id))
                 setConsultation(res.data)
-                console.log(res.data)
                 if (store.user?.personId){
                     const url = await ConsultationService.getConsultationUrl(res.data.id, store.user?.id)
                     setUrl(url.data)
-                   /*  console.log(url) */
                 }
             }
         }
@@ -36,6 +31,12 @@ export default function ConsultationPage() {
             console.log(err)
         }
     }
+
+    
+    useEffect(() => {
+        fetchConsultation()
+    }, [id, fetchConsultation(), store.isAuth])
+    
     if (!consultation) {
         return <div className="p-6">Загрузка...</div>
     }
@@ -83,3 +84,5 @@ export default function ConsultationPage() {
         
     )
 }
+
+export default Page

@@ -2,28 +2,15 @@
 
 
 import Header from '@/components/Header'
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+
 import { useState, useEffect } from 'react'
 import { useStore } from '@/store'
 import { User } from '@/types/user'
 import dayjs from 'dayjs'
 import AuthService from '@/services/auth'
 import { observer } from 'mobx-react-lite'
-export default observer(function page() {
+import { AxiosError } from '@/types/errors'
+const Page = () => {
     const store = useStore()
     const [user, setUser] = useState<User | null>(store.user)
     const [errors, setErrors] = useState<string[]>([])
@@ -40,7 +27,7 @@ export default observer(function page() {
 
     const chechFormData = () => {
         let currErrorIndicator = false
-        let currError: string[] = []
+        const currError: string[] = []
         if (!user?.secondName || user?.secondName.length < 2) {
             
             currError.push('Введите Фамилию')
@@ -77,17 +64,18 @@ export default observer(function page() {
         return true
     }
 
-    const handleSaveUser = async (event: any) => {
+    const handleSaveUser = async (event: React.FormEvent<HTMLFormElement>) => {
         try {
-            event.preventDefault()
-            if (user){
-                const response = await AuthService.updateUser(user)
-                console.log(response)
+            if (user) {
+            const response = await AuthService.updateUser(user)
+            console.log(response)
             }
-        }
-        catch (e: any) {
-            if (e.response?.data) {
-                setErrors([e.response.data])
+        } catch (e: unknown) {
+            const err = e as AxiosError
+            if (err.response?.data) {
+                setErrors([err.response.data])
+            } else if (e instanceof Error) {
+                setErrors([e.message])
             } else {
                 setErrors(["Неизвестная ошибка"])
             }
@@ -432,4 +420,6 @@ export default observer(function page() {
             </div>
         </>
     )
-})
+}
+
+export default observer(Page)

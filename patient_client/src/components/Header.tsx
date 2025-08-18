@@ -1,45 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Dialog, DialogPanel, Popover, PopoverButton, PopoverGroup, PopoverPanel } from '@headlessui/react'
 import {
-  ArrowPathIcon,
   Bars3Icon,
-  ChartPieIcon,
-  CursorArrowRaysIcon,
-  FingerPrintIcon,
-  SquaresPlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
-const products = [
+import Link from 'next/link'
+/* const products = [
   { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: ChartPieIcon },
   { name: 'Engagement', description: 'Speak directly to your customers', href: '#', icon: CursorArrowRaysIcon },
   { name: 'Security', description: 'Your customers’ data will be safe and secure', href: '#', icon: FingerPrintIcon },
   { name: 'Integrations', description: 'Connect with third-party tools', href: '#', icon: SquaresPlusIcon },
   { name: 'Automations', description: 'Build strategic funnels that will convert', href: '#', icon: ArrowPathIcon },
-]
+] */
 const callsToAction = [
   { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
   { name: 'Contact sales', href: '#', icon: PhoneIcon },
 ]
-const company = [
-  { name: 'About us', href: '#', description: 'Learn more about our company values and mission to empower others' },
-  { name: 'Careers', href: '#', description: 'Looking for you next career opportunity? See all of our open positions' },
-  {
-    name: 'Support',
-    href: '#',
-    description: 'Get in touch with our dedicated support team or reach out on our community forums',
-  },
-  { name: 'Blog', href: '#', description: 'Read our latest announcements and get perspectives from our team' },
-]
 
 
 
-export default function Header() {
+const Header = () => {
     const router = useRouter()
     const store = useStore()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -74,13 +60,13 @@ export default function Header() {
                 </div>
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
 
-                    <a href="/" className="text-sm font-semibold leading-6 text-gray-900">
+                    <Link href="/" className="text-sm font-semibold leading-6 text-gray-900">
                         Главная
-                    </a>
+                    </Link>
 
-                    {/* <a href='/consultations/previous/' className="text-sm font-semibold leading-6 text-gray-900">
+                    {/* <Link href='/consultations/previous/' className="text-sm font-semibold leading-6 text-gray-900">
                         Прошедшие консультации
-                    </a> */}
+                    </Link> */}
 
 
                     <Popover className="relative">
@@ -101,10 +87,10 @@ export default function Header() {
                                         <LockOpenIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                     </div>
                                     <div className="flex-auto">
-                                        <a href='/consultations/current/' className="block font-semibold text-gray-900">
+                                        <Link href='/consultations/current/' className="block font-semibold text-gray-900">
                                             Активные консультации
                                             <span className="absolute inset-0" />
-                                        </a>
+                                        </Link>
                                         {/* <p className="mt-1 text-gray-600">Прошедшие консультации</p> */}
                                     </div>
                                 </div>
@@ -115,35 +101,35 @@ export default function Header() {
                                         <LockClosedIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                     </div>
                                     <div className="flex-auto">
-                                        <a href='/consultations/previous/' className="block font-semibold text-gray-900">
+                                        <Link href='/consultations/previous/' className="block font-semibold text-gray-900">
                                             Завершённые консультации
                                             <span className="absolute inset-0" />
-                                        </a>
+                                        </Link>
                                         {/* <p className="mt-1 text-gray-600">Прошедшие консультации</p> */}
                                     </div>
                                 </div>
                             </div>
                             {/* <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
                                 {callsToAction.map((item) => (
-                                <a
+                                <Link
                                     key={item.name}
                                     href={item.href}
                                     className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100"
                                 >
                                     <item.icon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
                                     {item.name}
-                                </a>
+                                </Link>
                                 ))}
                             </div> */}
                         </PopoverPanel>
                     </Popover>
 
-                    {/* <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                    {/* <Link href="#" className="text-sm font-semibold leading-6 text-gray-900">
                         Features
-                    </a>
-                    <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+                    </Link>
+                    <Link href="#" className="text-sm font-semibold leading-6 text-gray-900">
                         Marketplace
-                    </a>*/}
+                    </Link>*/}
 
                     {/* <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
@@ -169,9 +155,9 @@ export default function Header() {
                 </PopoverGroup> 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                     { store.isAuth === false ?
-                        <a onClick={() => router.push('/login')} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                        <Link href='/login' className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                             Войти <span aria-hidden="true">&rarr;</span>
-                        </a>
+                        </Link>
                         :
                         <>
                             <PopoverGroup className="hidden lg:flex lg:gap-x-12">
@@ -187,17 +173,17 @@ export default function Header() {
                                         >
                                         
                                         <div className="relative rounded-lg p-4 hover:bg-gray-50">
-                                            <a onClick={openProfile} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                                            <button onClick={openProfile} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                                                 Профиль
                                                 <span className="absolute inset-0" />
-                                            </a>
+                                            </button>
                                             <p className="mt-1 text-sm leading-6 text-gray-600">Просмотреть свой профиль</p>
                                         </div>
                                         <div className="relative rounded-lg p-4 hover:bg-gray-50">
-                                            <a onClick={logout} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                                            <button onClick={logout} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                                                 Выйти
                                                 <span className="absolute inset-0" />
-                                            </a>
+                                            </button>
                                         </div>
                                         
                                     </PopoverPanel>
@@ -212,14 +198,14 @@ export default function Header() {
                 <DialogPanel className="fixed inset-y-0 right-0 z-10 flex w-full flex-col justify-between overflow-y-auto bg-white sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="p-6">
                         <div className="flex items-center justify-between">
-                            <a href="#" className="-m-1.5 p-1.5">
+                            <Link href="#" className="-m-1.5 p-1.5">
                                 <span className="sr-only">Your Company</span>
                                 <img
                                     alt=""
                                     src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                                     className="h-8 w-auto"
                                 />
-                            </a>
+                            </Link>
                             <button
                                 type="button"
                                 onClick={() => setMobileMenuOpen(false)}
@@ -232,25 +218,25 @@ export default function Header() {
                         <div className="mt-6 flow-root">
                             <div className="-my-6 divide-y divide-gray-500/10">
                                 <div className="space-y-2 py-6">
-                                    <a
+                                    <Link
                                         href="/"
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Главная
-                                    </a>
+                                    </Link>
                                 </div>
                                 {/* <div className="space-y-2 py-6">
-                                    <a
+                                    <Link
                                         href='/consultations/previous/'
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Прошедшие консультации
-                                    </a>
+                                    </Link>
                                 </div> */}
                                  
                                 <div className="space-y-2 py-6">
                                     {/* {products.map((item) => (
-                                        <a
+                                        <Link
                                             key={item.name}
                                             href={item.href}
                                             className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
@@ -259,9 +245,9 @@ export default function Header() {
                                                 <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                             </div>
                                             {item.name}
-                                        </a>
+                                        </Link>
                                     ))} */}
-                                    <a
+                                    <Link
                                         href="/consultations/current"
                                         className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
@@ -269,8 +255,8 @@ export default function Header() {
                                             <LockOpenIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                         </div>
                                         Активные консультации
-                                    </a>
-                                    <a
+                                    </Link>
+                                    <Link
                                         href="/consultations/previous"
                                         className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
@@ -278,32 +264,32 @@ export default function Header() {
                                             <LockClosedIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                         </div>
                                         Завершённые консультации
-                                    </a>
+                                    </Link>
                                 </div>
                                 
                                 { store.isAuth === false ?
                                     <div className="py-6">
-                                        <a
+                                        <button
                                             onClick={() => router.push('/login')}
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                                         >
                                             Войти
-                                        </a>
+                                        </button>
                                     </div>
                                     :
                                     <div className="py-6">
-                                        <a
+                                        <button
                                             onClick={openProfile}
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                                         >
                                             {store.user?.secondName} {store.user?.firstName}
-                                        </a>
-                                        <a
+                                        </button>
+                                        <button
                                             onClick={logout}
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 cursor-pointer"
                                         >
                                             Выйти
-                                        </a>
+                                        </button>
                                     </div>
                                     
                                 }
@@ -311,19 +297,20 @@ export default function Header() {
                             </div>
                         </div>
                     </div>
-                    <div className="sticky bottom-0 grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50 text-center">
+                    {/* <div className="sticky bottom-0 grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50 text-center">
                         {callsToAction.map((item) => (
-                            <a
+                            <Link
                                 key={item.name}
                                 href={item.href}
                                 className="p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-100"
                             >
                                 {item.name}
-                            </a>
+                            </Link>
                         ))}
-                    </div>
+                    </div> */}
                 </DialogPanel>
             </Dialog>
         </header>
     )
 }
+export default observer(Header)

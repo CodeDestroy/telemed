@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
-import AuthService from "@/services/auth"
 import Header from '@/components/Header'
-function LoginPage() {
+const LoginPage = () => {
     const store = useStore()
     const router = useRouter()
     const [phone, setPhone] = useState('')
@@ -20,20 +19,25 @@ function LoginPage() {
         e.preventDefault()
         setError('')
         
-        try {
-            //console.log(phone, password)
+       try {
             const res = await store.login(phone, password)
-            if (res.status !== 200) {
-                setError(res.response?.data || 'Ошибка авторизации')
-            }
-            else {
+
+            // проверяем, что это AxiosResponse (есть status и data)
+            if ('status' in res && res.status === 200) {
                 router.push('/')
+            } else if ('response' in res && res.response?.data) {
+                setError(res.response.data)
+            } else {
+                setError('Ошибка авторизации')
             }
+
             console.log(res)
-            /* localStorage.setItem('token', data.token) */
-            //router.push('/main')
-        } catch (err: any) {
-            setError(err.message || 'Ошибка авторизации')
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('Ошибка авторизации')
+            }
         }
     }
     return (

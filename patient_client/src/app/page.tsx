@@ -41,7 +41,7 @@ function Home () {
             setDoctorListWithSchedule(response.data)
             const data: DoctorListItemResponse[] = response.data
             
-            let list: Doctor[] = []
+            const list: Doctor[] = []
             data.map((item) => {
                 list.push(item.doctor)
             })

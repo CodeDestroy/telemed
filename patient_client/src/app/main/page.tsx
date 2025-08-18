@@ -16,7 +16,7 @@
 
 import Header from "@/components/Header"
 
-export default function Main() {
+const Main = () => {
   return (
           <>
               <Header/>
@@ -25,3 +25,4 @@ export default function Main() {
           
       )
 }
+export default Main

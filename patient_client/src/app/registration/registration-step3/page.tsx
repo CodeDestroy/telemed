@@ -1,23 +1,25 @@
 'use client'
 import Header from '@/components/Header'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { FormEvent, useEffect, useState } from 'react'
 
 import { useStore } from '@/store'
-import AuthService from '@/services/auth'
-import { AxiosError } from 'axios'
 import { useSearchParams } from "next/navigation"
 import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
-export default observer (function Registration() {
+import { AxiosError } from '@/types/errors'
+const Registration = () => {
 
     const searchParams = useSearchParams()
     const store = useStore()
     const router = useRouter()
-    const phone: string = searchParams.get("phone")
+     const phone: string = searchParams?.get("phone") || ""  // безопасно, default ""
+
+    // достаём code, если его нет — используем пустую строку
+    const initialCode = searchParams?.get("code") || ""
+    const [code, setCode] = useState<string>(initialCode)
 
     // пробуем достать code из URL, если его нет — используем состояние
-    const [code, setCode] = useState<string | number | readonly string[] >(searchParams.get("code") || "")
+    //const [code, setCode] = useState<string | number | readonly string[] >(searchParams.get("code") || "")
   
 
     const [errors, setErrors] = useState<string[]>([])
@@ -33,9 +35,12 @@ export default observer (function Registration() {
             
             
         }
-        catch (e: any) {
-            if (e.response?.data) {
-                setErrors([e.response.data])
+        catch (e: unknown) {
+            const err = e as AxiosError
+            if (err.response?.data) {
+                setErrors([err.response.data])
+            } else if (e instanceof Error) {
+                setErrors([e.message])
             } else {
                 setErrors(["Неизвестная ошибка"])
             }
@@ -250,4 +255,6 @@ export default observer (function Registration() {
         
     </>
   )
-})
+}
+
+export default observer (Registration)

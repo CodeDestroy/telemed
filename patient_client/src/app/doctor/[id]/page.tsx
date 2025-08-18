@@ -8,6 +8,8 @@ import DoctorListItemResponse from '@/types/main'
 import main from "@/services/main";
 import Header from "@/components/Header";
 import { store } from "@/store";
+import { Slot } from "@/types/consultaion";
+import Link from "next/link";
 
 interface Consultation {
   id: number;
@@ -16,9 +18,10 @@ interface Consultation {
   slotStatusId: number;
 }
 
-export default function DoctorPage() {
-  const params = useParams();
-  const id = params.id as string;
+const DoctorPage = () => {
+  const params = useParams()
+  const rawId = params?.id
+  const id = Array.isArray(rawId) ? rawId[0] : rawId
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [doctor, setDoctor] = useState<DoctorListItemResponse>();
@@ -34,9 +37,11 @@ export default function DoctorPage() {
 
   const fetchDoctor = async () => {
     try {
-      const response = await main.getDoctor(parseInt(id), new Date());
-      setDoctor(response.data);
-      setDoctorIsLoading(false);
+      if (id) {
+        const response = await main.getDoctor(parseInt(id), new Date());
+        setDoctor(response.data);
+        setDoctorIsLoading(false);
+      }
     } catch (error) {
       console.log(error);
       setDoctorIsLoading(false);
@@ -55,7 +60,7 @@ export default function DoctorPage() {
 
       // Генерация доступных временных интервалов
       const slots: string[] = [];
-      schedule.forEach((slot: any) => {
+      schedule.forEach((slot: Slot) => {
         let start = dayjs(`${date}T${slot.scheduleStartTime}`);
         const end = dayjs(`${date}T${slot.scheduleEndTime}`);
 
@@ -127,12 +132,12 @@ export default function DoctorPage() {
       <Header />
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Назад */}
-        <a
+        <Link
           href="/"
           className="inline-flex items-center text-sm text-blue-600 hover:underline"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> Назад
-        </a>
+        </Link>
 
         {/* Информация о враче */}
         <div className="bg-white shadow rounded-lg p-6 flex gap-6 items-center">
@@ -197,3 +202,5 @@ export default function DoctorPage() {
     </>
   );
 }
+
+export default DoctorPage

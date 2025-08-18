@@ -6,7 +6,7 @@ import { SlotWithRoomPatient } from '@/types/consultaion'
 import dayjs from 'dayjs'
 import Header from '@/components/Header'
 
-export default function ConsultationPage() {
+const ConsultationPage = () => {
     const params = useParams() as { id?: string | string[] } | null
     const rawId = params?.id
     const id = Array.isArray(rawId) ? rawId[0] : rawId // теперь id: string | undefined
@@ -56,3 +56,5 @@ export default function ConsultationPage() {
         
     )
 }
+
+export default ConsultationPage

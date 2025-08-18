@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '@/store'
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { checkAuth, isLoading } = useStore()
   const [checked, setChecked] = useState(false)
 
@@ -22,3 +22,5 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   return <>{children}</>
 }
+export default  AuthProvider
+

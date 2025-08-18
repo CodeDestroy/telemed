@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '@/components/StoreProvider'
+import { useStore } from '@/store'
 
 interface PrivateRouteProps {
   children: React.ReactNode
