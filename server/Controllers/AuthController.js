@@ -6,8 +6,12 @@ const ApiError = require('../Errors/api-error');
 const MailManager = require("../Utils/MailManager");
 const nodemailer = require('nodemailer');
 
-const database = require('../models/index')
+const UserDto = require('../Dtos/UserDto');
+const database = require('../models/index');
+const PatientService = require("../Services/PatientService");
 const CLIENT_URL =  process.env.CLIENT_URL;
+const PATIENT_CLIENT_URL =  process.env.PATIENT_CLIENT_URL;
+
 class AuthController {
 
     async login(req, res) {
@@ -106,6 +110,39 @@ class AuthController {
         }
     }
 
+    async confirmRegistrationPatient (req, res) {
+        try {
+            const {secondName, name, patronomicName, birthDate, email, phone, password, snils} = req.body
+            const candidate = await database['Users'].findOne({where: {email: email}})
+            if (candidate) {
+                throw ApiError.BadRequest('Пользователь с данным email уже зарегистрирован')
+            }
+            //const parsedDate = await DateTimeManager.parseDateFromRussian(birthDate)
+            const newUser = await userService.createUser(1, phone, password, null, email, phone)
+            newUser.confirmed = false;
+            newUser.save()
+            const newCode = await CodeService.createNewCode(newUser.id, 180)
+            
+            const link = PATIENT_CLIENT_URL + '/registration/registration-step3?phone=' + phone+'&code='+newCode.code
+            const transporter = await MailManager.getTransporter()
+            const mailOptions = await MailManager.getMailOptionsCode(email, newCode.code, link)
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    return console.log(error);
+                }
+                console.log('Сообщение отправленно: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            });
+            const newDoctor = await PatientService.createPatient(newUser.id, secondName, name, patronomicName, birthDate, null, snils)
+
+            res.status(200).send([newUser, newDoctor])
+        }
+        catch (e) {
+            console.log(e)
+            return res.status(500).json(e.message)
+        }
+    }
+
     async confirmEmail (req, res) {
         try {
             const { phone, code } = req.body
@@ -142,6 +179,32 @@ class AuthController {
             res.status(500).json({error: e.message})
         }
         
+    }
+
+    async changeUser (req, res) {
+        try {
+            const userDto = req.body.user
+            const user = await userService.getUser(userDto.id)
+            const patient = await PatientService.getPatientByUserId(user.id)
+            user.phone = userDto.phone
+            userDto.login = userDto.phone
+            user.email = userDto.email
+            patient.secondName = userDto.secondName
+            patient.firstName = userDto.firstName
+            patient.patronomicName = userDto.patronomicName
+            patient.birthDate = userDto.birthDate
+            patient.snils = userDto.snils
+            patient.info = userDto.info
+            user.save()
+            patient.save()
+            const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
+            res.status(200).json({userDtoPatient})
+        }
+        catch (e) {
+            res.status(500).json({
+                error: e.message
+            })
+        }
     }
 }
 

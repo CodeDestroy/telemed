@@ -308,6 +308,27 @@ class UserService {
             throw e
         }
     }
+
+    async getUser(id) {
+        try {
+            const user = await database["Users"].findOne({
+                where: {
+                    id: id
+                },
+                include: [
+                    {
+                        model: database["UsersRoles"],
+                        required: true
+                    }
+                ],
+            })
+            return user
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
 }
 
 

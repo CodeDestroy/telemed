@@ -24,6 +24,8 @@ const Posts = require('./models/posts')
 const API = require('./models/api')
 const Schedule = require('./models/schedule')
 const WeekDays = require('./models/weekdays')
+const UsersRooms = require('./models/usersrooms')
+const UsersSettings = require('./models/userssettings')
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = class Database {
@@ -44,6 +46,8 @@ module.exports = class Database {
     this.models = {
       Users: Users(this.sequelize, DataTypes),
       UsersRoles: UsersRoles(this.sequelize, DataTypes),
+      UsersRooms: UsersRooms(this.sequelize, DataTypes),
+      UsersSettings: UsersSettings(this.sequelize, DataTypes),
       Doctors: Doctors(this.sequelize, DataTypes),
       Admins: Admins(this.sequelize, DataTypes),
       Patients: Patients(this.sequelize, DataTypes),
@@ -67,6 +71,12 @@ module.exports = class Database {
       Schedule: Schedule(this.sequelize, DataTypes),
       WeekDays: WeekDays(this.sequelize, DataTypes),
     };
+
+    Object.keys(this.models).forEach(modelName => {
+      if (this.models[modelName].associate) {
+        this.models[modelName].associate(this.models);
+      }
+    });
 
     // Установление ассоциаций
     

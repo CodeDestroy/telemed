@@ -11,7 +11,7 @@ import {
   SquaresPlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+import { ChevronDownIcon, PhoneIcon, PlayCircleIcon, LockClosedIcon, LockOpenIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
@@ -45,7 +45,7 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     
     const openProfile = () => {
-        console.log('profile')
+        router.push('/profile')
     }
 
     const logout = () => {
@@ -78,14 +78,14 @@ export default function Header() {
                         Главная
                     </a>
 
-                    <a href='/profile/previous/' className="text-sm font-semibold leading-6 text-gray-900">
+                    {/* <a href='/consultations/previous/' className="text-sm font-semibold leading-6 text-gray-900">
                         Прошедшие консультации
-                    </a>
+                    </a> */}
 
 
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
-                            Product
+                            Консультации
                             <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
                         </PopoverButton>
 
@@ -94,25 +94,36 @@ export default function Header() {
                             className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
                             >
                             <div className="p-4">
-                                {products.map((item) => (
                                 <div
-                                    key={item.name}
                                     className="group relative flex gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
                                 >
                                     <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                        <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
+                                        <LockOpenIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                     </div>
                                     <div className="flex-auto">
-                                        <a href={item.href} className="block font-semibold text-gray-900">
-                                            {item.name}
+                                        <a href='/consultations/current/' className="block font-semibold text-gray-900">
+                                            Активные консультации
                                             <span className="absolute inset-0" />
                                         </a>
-                                        <p className="mt-1 text-gray-600">{item.description}</p>
+                                        {/* <p className="mt-1 text-gray-600">Прошедшие консультации</p> */}
                                     </div>
                                 </div>
-                                ))}
+                                <div
+                                    className="group relative flex gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50"
+                                >
+                                    <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                        <LockClosedIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
+                                    </div>
+                                    <div className="flex-auto">
+                                        <a href='/consultations/previous/' className="block font-semibold text-gray-900">
+                                            Завершённые консультации
+                                            <span className="absolute inset-0" />
+                                        </a>
+                                        {/* <p className="mt-1 text-gray-600">Прошедшие консультации</p> */}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
+                            {/* <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
                                 {callsToAction.map((item) => (
                                 <a
                                     key={item.name}
@@ -123,7 +134,7 @@ export default function Header() {
                                     {item.name}
                                 </a>
                                 ))}
-                            </div>
+                            </div> */}
                         </PopoverPanel>
                     </Popover>
 
@@ -165,7 +176,7 @@ export default function Header() {
                         <>
                             <PopoverGroup className="hidden lg:flex lg:gap-x-12">
                                 <Popover className="relative">
-                                    <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
+                                    <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                                         {store.user?.secondName} {store.user?.firstName}
                                         <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
                                     </PopoverButton>
@@ -176,14 +187,14 @@ export default function Header() {
                                         >
                                         
                                         <div className="relative rounded-lg p-4 hover:bg-gray-50">
-                                            <a onClick={openProfile} className="block text-sm font-semibold leading-6 text-gray-900">
+                                            <a onClick={openProfile} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                                                 Профиль
                                                 <span className="absolute inset-0" />
                                             </a>
                                             <p className="mt-1 text-sm leading-6 text-gray-600">Просмотреть свой профиль</p>
                                         </div>
                                         <div className="relative rounded-lg p-4 hover:bg-gray-50">
-                                            <a onClick={logout} className="block text-sm font-semibold leading-6 text-gray-900">
+                                            <a onClick={logout} className="block text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                                                 Выйти
                                                 <span className="absolute inset-0" />
                                             </a>
@@ -228,17 +239,17 @@ export default function Header() {
                                         Главная
                                     </a>
                                 </div>
-                                <div className="space-y-2 py-6">
+                                {/* <div className="space-y-2 py-6">
                                     <a
-                                        href='/profile/previous/'
+                                        href='/consultations/previous/'
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Прошедшие консультации
                                     </a>
-                                </div>
+                                </div> */}
                                  
                                 <div className="space-y-2 py-6">
-                                    {products.map((item) => (
+                                    {/* {products.map((item) => (
                                         <a
                                             key={item.name}
                                             href={item.href}
@@ -249,7 +260,25 @@ export default function Header() {
                                             </div>
                                             {item.name}
                                         </a>
-                                    ))}
+                                    ))} */}
+                                    <a
+                                        href="/consultations/current"
+                                        className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                            <LockOpenIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
+                                        </div>
+                                        Активные консультации
+                                    </a>
+                                    <a
+                                        href="/consultations/previous"
+                                        className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
+                                            <LockClosedIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
+                                        </div>
+                                        Завершённые консультации
+                                    </a>
                                 </div>
                                 
                                 { store.isAuth === false ?

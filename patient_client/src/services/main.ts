@@ -7,8 +7,8 @@ import Post from "@/types/posts";
 
 export default class MainService {
 
-    static async getDoctorList(date: Date): Promise<AxiosResponse<DoctorListItemResponse[]>> {
-        return $api.get<DoctorListItemResponse[]>('/api/patient/doctorList', {params: {dateStart: date}})
+    static async getDoctorList(date: Date, medOrgId: number | string | undefined): Promise<AxiosResponse<DoctorListItemResponse[]>> {
+        return $api.get<DoctorListItemResponse[]>('/api/patient/doctorList', {params: {dateStart: date, medOrgId}})
     }
 
     static async getDoctor(id: number, date: Date): Promise<AxiosResponse<DoctorListItemResponse>> {

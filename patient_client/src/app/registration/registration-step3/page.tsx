@@ -1,98 +1,35 @@
 'use client'
 import Header from '@/components/Header'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 
 import { useStore } from '@/store'
 import AuthService from '@/services/auth'
 import { AxiosError } from 'axios'
-
+import { useSearchParams } from "next/navigation"
 import { useRouter } from 'next/navigation'
-export default function Registration() {
+import { observer } from 'mobx-react-lite'
+export default observer (function Registration() {
 
-    
+    const searchParams = useSearchParams()
     const store = useStore()
+    const router = useRouter()
+    const phone: string = searchParams.get("phone")
 
-    const [secondName, setSecondName] = useState<string>('')
-    const [firstName, setFirstName] = useState<string>('')
-    const [patronomicName, setPatronomicName] = useState<string>('')
-    const [phone, setPhone] = useState<string>('')
-    const [email, setEmail] = useState<string>('')
-    const [password, setPassword] = useState<string>('')
-    const [snils, setSnils] = useState<string>('')
-    const [birthDate, setBirthDate] = useState<string>('')
+    // пробуем достать code из URL, если его нет — используем состояние
+    const [code, setCode] = useState<string | number | readonly string[] >(searchParams.get("code") || "")
+  
 
     const [errors, setErrors] = useState<string[]>([])
 
-    
-    const router = useRouter()
 
-    const chechFormData = () => {
-        let currErrorIndicator = false
-        let currError: string[] = []
-        if (!secondName || secondName.length < 2) {
-            
-            currError.push('Введите Фамилию')
-            currErrorIndicator = true
-        }
-        if (!firstName|| firstName.length < 2) {
-            currError.push('Введите Имя')
-            currErrorIndicator = true
-        }
-        if (!phone || phone.length < 11 || phone.length > 13){
-            currError.push('Введите Телефон')
-            currErrorIndicator = true
-        }
-        if (!email ) {
-            currError.push('Введите Email')
-            currErrorIndicator = true
-        }
-        if (email.length < 2) {
-            currError.push('Email должен быть длиннее 2 символов')
-            currErrorIndicator = true
-        }
-        
-        if (!password) {
-            currError.push('Введите Пароль')
-            currErrorIndicator = true
-        }
-        if (password.length < 3) {
-            currError.push('Пароль должен быть длиннее 3 символов')
-            currErrorIndicator = true
-        }
-        if (!snils || snils.length != 11) {
-            currError.push('Введите корректный СНИЛС')
-            currErrorIndicator = true
-        }
-        if (!birthDate) {
-            currError.push('Введите Дату рождения')
-            currErrorIndicator = true
-        }
-        
-        if (currErrorIndicator){
-            /* setError(error ? error : '' + (`\n\n${currError}`)) */
-            
-            setErrors(currError)
-            return false
-        }
-        setErrors([])
-        return true
-    }
-
-    const registration = async (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         try {
             setErrors([])
             event.preventDefault()
-            if (chechFormData()) {
-               console.log(secondName, firstName, patronomicName, phone, email, password, snils, birthDate)
-                const response1 = await AuthService.checkPhone(phone)
-                if (!response1.data) {
-                    const response2 = await AuthService.confirmRegistration(secondName, firstName, patronomicName, birthDate, email, phone, password, snils)
-                    router.push(`/registration/registration-step3?phone=${response2.data[0]?.phone}`)
-                    //http://localhost:3000/registration/registration-step3?phone=88005553533&code=4978
-                    console.log(response2)
-                } 
-            }
+            /* const response = await AuthService.confirmEmail(phone, code) */
+            await store.registrationByCode(phone, code?.toString())
+           
             
             
         }
@@ -104,6 +41,13 @@ export default function Registration() {
             }
         }
     }
+
+    useEffect(() => {
+        if (store.isAuth) {
+            router.push('/')
+        }
+        console.log(store)
+    }, [store.isAuth, router])
 
 
 
@@ -117,24 +61,38 @@ export default function Registration() {
                         <h2 className="text-base font-semibold leading-7 text-gray-900">Регистрация</h2>
                         <p className="mt-1 text-sm leading-6 text-gray-600">Введите свои данные для регистрации</p>
                     </div>
-
-                    <form className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {errors && errors.length > 0 ?      
+                            <div className="w-full"> 
+                                <ul>
+                                    {errors.map((err, i) => (
+                                        <li className="text-red-800 block text-sm font-medium leading-6 text-gray-900" key={i}>{err}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            : 
+                            ''
+                        }
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Код подтверждения</label>
+                            <input
+                                type="text"
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                placeholder="Введите код"
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500"
+                            >
+                            Подтвердить
+                        </button>
+                    </form>
+                   {/*  <form className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
                         <div className="px-4 py-6 sm:p-8">
-                            {errors && errors.length > 0 ?
-                                    
-                                    <div className="w-full"> 
-                                        {/* <p className="text-red-800 block text-sm font-medium leading-6 text-gray-900" style={{ whiteSpace: "pre-line" }}>
-                                            {error}
-                                        </p> */}
-                                        <ul>
-                                            {errors.map((err, i) => (
-                                                <li className="text-red-800 block text-sm font-medium leading-6 text-gray-900" key={i}>{err}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    : 
-                                    ''
-                                }
+                            
                             <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                 
                                 <div className="sm:col-span-4">
@@ -285,11 +243,11 @@ export default function Registration() {
                                 Зарегистрироваться
                             </button>
                         </div>
-                    </form>
+                    </form> */}
                 </div>
             </div>
         </div>
         
     </>
   )
-}
+})

@@ -13,6 +13,7 @@ export interface User {
   phone: string
   schedulerType: string
   roleName: string
+  snils: string
 }
 
 

@@ -53,7 +53,7 @@ function LoginPage() {
                             </h2>
                             <p className="mt-2 text-sm leading-6 text-gray-500">
                                 Не зарегистрированы?{' '}
-                                <a onClick={()=>{router.push('/registration')}} className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                <a onClick={()=>{router.push('/registration')}} className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
                                     Регистрация
                                 </a>
                             </p>
@@ -120,7 +120,7 @@ function LoginPage() {
                                 <div>
                                     <button
                                         type="submit"
-                                        className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                        className="cursor-pointer flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                     >
                                         Войти
                                     </button>

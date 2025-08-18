@@ -33,3 +33,32 @@ export interface ConfirmRegistrationRequest {
   password: string
   snils: string
 }
+
+export interface RegistrationResponse {
+  0: {
+    avatar: string,
+    confirmCode: null,
+    confirmed: boolean,
+    createdAt: string,
+    email: string,
+    id: number,
+    login: string,
+    password: string,
+    phone: string,
+    schedulerType: string,
+    updatedAt: string,
+    userRoleId: number
+  }
+  1: {
+    birthDate: string,
+    createdAt: string,
+    firstName: string,
+    id: number,
+    info: string | null,
+    patronomicName: string | null,
+    secondName: string,
+    snils: string,
+    updatedAt: string,
+    userId: number,
+  }
+}

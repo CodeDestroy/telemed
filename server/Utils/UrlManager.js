@@ -52,6 +52,36 @@ class UrlManager {
         
     }
 
+    async getUrlBySlotId (slotId, userId) {
+        try {
+            const url = await database.models.Url.findOne({
+                where: {
+                    userId
+                },
+                include: [
+                    {
+                        model: database.models.Rooms,
+                        required: true,
+                        include: [
+                            {
+                                model: database.models.Slots,
+                                required: true,
+                                where: {
+                                    id: slotId
+                                }
+                            }
+                        ]
+                    }
+                ]
+            });
+            return url;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
 
 }
 

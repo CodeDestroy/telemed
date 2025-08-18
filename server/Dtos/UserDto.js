@@ -19,6 +19,7 @@ class UserDto {
             info: person.info,
             birthDate: person.birthDate,
             personId: person.id,
+            snils: person.snils
         }
         return (result)
     }

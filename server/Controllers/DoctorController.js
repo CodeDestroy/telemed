@@ -40,7 +40,8 @@ class DoctorController {
     async getDoctorList (req, res) {
         try {
             const {dateStart} = req.query
-            const doctors = await DoctorService.getDoctorsWithPosts()
+            const {medOrgId} = req.query
+            const doctors = await DoctorService.getDoctorsWithPostsByMedOrgId(medOrgId)
             const wrappedDoctors = await Promise.all(
                 doctors.map(async (doc) => ({
                     doctor: doc,

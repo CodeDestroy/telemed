@@ -60,3 +60,13 @@ export interface SlotWithRoomPatient {
     Patient: Patient
     Doctor: Doctor
 }
+
+export interface Url {
+    originalUrl: string
+    shortUrl: string
+    userId: number
+    roomId: number
+    type: number
+    Room: Room
+    
+}

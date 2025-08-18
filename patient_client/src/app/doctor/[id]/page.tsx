@@ -91,7 +91,7 @@ export default function DoctorPage() {
                 const startDateTime = dayjs(`${selectedDate}T${selectedTime}`).toISOString();
                 const response = await main.createConsultation(
                     doctor.doctor.id,
-                    store.user?.id,
+                    store.user?.personId,
                     startDateTime,
                     60, // или другое значение
                 );

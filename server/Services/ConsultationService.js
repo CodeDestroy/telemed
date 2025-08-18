@@ -3,6 +3,7 @@ const { Op } = require('sequelize')
 const DateTimeManager = require('../Utils/DateTimeManager')
 const moment = require('moment-timezone');
 const { raw } = require('body-parser');
+const UrlManager = require('../Utils/UrlManager');
 
 const JITSI_APP_ID = process.env.JITSI_APP_ID;
 const JITSI_SERVER_URL = process.env.JITSI_SERVER_URL;
@@ -41,6 +42,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -73,6 +75,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -119,6 +122,7 @@ class ConsultationService {
         catch (e) {
             console.log(e)
             throw e
+            throw e
         }   
     }
 
@@ -162,6 +166,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -196,6 +201,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -219,6 +225,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -260,6 +267,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -301,6 +309,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -340,6 +349,48 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
+        }
+    }
+
+    async getActivePatientSlots(patientId) {
+        try {
+            const currTime = new Date().toISOString();
+                        
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    post."postName" as "postName",
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", *
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
+                join "Posts" post on post.id = d."postId"
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and s."patientId" = :patientId 
+                    and (r."ended" != true or r."ended" is null) `, 
+            {
+                replacements: { patientId: patientId}, 
+                raw: true
+            })
+            /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
+            /* console.log(slots) */
+            return slots;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
         }
     }
 
@@ -377,6 +428,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -408,6 +460,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -418,7 +471,7 @@ class ConsultationService {
                     include: [
                     {
                         model: database["Rooms"],
-                        required: false
+                        required: false,
                     },
                     {
                         model: database["Patients"],
@@ -441,6 +494,18 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
+        }
+    }
+
+    async getUrlBySlotId (slotId, userId) {
+        try {
+            const url = await UrlManager.getUrlBySlotId(slotId, userId)
+            return url
+        }
+        catch (e) {
+            console.log(e)
+            throw e
         }
     }
 
@@ -470,6 +535,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -503,6 +569,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -513,6 +580,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -530,8 +598,9 @@ class ConsultationService {
         }
         catch (e)
         {
-            next(e)
+            throw e
             console.log(e)
+            throw e
         }
     }
 
@@ -549,8 +618,9 @@ class ConsultationService {
         }
         catch (e)
         {
-            next(e)
+            throw e
             console.log(e)
+            throw e
         }
     }
 
@@ -570,6 +640,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -609,6 +680,7 @@ class ConsultationService {
         }
         catch(e) {
             console.log(e)
+            throw e
         }
         
 
@@ -643,6 +715,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -676,6 +749,7 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
+            throw e
         }
     }
 
@@ -687,6 +761,7 @@ class ConsultationService {
         catch (e) {
 
             console.log(e)
+            throw e
             
         }
     }

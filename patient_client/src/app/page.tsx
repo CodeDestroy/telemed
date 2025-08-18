@@ -34,10 +34,10 @@ function Home () {
     const [doctorListWithSchedule, setDoctorListWithSchedule] = useState<DoctorListItemResponse[]>([])
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
     const [inputDoctorValue, setinputDoctorValue] = useState('')
+    const medOrgId = process.env.NEXT_PUBLIC_MED_ORG_ID
     const fetchDoctorsList = async () => {
         try {
-            const response = await main.getDoctorList(new Date())
-            console.log(response.data)
+            const response = await main.getDoctorList(new Date(), medOrgId)
             setDoctorListWithSchedule(response.data)
             const data: DoctorListItemResponse[] = response.data
             
@@ -67,11 +67,11 @@ function Home () {
         fetchSpetialityList()
     }, [])
 
-    useEffect(() => {
+    /* useEffect(() => {
         if (doctorListWithSchedule.length) {
             console.log(doctorListWithSchedule)
         }
-    }, [doctorListWithSchedule])
+    }, [doctorListWithSchedule]) */
 
     useEffect(() => {
         let filtered = [...doctorListWithSchedule]
@@ -97,10 +97,10 @@ function Home () {
     }, [selectedPost, selectedDoctor, date, doctorListWithSchedule])
 
 
-    const handleSelectDoctor = (doctor: Event) => {
+    /* const handleSelectDoctor = (doctor: Event) => {
 
         console.log(doctor)
-    }
+    } */
 
     return (
         <>
@@ -108,7 +108,7 @@ function Home () {
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'> 
-                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+                    {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
                         <Box
                         >
                             
@@ -118,14 +118,14 @@ function Home () {
                                     format="DD.MM.YYYY"
                                     label='Дата'
                                     onChange={(date) => {setDate(date)}}
-                                    /* minDate={dayjs(new Date())} */
+                                    minDate={dayjs(new Date())}
                                     localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
                                     slotProps={{
                                         field: { clearable: true, onClear: () => setDate(null) },
                                     }}
                             />
                         </Box>
-                    </LocalizationProvider>
+                    </LocalizationProvider> */}
                     <Autocomplete
                         options={postsList}
                         value={selectedPost}
