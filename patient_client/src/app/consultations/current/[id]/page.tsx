@@ -35,7 +35,7 @@ const Page = () => {
     
     useEffect(() => {
         fetchConsultation()
-    }, [id, fetchConsultation(), store.isAuth])
+    }, [id, store.isAuth])
     
     if (!consultation) {
         return <div className="p-6">Загрузка...</div>
