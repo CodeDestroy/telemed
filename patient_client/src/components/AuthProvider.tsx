@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useStore } from '@/store'
+import Header from './Header'
+import Loader from './Loader'
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { checkAuth, isLoading } = useStore()
@@ -17,7 +19,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   if (!checked || isLoading) {
     // Пока проверяем авторизацию — показываем, например, лоадер
-    return <div>Загрузка...</div>
+    return (
+    <>
+      <Header/>
+      <div style={{top: '40%'}} className='relative text-center mt-5'>
+        <Loader/>
+      </div>
+    </>)
   }
 
   return <>{children}</>

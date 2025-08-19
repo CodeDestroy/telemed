@@ -19,6 +19,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { Doctor } from '@/types/doctor'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import Box from '@mui/material/Box';
+import Loader from '@/components/Loader'
 
 function Home () {
     const [date, setDate] = useState<Dayjs | null>(null);
@@ -187,7 +188,7 @@ function Home () {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-full">
                     {doctorsListIsLoading ? (
-                        <p>Загрузка врачей...</p>
+                        <div style={{top: '30%'}} className='relative text-center'><Loader/></div>
                     ) : (
                         <ul role="list" className="divide-y divide-gray-100">
                             {sortedList.length > 0 && sortedList.map((item) => 
