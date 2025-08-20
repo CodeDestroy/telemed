@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import Header from '@/components/Header'
+import Link from 'next/link'
 const LoginPage = () => {
     const store = useStore()
     const router = useRouter()
@@ -57,9 +58,9 @@ const LoginPage = () => {
                             </h2>
                             <p className="mt-2 text-sm leading-6 text-gray-500">
                                 Не зарегистрированы?{' '}
-                                <a onClick={()=>{router.push('/registration')}} className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+                                <Link href='/registration' className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
                                     Регистрация
-                                </a>
+                                </Link>
                             </p>
                         </div>
                         
@@ -103,21 +104,21 @@ const LoginPage = () => {
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
-                                    <input
-                                        id="remember-me"
-                                        name="remember-me"
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                    />
-                                    <label htmlFor="remember-me" className="ml-3 block text-sm leading-6 text-gray-700">
-                                        Запомнить меня
-                                    </label>
+                                        <input
+                                            id="remember-me"
+                                            name="remember-me"
+                                            type="checkbox"
+                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        />
+                                        <label htmlFor="remember-me" className="ml-3 block text-sm leading-6 text-gray-700">
+                                            Запомнить меня
+                                        </label>
                                     </div>
 
                                     <div className="text-sm leading-6">
-                                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                        Забыли пароль?
-                                    </a>
+                                        <Link href="/login/restore_password" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                            Забыли пароль?
+                                        </Link>
                                     </div>
                                 </div>
 

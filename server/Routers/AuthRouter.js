@@ -16,4 +16,8 @@ router.post('/user/:userId/setPassword', AuthController.setPassword)
 
 router.post('/user/changeUser', AuthController.changeUser)
 
+router.post('/user/send-recovery-code', AuthController.sendRecoveryCode)
+
+router.post('/user/reset-password', AuthController.resetPassword)
+
 module.exports = router;

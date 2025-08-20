@@ -329,6 +329,28 @@ class UserService {
             throw e
         }
     }
+
+    async getUserByPhone(phone) {
+        try {
+            const user = await database["Users"].findOne({
+                where: {
+                    phone: phone,
+                    login: phone
+                },
+                include: [
+                    {
+                        model: database["UsersRoles"],
+                        required: true
+                    }
+                ],
+            })
+            return user
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
 }
 
 

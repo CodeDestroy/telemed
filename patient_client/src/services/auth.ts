@@ -43,5 +43,13 @@ export default class AuthService {
         return $api.post<User>('/api/user/changeUser', {user})
     }
 
+    static async sendRecoveryCode(phone: string): Promise<AxiosResponse<boolean>> {
+        return $api.post<boolean>('/api/user/send-recovery-code', { phone })
+    }
+
+    static async resetPassword(phone: string, code: string, password: string): Promise<AxiosResponse<boolean>> {
+        return $api.post<boolean>('/api/user/reset-password', {phone, code, password})
+    }
+
     
 }

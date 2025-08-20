@@ -206,6 +206,51 @@ class AuthController {
             })
         }
     }
+
+    async sendRecoveryCode (req, res) {
+        try {
+            const {phone} = req.body
+            const user = await userService.checkPhone(phone)
+            if (!user) throw ApiError.BadRequest('Пользователь с таким номером телефона не зарегистрирован')
+            const newCode = await CodeService.createNewCode(user.id, 180)
+           
+            const transporter = await MailManager.getTransporter()
+            const mailOptions = await MailManager.getMailOptionsRestorePasswordCode(user.email, newCode.code)
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    res.status(200).send(false)
+                    return console.log(error);
+                }
+                console.log('Сообщение отправленно: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            });
+            res.status(200).send(true)
+        }
+        catch (e) {
+            res.status(500).json({
+                error: e.message
+            })
+        }
+    }
+
+    async resetPassword (req, res) {
+        try {
+            const {phone, code, password} = req.body
+            const user = await userService.checkPhone(phone)
+            if (!user) throw ApiError.BadRequest('Пользователь с таким номером телефона не зарегистрирован')
+            const confirmedCode = await CodeService.checkCode(user.id, code)
+            if (confirmedCode !== null) {
+                await userService.setPassword(user.id, password)
+                user.save()
+            }
+            res.status(200).send(true)
+        }
+        catch (e) {
+            res.status(500).json({
+                error: e.message
+            })
+        }
+    }
 }
 
 module.exports = new AuthController()

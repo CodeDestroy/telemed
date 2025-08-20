@@ -113,4 +113,38 @@ export default class Store {
       this.setLoading(false)
     }
   }
+
+  sendRecoveryCode = async (phone: string) => {
+    try {
+      await AuthService.sendRecoveryCode(phone)
+      return true
+    } catch (e: unknown) {
+      const err = e as AxiosError
+      this.setUser(null)
+      this.setAuth(false)
+      this.setError(err.response?.data || 'Ошибка отправки кода')
+      localStorage.removeItem('token')
+      throw e
+    } finally {
+      this.setLoading(false)
+    }
+  }
+
+  resetPassword = async (phone: string, code: string, password: string) => {
+    try {
+      await AuthService.resetPassword(phone, code, password)
+      return true
+    } catch (e: unknown) {
+      const err = e as AxiosError
+      this.setUser(null)
+      this.setAuth(false)   
+      this.setError(err.response?.data || 'Ошибка при сбросе пароля')
+      localStorage.removeItem('token')
+      throw e
+    } finally {
+      this.setLoading(false)
+    }
+
+  
+  }
 }
