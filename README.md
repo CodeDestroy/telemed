@@ -18,3 +18,12 @@ npm install
 node ./index.js
 в дериктории client/tmk_client
 npm start
+
+
+next js (patient_client)
+В терминале npm install
+Создать .env (или скопировать из client/tmk_client)
+NEXT_PUBLIC_MED_ORG_ID = 1
+NEXT_PUBLIC_PUBLIC_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS"
+NEXT_PUBLIC_SERVER_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" //вроде не используется
+NEXT_PUBLIC_CLIENT_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" //вроде не используется
