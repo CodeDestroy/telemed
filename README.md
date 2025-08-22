@@ -20,10 +20,10 @@ node ./index.js
 npm start
 
 
-next js (patient_client)
-В терминале npm install
-Создать .env (или скопировать из client/tmk_client)
-NEXT_PUBLIC_MED_ORG_ID = 1
-NEXT_PUBLIC_PUBLIC_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS"
-NEXT_PUBLIC_SERVER_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" //вроде не используется
+next js (patient_client) <br>
+В терминале npm install <br>
+Создать .env (или скопировать из client/tmk_client) <br>
+NEXT_PUBLIC_MED_ORG_ID = 1 <br>
+NEXT_PUBLIC_PUBLIC_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" <br>
+NEXT_PUBLIC_SERVER_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" //вроде не используется <br>
 NEXT_PUBLIC_CLIENT_URL="URL ЛОКАЛЬНОГО СЕРВЕРА (БЭК) NODEJS" //вроде не используется
