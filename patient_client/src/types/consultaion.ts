@@ -41,7 +41,8 @@ export interface ConsultationFull {
     type: string | undefined,
     updatedAt: string | undefined,
     userId: number | undefined,
-    postName: string | undefined
+    postName: string | undefined,
+    avatar: string | undefined
 }
 
 export interface SlotWithRoomPatient {

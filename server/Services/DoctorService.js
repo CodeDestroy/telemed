@@ -176,6 +176,10 @@ class DoctorService {
                         where: {
                             id: medOrgId
                         }
+                    },
+                    {
+                        model: database["Users"],
+                        required: true
                     }
                 ]
             })
@@ -197,6 +201,10 @@ class DoctorService {
                     },
                     {
                         model: database["MedicalOrgs"],
+                        required: true
+                    },
+                    {
+                        model: database["Users"],
                         required: true
                     }
                 ]

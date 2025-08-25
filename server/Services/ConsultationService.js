@@ -285,11 +285,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     post."postName" as "postName",
                     url."shortUrl" as "dUrl", 
-                    url2."shortUrl" as "pUrl", *
+                    url2."shortUrl" as "pUrl", usr."avatar" as "avatar", *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
                 join "Doctors" d on d.id = s."doctorId" 
+                join "Users" usr on usr.id = d."userId"
                 join "Urls" url on url."userId" = d."userId" 
                 join "Urls" url2 on url2."userId" = p."userId" 
                 join "Posts" post on post.id = d."postId"
@@ -367,11 +368,12 @@ class ConsultationService {
                     d."patronomicName" as "dPatronomicName", 
                     post."postName" as "postName",
                     url."shortUrl" as "dUrl", 
-                    url2."shortUrl" as "pUrl", *
+                    url2."shortUrl" as "pUrl", usr."avatar" as "avatar", *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
                 join "Doctors" d on d.id = s."doctorId" 
+                join "Users" usr on usr.id = d."userId"
                 join "Urls" url on url."userId" = d."userId" 
                 join "Urls" url2 on url2."userId" = p."userId" 
                 join "Posts" post on post.id = d."postId"
@@ -379,7 +381,7 @@ class ConsultationService {
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
                     and s."patientId" = :patientId 
-                    and (r."ended" != true or r."ended" is null) `, 
+                    and ((r."ended" != true or r."ended" is null) and (s."slotStatusId" != 4 or s."slotStatusId" != 5)) `, 
             {
                 replacements: { patientId: patientId}, 
                 raw: true
@@ -483,6 +485,10 @@ class ConsultationService {
                         include: [
                             {
                                 model: database["Posts"],
+                                required: true
+                            },
+                            {
+                                model: database["Users"],
                                 required: true
                             }
                         ]

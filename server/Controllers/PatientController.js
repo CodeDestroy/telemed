@@ -15,7 +15,8 @@ class PatientController {
             console.log(data)
             return res.status(200).json({data}) */
             const {userId} = req.query
-            const {previous} = (req.query.previous === 'true' ? true : false)
+            const previous = (req.query.previous === 'true' ? true : false)
+            console.log(previous)
             const patient = await PatientService.getPatientByUserId(userId)
             if (previous){
                 const activeSlots = await ConsultationService.getEndedPatientSlots(patient.id)

@@ -154,7 +154,8 @@ const DoctorPage = () => {
 
         <div className="bg-white shadow rounded-lg p-6 flex gap-6 items-center">
           <img
-            src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            src={doctor?.doctor.User?.avatar}
             alt={`${doctor?.doctor.secondName} ${doctor?.doctor.firstName}`}
             className="w-24 h-24 rounded-full object-cover"
           />

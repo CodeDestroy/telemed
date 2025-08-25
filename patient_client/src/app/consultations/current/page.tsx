@@ -21,7 +21,6 @@ const Page = () => {
             if (store.user?.id) {
                 const response = await ConsultationService.getCurrentConsultations(store.user.id)
                 const data: ConsultationFull[] = response.data
-                console.log(data)
                 setConsultations(data)
             }
             
@@ -32,7 +31,6 @@ const Page = () => {
     }
 
     useEffect(() => {
-        console.log(store.isAuth)
         fetchConsultations()
 
     }, [])
@@ -61,6 +59,12 @@ const Page = () => {
                                 >
                                 {/* Левая часть — инфа о консультации */}
                                 <div className="flex-1">
+                                    <img
+                                        //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                        src={consultation?.avatar}
+                                        alt={`Фото`}
+                                        className="w-24 h-24 rounded-full object-cover"
+                                    />
                                     <div className="flex items-center gap-x-4 text-xs">
                                         <time dateTime={consultation.slotStartDateTime} className="text-gray-500">
                                             {dayjs(consultation.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
@@ -73,7 +77,7 @@ const Page = () => {
                                         <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
                                             <a href={`/rooms/${consultation.roomId}`}>
                                             <span className="absolute inset-0" />
-                                            {consultation.pSecondName} {consultation.pFirstName} {consultation.pPatronomicName}
+                                                {consultation.dSecondName} {consultation.dFirstName} {consultation.dPatronomicName}
                                             </a>
                                         </h3>
                                         <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
@@ -85,7 +89,7 @@ const Page = () => {
                                             <p className="font-semibold text-gray-900">
                                             <a href={(consultation.doctorId)?.toString()}>
                                                 <span className="absolute inset-0" />
-                                                {consultation.dSecondName} {consultation.dFirstName} {consultation.dPatronomicName}
+                                                {consultation.pSecondName} {consultation.pFirstName} {consultation.pPatronomicName}
                                             </a>
                                             </p>
                                             <p className="text-gray-600">{consultation.postName}</p>

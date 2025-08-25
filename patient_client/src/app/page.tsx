@@ -41,7 +41,6 @@ function Home () {
             const response = await main.getDoctorList(new Date(), medOrgId)
             setDoctorListWithSchedule(response.data)
             const data: DoctorListItemResponse[] = response.data
-            
             const list: Doctor[] = []
             data.map((item) => {
                 list.push(item.doctor)
@@ -206,7 +205,8 @@ function Home () {
                                             <div className="col-span-12 sm:col-span-7 flex min-w-0 gap-x-4">
                                                 <img
                                                     alt=""
-                                                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                    src={item.doctor.User?.avatar}
                                                     className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                                 />
                                                 <div className="min-w-0 flex-auto">

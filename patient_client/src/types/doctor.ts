@@ -1,5 +1,6 @@
 import MedicalOrg from "./medicalOrg";
 import Post from "./posts";
+import { User } from "./user";
 
 export interface Doctor {
   id: number,
@@ -12,4 +13,5 @@ export interface Doctor {
   Post: Post | null
   info: string | null,
   MedOrg: MedicalOrg | null,
+  User: User | null
 }
