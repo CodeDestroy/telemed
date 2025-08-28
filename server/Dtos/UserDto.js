@@ -19,7 +19,34 @@ class UserDto {
             info: person.info,
             birthDate: person.birthDate,
             personId: person.id,
-            snils: person.snils
+            snils: person.snils,
+            medicalOrgs: person?.MedicalOrg 
+        }
+        return (result)
+    }
+
+    async serializeWorker(user, user_role, persons) {
+        const result = {
+            id: parseInt(user.id),
+            login: user.login,
+            password: user.password,
+            accessLevel: user_role.accessLevel,
+            avatar: user.avatar,
+            email: user.email,
+            phone: user.phone,
+            schedulerType: user.schedulerType,
+            //payload2
+            roleName: user_role.roleName,
+            secondName: persons[0].secondName,
+            firstName: persons[0].firstName,
+            patronomicName: persons[0].patronomicName,
+            /* info: person.info, */
+            birthDate: persons[0].birthDate,
+            isWorker: true,
+            /* personId: person.id,
+            snils: person.snils,
+            medicalOrgs: person?.MedicalOrg  */
+            persons: persons
         }
         return (result)
     }

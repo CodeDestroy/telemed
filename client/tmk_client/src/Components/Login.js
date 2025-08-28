@@ -26,7 +26,6 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await store.login(phone, password)
-        
             if (response.status !== 200) {
                 /* alert(response.response.data) */
                 console.log(store.error)
@@ -41,6 +40,12 @@ const Login = () => {
     const clearPhone = async () => {
         setPhone('')
     }
+
+    useEffect(() => {
+        if (store.mustSelect && store.isAuth && !store.isSelected) {
+            console.log('Выберите профиль')
+        }
+    }, [store.mustSelect])
 
     if (!store.isAuth) 
         return (

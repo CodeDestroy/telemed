@@ -1,12 +1,15 @@
 import { makeAutoObservable } from "mobx";
 
 import AuthService from "../Services/AuthService";
-
 /* import UserDto from "../dtos/user-dto"; */
 //import { AuthResponse } from "../models/response/AuthResponse";
 
 export default class Store {
     user = {};
+    profiles = [];
+    selectedProfile = {};
+    isSelected = false;
+    mustSelect = true;
     isAuth = false;
     isLoading = false;
     error = '';
@@ -29,14 +32,59 @@ export default class Store {
     setError (error) {
         this.error = error
     }
-    
+    setSelectedProfile (worker) {
+        this.user.medOrgId = worker.medOrgId
+        this.user.MedicalOrg = worker.MedicalOrg
+        this.user.Post = worker.Post
+        this.user.info = worker.info
+        this.user.postId = worker.postId
+        this.user.personId = worker.id
+        this.selectedProfile = worker
+        localStorage.setItem('profile', worker.id);
+    }
+    setProfiles(profiles) {
+        this.profiles = profiles
+    }
     async login (login, password){
         this.setLoading(true)
         try {
             const response = await AuthService.login(login, password);   
+            
             if (response.status === 200) {
+                let tempUser = response.data.user;
+                if (tempUser.accessLevel === 1) {
+                    this.setLoading(false)
+                    const res = {response: {
+                        data: 'Запрещён вход для пациентов',
+                        redirect: process.env.REACT_APP_PATIENT_CLIENT_URL
+                    }}
+                    this.setError('Нет профиля')
+                    return res
+                }
+                if (tempUser.persons.length === 0 ) {
+                    this.setLoading(false)
+                    const res = {response: {
+                        data: 'Нет профиля'
+                    }}
+                    this.setError('Нет профиля')
+                    return res
+                }
+                else if (tempUser.persons.length === 1) {
+                    tempUser.medOrgId = this.user.persons[0].medOrgId
+                    tempUser.info = this.user.persons[0].info
+                    tempUser.postId = this.user.persons[0].postId
+                    tempUser.personId = this.user.persons[0].id
+                    this.setProfiles(tempUser.persons)
+                    this.isSelected = true;
+                    this.mustSelect = false;
+                    localStorage.setItem('profile', this.user.persons[0].id);
+                }
+                else {
+                    this.setProfiles(tempUser.persons)
+                    this.mustSelect = true
+                }
 
-                this.setUser(response.data.user);
+                this.setUser(tempUser);
                 localStorage.setItem('token', response.data.accessToken);
                 this.setAuth(true);
                 this.setLoading(false)
@@ -53,6 +101,7 @@ export default class Store {
             
         }
         catch (e) {
+            console.log(e)
             this.setError(e.response.data)
             
             return (e)
@@ -89,8 +138,15 @@ export default class Store {
         try {
             await AuthService.logout();
             localStorage.removeItem('token');
+            localStorage.removeItem('profile');
             this.setAuth(false);
             this.setLoading(false)
+            this.setSelectedProfile({})
+            this.mustSelect = true
+            this.isSelected = false
+            
+            this.setProfiles([])
+
             this.setError('')
             this.setUser({});
         }
@@ -116,15 +172,73 @@ export default class Store {
     }
 
     async checkAuth () {
+        console.log(`профиль: ${localStorage.getItem('profile')}`)
         this.setLoading(true)
         try {
             
             const response = await AuthService.refresh();
             localStorage.setItem('token', response.data.accessToken);
             /* const user = await UserDto.deserialize(response.data.user) */
-            this.setUser(response.data.user);
-            this.setAuth(true);
-            return true;
+            if (response.status === 200) {
+                let tempUser = response.data.user;
+                if (localStorage.getItem('profile')) {
+                    tempUser.persons.forEach((profile) => {
+                        if (profile.id === Number(localStorage.getItem('profile'))) {
+                            this.setSelectedProfile(profile)
+                            this.mustSelect = false
+                            this.isSelected = true
+                            
+                        }
+                    })
+                }
+                else {
+                    if (tempUser.accessLevel === 1) {
+                        this.setLoading(false)
+                        const res = {response: {
+                            data: 'Запрещён вход для пациентов',
+                            redirect: process.env.REACT_APP_PATIENT_CLIENT_URL
+                        }}
+                        this.setError('Нет профиля')
+                        return res
+                    }
+                    if (tempUser.persons.length === 0 ) {
+                        this.setLoading(false)
+                        const res = {response: {
+                            data: 'Нет профиля'
+                        }}
+                        this.setError('Нет профиля')
+                        return res
+                    }
+                    else if (tempUser.persons.length === 1) {
+                        tempUser.medOrgId = this.user.persons[0].medOrgId
+                        tempUser.info = this.user.persons[0].info
+                        tempUser.postId = this.user.persons[0].postId
+                        tempUser.personId = this.user.persons[0].id
+                        this.setProfiles(tempUser.persons)
+                        this.isSelected = true;
+                        this.mustSelect = false
+                        
+                    }
+                    else {
+                        this.setProfiles(tempUser.persons)
+                        this.mustSelect = true;
+                    }
+                }
+                
+                this.setUser(tempUser);
+                localStorage.setItem('token', response.data.accessToken);
+                this.setAuth(true);
+                this.setLoading(false)
+                return response
+            }
+            else {
+                this.setLoading(false)
+                const res = {response: {
+                    data: 'Неизвестная ошибка'
+                }}
+                this.setError('Неизвестная ошибка')
+                return res
+            }
         }
         catch (e){
             this.setUser({});

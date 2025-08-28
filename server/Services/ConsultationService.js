@@ -126,6 +126,48 @@ class ConsultationService {
         }   
     }
 
+    async getAllSlotsInMOByAdminId (adminId) {
+        try {
+            const admin = await database["Admins"].findByPk(adminId)
+
+            if (admin.medOrgId) {
+                const slots = await database.sequelize.query(`
+                    select s.id as "id" , 
+                        p."firstName" as "pFirstName", 
+                        p."secondName" as "pSecondName", 
+                        p."patronomicName" as "pPatronomicName", 
+                        d."firstName" as "dFirstName", 
+                        d."secondName" as "dSecondName", 
+                        d."patronomicName" as "dPatronomicName", 
+                        url."shortUrl" as "dUrl", 
+                        url2."shortUrl" as "pUrl", *
+                    from "Slots" s 
+                    left join "Rooms" r  on s.id = r."slotId" 
+                    left join "Patients" p on p.id  = s."patientId" 
+                    join "Doctors" d on d.id = s."doctorId" 
+                    join "Urls" url on url."userId" = d."userId" 
+                    join "Urls" url2 on url2."userId" = p."userId" 
+                    join "SlotStatuses" sst on sst.id = s."slotStatusId"
+                    where 
+                        d."medOrgId" = ${admin.medOrgId} and
+                        url2."roomId" = r.id 
+                        and url."roomId" = r.id `, 
+                {
+                    raw: false
+                })
+                return slots;
+            }
+            else {
+                throw new Error('Не найдена Мед Организация, обратитесь в поддержку.')
+            }
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+            throw e
+        }   
+    }
+
     async getAllDoctorSlotsRaw(doctorId) {
         try {
             /* const slots = await database["Slots.findAll({

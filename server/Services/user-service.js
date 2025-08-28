@@ -101,19 +101,48 @@ class UserService {
                     let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
+                    let doctors = await database["Doctors"].findAll({
+                        where: {
+                            userId: user.id
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            },
+                            {
+                                model: database["Posts"],
+                                required: false
+                            }
+                        ]
+                    })
+
                     const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
+                    const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
-                    const tokens = await tokenService.generateTokens({...userDto});
+                    const tokens = await tokenService.generateTokens({...newUserDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
-                    return { ...tokens, user: userDto } 
+                    return { ...tokens, user: newUserDto } 
                 case 3:
                     let admin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     
                     const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
@@ -126,7 +155,13 @@ class UserService {
                     let superAdmin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
                     /* console.log({...userDtoAdmin}) */
@@ -138,7 +173,13 @@ class UserService {
                     let operator = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)
                     /* console.log({...userDtoAdmin}) */
@@ -202,19 +243,55 @@ class UserService {
                     let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
-                    
+
+                    let doctors = await database["Doctors"].findAll({
+                        where: {
+                            userId: user.id
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            },
+                            {
+                                model: database["Posts"],
+                                required: false
+                            }
+                        ]
+                    })
+
                     const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
+                    const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
+                    /* console.log({...userDto}) */
+                    const tokens = await tokenService.generateTokens({...newUserDto});
+                    await tokenService.saveToken(user.id, tokens.refreshToken);
+                    //send answer (user and tokens)
+                    return { ...tokens, user: newUserDto } 
+                    
+                    /* const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const tokens = await tokenService.generateTokens({...userDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
-                    return { ...tokens, user: userDto } 
+                    return { ...tokens, user: userDto }  */
                 case 3:
                     let admin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
@@ -225,7 +302,13 @@ class UserService {
                     let superAdmin = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     
                     const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
@@ -238,7 +321,13 @@ class UserService {
                     let operator = await database["Admins"].findOne({
                         where: {
                             userId: user.id
-                        }
+                        },
+                        include: [
+                            {
+                                model: database["MedicalOrgs"],
+                                required: true
+                            }
+                        ]
                     })
                     
                     const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)

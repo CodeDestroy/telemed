@@ -23,7 +23,7 @@ class AdminController {
                 allSlots = await ConsultationService.getAllSlots()
             }
             else if (req.user.accessLevel === 3 || req.user.accessLevel === 5) {
-                allSlots = await ConsultationService.getAllSlotsInMO(req.user.id)
+                allSlots = await ConsultationService.getAllSlotsInMOByAdminId(req.user.personId)
             }
             else if (req.user.accessLevel === 2) {
                 allSlots = await ConsultationService.getAllDoctorSlotsRaw(req.user.personId)
@@ -255,7 +255,7 @@ class AdminController {
                 allDoctors = await DoctorService.getAllDoctors()
             }
             else if (req.user.accessLevel == 3 || req.user.accessLevel == 5) {
-                const medOrg = await MedicalOrgService.getMedOrgByUserId(req.user.id)
+                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.user.personId)
                 if (!medOrg) {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
                 }
@@ -365,7 +365,7 @@ class AdminController {
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
             }
             else if (req.user.accessLevel == 3) {
-                const medOrg = await MedicalOrgService.getMedOrgByUserId(req.user.id)
+                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.user.personId)
                 if (!medOrg) {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
                 }

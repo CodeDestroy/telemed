@@ -7,10 +7,6 @@ import { Context } from '../../../..';
 const DoctorDashboard = () => {
     const { store } = useContext(Context);
 
-    useEffect(() => {
-        console.log(store.user);
-    }, [store.user]);
-
     const cardStyle1 = { backgroundColor: '#e3f2fd', marginBottom: '1rem' };
     const cardStyle2 = { backgroundColor: '#ffebee', marginBottom: '1rem' };
     const cardStyle3 = { backgroundColor: '#e8f5e9', marginBottom: '1rem' };

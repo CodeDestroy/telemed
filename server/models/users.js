@@ -13,8 +13,10 @@ module.exports = (sequelize, DataTypes) => {
 
       Users.belongsTo(models.UsersRoles, { foreignKey: 'userRoleId' });
       Users.hasMany(models.Tokens, { foreignKey: 'userId' });
-      Users.hasOne(models.Doctors, { foreignKey: 'userId' });
-      Users.hasOne(models.Admins, { foreignKey: 'userId' });
+      /* Users.hasOne(models.Doctors, { foreignKey: 'userId' });
+      Users.hasOne(models.Admins, { foreignKey: 'userId' }); */
+      Users.hasMany(models.Doctors, { foreignKey: 'userId' });
+      Users.hasMany(models.Admins, { foreignKey: 'userId' });
       Users.hasOne(models.Patients, { foreignKey: 'userId' });
       Users.hasMany(models.Messages, { foreignKey: 'userId' });
       /* Users.hasMany(models.Files, { foreignKey: 'userId' }); */

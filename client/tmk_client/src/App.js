@@ -11,6 +11,7 @@ import doctorRouter from "./Routers/doctorRouter";
 import authRouter from './Routers/authRouter'
 import superAdminRouter from "./Routers/superAdminRouter";
 import operatorRouter from "./Routers/operatorRouter";
+import selectProfileRouter from "./Routers/selectProfileRouter";
 function App() {
   
   const { store } = useContext(Context);
@@ -48,7 +49,11 @@ function App() {
       );
     }
     else if (store.isAuth || localStorage.getItem('token')) {
+      
       html.style.removeProperty('font-size')
+      if (store.mustSelect && !store.isSelected) {
+        return (<RouterProvider router={selectProfileRouter} />)
+      }
       /* console.log('try to login') */
       switch (store.user.accessLevel) {
         case 1: 
