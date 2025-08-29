@@ -4,8 +4,8 @@ import {$api, $apiMultipartData} from "../api";
 
 export default class AdminService {
 
-    static async getConsultations () {
-        return $api.get('/api/admin/consultations/all');
+    static async getConsultations (personId) {
+        return $api.get('/api/admin/consultations/all', {params: {personId}});
     }
 
     static async getConsultationsByDate (date) {

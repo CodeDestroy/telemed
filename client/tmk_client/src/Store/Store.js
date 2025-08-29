@@ -172,7 +172,6 @@ export default class Store {
     }
 
     async checkAuth () {
-        console.log(`профиль: ${localStorage.getItem('profile')}`)
         this.setLoading(true)
         try {
             
@@ -185,6 +184,12 @@ export default class Store {
                     tempUser.persons.forEach((profile) => {
                         if (profile.id === Number(localStorage.getItem('profile'))) {
                             this.setSelectedProfile(profile)
+                            tempUser.medOrgId = profile.medOrgId
+                            tempUser.MedicalOrg = profile.MedicalOrg
+                            tempUser.Post = profile.Post
+                            tempUser.info = profile.info
+                            tempUser.postId = profile.postId
+                            tempUser.personId = profile.id
                             this.mustSelect = false
                             this.isSelected = true
                             
@@ -224,7 +229,6 @@ export default class Store {
                         this.mustSelect = true;
                     }
                 }
-                
                 this.setUser(tempUser);
                 localStorage.setItem('token', response.data.accessToken);
                 this.setAuth(true);

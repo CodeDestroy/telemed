@@ -137,14 +137,13 @@ function Index() {
         if (store?.user?.id) {
             async function fetchConsultations() {
                 try {
-                    const response = await DoctorService.getEndedConsultations(store.user.id);
+                    const response = await DoctorService.getEndedConsultationsByDoctorId(store.user.personId);
                     let array = response.data[0]
                     array = array.filter(item => item.type !== "protocol");
                     array.forEach(function(part, index, theArray) {
                         theArray[index].patient = `Пациент: ${theArray[index].pSecondName} ${theArray[index].pFirstName}`;
                         /* theArray[index].url = theArray[index].dUrl; */
                     });
-                    console.log(array)
                     setConsultations(array);
 
                 } catch (e) {

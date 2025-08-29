@@ -19,6 +19,7 @@ class AdminController {
     async getAllConsultations(req, res) {
         try {
             let allSlots = []
+            console.log(req.user)
             if (req.user.accessLevel === 4) {
                 allSlots = await ConsultationService.getAllSlots()
             }
@@ -26,7 +27,12 @@ class AdminController {
                 allSlots = await ConsultationService.getAllSlotsInMOByAdminId(req.user.personId)
             }
             else if (req.user.accessLevel === 2) {
-                allSlots = await ConsultationService.getAllDoctorSlotsRaw(req.user.personId)
+                if (!req.user.personId) {
+                    const {personId} = req.query
+                    console.log(personId)
+                    if (!personId) {throw new ApiError('personId is required', 400)}
+                    allSlots = await ConsultationService.getAllDoctorSlotsRaw(personId)
+                }
             }
             else if (req.user.accessLevel === 1) {
                 //Все слоты пациента
@@ -80,7 +86,6 @@ class AdminController {
     async createConsultation(req, res) {
         try {
             const {doctor, patient, startDateTime, duration, slotStatusId } = req.body
-            console.log(duration)
             const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)

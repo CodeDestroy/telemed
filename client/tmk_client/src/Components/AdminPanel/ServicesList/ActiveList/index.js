@@ -87,7 +87,7 @@ function Index() {
         if (store?.user?.id) {
             async function fetchConsultations() {
                 try {
-                    const response = await DoctorService.getConsultations(store.user.id);
+                    const response = await DoctorService.getConsultationsByDoctorId(store.user.personId);
                     let array = response.data[0]
 
                     array.forEach(function(part, index, theArray) {
