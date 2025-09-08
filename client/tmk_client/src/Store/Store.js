@@ -49,7 +49,7 @@ export default class Store {
         this.setLoading(true)
         try {
             const response = await AuthService.login(login, password);   
-            
+            console.log(response)
             if (response.status === 200) {
                 let tempUser = response.data.user;
                 if (tempUser.accessLevel === 1) {
@@ -70,14 +70,14 @@ export default class Store {
                     return res
                 }
                 else if (tempUser.persons.length === 1) {
-                    tempUser.medOrgId = this.user.persons[0].medOrgId
-                    tempUser.info = this.user.persons[0].info
-                    tempUser.postId = this.user.persons[0].postId
-                    tempUser.personId = this.user.persons[0].id
+                    tempUser.medOrgId = tempUser.persons[0].medOrgId
+                    tempUser.info = tempUser.persons[0].info
+                    tempUser.postId = tempUser.persons[0].postId
+                    tempUser.personId = tempUser.persons[0].id
                     this.setProfiles(tempUser.persons)
                     this.isSelected = true;
                     this.mustSelect = false;
-                    localStorage.setItem('profile', this.user.persons[0].id);
+                    localStorage.setItem('profile', tempUser.persons[0].id);
                 }
                 else {
                     this.setProfiles(tempUser.persons)
