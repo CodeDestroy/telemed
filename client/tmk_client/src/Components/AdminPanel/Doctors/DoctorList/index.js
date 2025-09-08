@@ -69,7 +69,7 @@ const DoctorList = () => {
         if (store?.user?.id) {
             async function fetchPatients() {
                 try {
-                    const response = await AdminService.getDoctors()
+                    const response = await AdminService.getDoctors(store.selectedProfile.id)
                     let array = response.data
 
                     setDoctors(array);

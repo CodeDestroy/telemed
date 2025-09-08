@@ -29,8 +29,8 @@ export default class AdminService {
     }
     
 
-    static async getDoctors() {
-        return $api.get('/api/admin/doctors/all');
+    static async getDoctors(profileId = null) {
+        return $api.get('/api/admin/doctors/all', {params: {profileId}});
     }
 
     static async getDoctor(doctorId) {
@@ -42,8 +42,8 @@ export default class AdminService {
     }
 
 
-    static async createDoctor(formData) {
-        return $apiMultipartData.post('/api/admin/doctors/create', formData);
+    static async createDoctor(formData, profileId = null) {
+        return $apiMultipartData.post('/api/admin/doctors/create', formData, {params: {profileId}});
     }
 
     static async createPatient(formData) {

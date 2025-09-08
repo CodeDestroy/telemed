@@ -4,7 +4,7 @@ import { DateField } from '@mui/x-date-pickers/DateField';
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useContext} from 'react'
 import AdminService from "../../../../Services/AdminService";
 import SchedulerService from "../../../../Services/SchedulerService";
 import DoctorService from "../../../../Services/DoctorService";
@@ -13,6 +13,7 @@ import { blue, grey } from '@mui/material/colors';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import adminLocations from "../../../../Locations/AdminLocations";
+import { Context } from '../../../../'
 
 import { IconButton, Snackbar, Checkbox, FormControlLabel, FormGroup  } from "@mui/material";
 import PatientCreateModal from '../../Modals/Patients/Create';
@@ -33,6 +34,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
         },
     });
     const event = scheduler.edited;
+    const { store } = useContext(Context);
     const [doctors, setDoctors] = useState([]);
     const [inputDoctorValue, setInputDoctorValue] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null)
@@ -236,7 +238,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
     };
 
     async function fetchDoctors() {
-        let response = await AdminService.getDoctors();
+        let response = await AdminService.getDoctors(store.selectedProfile.id);
         response.data.map((doc) => {
             doc.label = doc.secondName + " " + doc.firstName + " " + doc.patronomicName;
         })

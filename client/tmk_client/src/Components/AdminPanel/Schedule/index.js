@@ -34,8 +34,8 @@ function Schedule() {
     useEffect(() => {
         async function fetchDataSlots() {
             try {
-                console.log(store.user.personId)
-                const response = await AdminService.getConsultations(store.user.personId);
+                /* console.log(store.user.personId) */
+                const response = await AdminService.getConsultations(store.selectedProfile.id);
                 response.data[0].map((slot) => {
                     let color = "red"
                     switch (slot.slotStatusId) {
@@ -84,8 +84,6 @@ function Schedule() {
             
         }
         if (store.user){
-
-            console.log(store.user)
             fetchDataSlots()
         }
     }, [store.user])
