@@ -27,7 +27,7 @@ function CreateDateSchedule() {
     useEffect(() => {
         async function fetchDoctors() {
             try {
-                const response = await AdminService.getDoctors();
+                const response = await AdminService.getDoctors(store.selectedProfile.id);
                 if (response.status === 200) {
                     const arrayDoctors = response.data.map(doctor => ({ label: `${doctor.secondName} ${doctor.firstName}`, id: doctor.id }));
                     setDoctors(arrayDoctors);

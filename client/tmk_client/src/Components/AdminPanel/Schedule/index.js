@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { Context } from '../../../';
 import { IconButton, Snackbar, Checkbox } from "@mui/material";
+import { SubscriptionsOutlined } from '@mui/icons-material';
 function Schedule() {
     const {store} = useContext(Context)
     let [events, setEvents] = useState([])
@@ -33,7 +34,8 @@ function Schedule() {
     useEffect(() => {
         async function fetchDataSlots() {
             try {
-                const response = await AdminService.getConsultations();
+                /* console.log(store.user.personId) */
+                const response = await AdminService.getConsultations(store.selectedProfile.id);
                 response.data[0].map((slot) => {
                     let color = "red"
                     switch (slot.slotStatusId) {
@@ -81,8 +83,10 @@ function Schedule() {
             }
             
         }
-        fetchDataSlots()
-    }, [])
+        if (store.user){
+            fetchDataSlots()
+        }
+    }, [store.user])
 
 
     const handleEventsChange = (event) => {

@@ -8,8 +8,16 @@ export default class DoctorService {
         return $api.get('/api/doctor/consultations/active', {params: {userId, date}});
     }
 
+    static async getConsultationsByDoctorId (doctorId, date) {
+        return $api.get('/api/doctor/v2/consultations/active', {params: {doctorId, date}});
+    }
+
     static async getEndedConsultations (userId) {
         return $api.get('/api/doctor/consultations/ended', {params: {userId}})
+    }
+
+    static async getEndedConsultationsByDoctorId (doctorId) {
+        return $api.get('/api/doctor/v2/consultations/ended', {params: {doctorId}})
     }
 
     static async createScheduler (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {

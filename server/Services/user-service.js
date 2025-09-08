@@ -98,7 +98,7 @@ class UserService {
                     return { ...tokensPatient, user: userDtoPatient } 
                     break;
                 case 2:
-                    let doctor = await database["Doctors"].findOne({
+                    /* let doctor = await database["Doctors"].findOne({
                         where: {
                             userId: user.id
                         },
@@ -108,7 +108,7 @@ class UserService {
                                 required: true
                             }
                         ]
-                    })
+                    }) */
                     let doctors = await database["Doctors"].findAll({
                         where: {
                             userId: user.id
@@ -125,7 +125,7 @@ class UserService {
                         ]
                     })
 
-                    const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
+                    //const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
                     const tokens = await tokenService.generateTokens({...newUserDto});
@@ -133,7 +133,7 @@ class UserService {
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
                 case 3:
-                    let admin = await database["Admins"].findOne({
+                    let admins = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -145,14 +145,14 @@ class UserService {
                         ]
                     })
                     
-                    const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
+                    const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
                     /* console.log({...userDtoAdmin}) */
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin } 
                 case 4:
-                    let superAdmin = await database["Admins"].findOne({
+                    let superAdmins = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -163,14 +163,14 @@ class UserService {
                             }
                         ]
                     })
-                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
+                    const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
                     const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }
                 case 5:
-                    let operator = await database["Admins"].findOne({
+                    let operators = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -181,7 +181,7 @@ class UserService {
                             }
                         ]
                     })
-                    const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)
+                    const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
                     const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);
@@ -240,17 +240,6 @@ class UserService {
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
                 case 2:
-                    let doctor = await database["Doctors"].findOne({
-                        where: {
-                            userId: user.id
-                        },
-                        include: [
-                            {
-                                model: database["MedicalOrgs"],
-                                required: true
-                            }
-                        ]
-                    })
 
                     let doctors = await database["Doctors"].findAll({
                         where: {
@@ -267,22 +256,14 @@ class UserService {
                             }
                         ]
                     })
-
-                    const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
                     const tokens = await tokenService.generateTokens({...newUserDto});
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
-                    
-                    /* const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
-                    const tokens = await tokenService.generateTokens({...userDto});
-                    await tokenService.saveToken(user.id, tokens.refreshToken);
-                    //send answer (user and tokens)
-                    return { ...tokens, user: userDto }  */
                 case 3:
-                    let admin = await database["Admins"].findOne({
+                    let admins = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -293,13 +274,13 @@ class UserService {
                             }
                         ]
                     })
-                    const userDtoAdmin = await UserDto.deserialize(user, user.UsersRole, admin)
+                    const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
                     const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
                     await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin }
                 case 4:
-                    let superAdmin = await database["Admins"].findOne({
+                    let superAdmins = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -311,14 +292,14 @@ class UserService {
                         ]
                     })
                     
-                    const userDtoSuperAdmin = await UserDto.deserialize(user, user.UsersRole, superAdmin)
+                    const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
                     const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }  
                 case 5:
-                    let operator = await database["Admins"].findOne({
+                    let operators = await database["Admins"].findAll({
                         where: {
                             userId: user.id
                         },
@@ -330,7 +311,7 @@ class UserService {
                         ]
                     })
                     
-                    const userDtoOperator = await UserDto.deserialize(user, user.UsersRole, operator)
+                    const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
                     const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);

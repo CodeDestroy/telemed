@@ -19,14 +19,21 @@ class AdminController {
     async getAllConsultations(req, res) {
         try {
             let allSlots = []
+            let personId = req.user.personId
+            console.log(req.query)
+            if (!personId) {
+                personId = req.query.personId
+            }
+            console.log(personId)
             if (req.user.accessLevel === 4) {
                 allSlots = await ConsultationService.getAllSlots()
             }
             else if (req.user.accessLevel === 3 || req.user.accessLevel === 5) {
-                allSlots = await ConsultationService.getAllSlotsInMOByAdminId(req.user.personId)
+                allSlots = await ConsultationService.getAllSlotsInMOByAdminId(personId)
             }
             else if (req.user.accessLevel === 2) {
-                allSlots = await ConsultationService.getAllDoctorSlotsRaw(req.user.personId)
+                if (!personId) {throw new ApiError('personId is required', 400)}
+                allSlots = await ConsultationService.getAllDoctorSlotsRaw(personId)
             }
             else if (req.user.accessLevel === 1) {
                 //Все слоты пациента
@@ -80,7 +87,6 @@ class AdminController {
     async createConsultation(req, res) {
         try {
             const {doctor, patient, startDateTime, duration, slotStatusId } = req.body
-            console.log(duration)
             const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
@@ -255,7 +261,8 @@ class AdminController {
                 allDoctors = await DoctorService.getAllDoctors()
             }
             else if (req.user.accessLevel == 3 || req.user.accessLevel == 5) {
-                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.user.personId)
+                if (!req.query.profileId) throw ApiError.BadRequest('ProfileId не может быть Null')
+                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.query.profileId)
                 if (!medOrg) {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
                 }
@@ -342,6 +349,7 @@ class AdminController {
                 inn,
                 snils
             } = req.body;
+            
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             let errors = ''
@@ -360,12 +368,14 @@ class AdminController {
 
             if (req.user.accessLevel == 4) {
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1)
 
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
             }
             else if (req.user.accessLevel == 3) {
-                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.user.personId)
+                
+                if (!req.query.profileId) throw ApiError.BadRequest('ProfileId не может быть Null')
+                const medOrg = await MedicalOrgService.getMedOrgByAdminId(req.query.profileId)
                 if (!medOrg) {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
                 }

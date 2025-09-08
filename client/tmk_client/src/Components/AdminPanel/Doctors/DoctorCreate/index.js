@@ -2,10 +2,11 @@ import SubMenu from '../../../SubMenu';
 import Header from '../../Header';
 import menuItems from '../../../SubMenu/AdminDoctorManagmentSub';
 import CloseIcon from '@mui/icons-material/Close';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Container, TextField, Button, Box, IconButton, InputAdornment, Snackbar } from '@mui/material';
 import { Visibility, VisibilityOff, FileCopy } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Context } from '../../../..';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -17,6 +18,7 @@ const generatePassword = () => {
 };
 
 const DoctorCreate = () => {
+    const { store } = useContext(Context);
     const [password, setPassword] = useState(generatePassword());
     const [showPassword, setShowPassword] = useState(false);
     const [avatar, setAvatar] = useState(null);
@@ -66,7 +68,7 @@ const DoctorCreate = () => {
         }
         // Здесь должна быть логика создания нового пациента
         try {
-            const response = await AdminService.createDoctor(formData)
+            const response = await AdminService.createDoctor(formData, store.selectedProfile.id)
 
             if (response.status !== 500) {
                 setSaved(true);

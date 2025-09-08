@@ -25,10 +25,44 @@ class DoctorController {
         
     }
 
+    async getConsultationsByDoctorId(req, res) {
+        try {
+            const {doctorId} = req.query
+            const doctor = await DoctorService.getDoctor(doctorId)
+            const {date} = req.query
+            let activeSlots = []
+            if (!date) {
+                activeSlots = await ConsultationService.getActiveDoctorSlots(doctor.id)
+                
+            }
+            else {
+                activeSlots = await ConsultationService.getActiveDoctorSlotsByDate(doctor.id, date)
+            }
+            res.status(200).json(activeSlots)
+            
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+        
+    }
+
     async getEndedConsultations (req, res) {
         try {
             const {userId} = req.query
             const doctor = await DoctorService.getDoctorByUserId(userId)
+            const activeSlots = await ConsultationService.getEndedDoctorSlots(doctor.id)
+            res.status(200).json(activeSlots)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async getEndedConsultationsByDoctorId (req, res) {
+        try {
+            const {doctorId} = req.query
+            const doctor = await DoctorService.getDoctor(doctorId)
             const activeSlots = await ConsultationService.getEndedDoctorSlots(doctor.id)
             res.status(200).json(activeSlots)
         }
