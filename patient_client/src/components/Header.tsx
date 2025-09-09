@@ -11,19 +11,6 @@ import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import Link from 'next/link'
-/* const products = [
-  { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: ChartPieIcon },
-  { name: 'Engagement', description: 'Speak directly to your customers', href: '#', icon: CursorArrowRaysIcon },
-  { name: 'Security', description: 'Your customers’ data will be safe and secure', href: '#', icon: FingerPrintIcon },
-  { name: 'Integrations', description: 'Connect with third-party tools', href: '#', icon: SquaresPlusIcon },
-  { name: 'Automations', description: 'Build strategic funnels that will convert', href: '#', icon: ArrowPathIcon },
-] */
-const callsToAction = [
-  { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
-  { name: 'Contact sales', href: '#', icon: PhoneIcon },
-]
-
-
 
 const Header = () => {
     const router = useRouter()
@@ -63,12 +50,6 @@ const Header = () => {
                     <Link href="/" className="text-sm font-semibold leading-6 text-gray-900">
                         Главная
                     </Link>
-
-                    {/* <Link href='/consultations/previous/' className="text-sm font-semibold leading-6 text-gray-900">
-                        Прошедшие консультации
-                    </Link> */}
-
-
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
                             Консультации
@@ -123,35 +104,12 @@ const Header = () => {
                             </div> */}
                         </PopoverPanel>
                     </Popover>
-
-                    {/* <Link href="#" className="text-sm font-semibold leading-6 text-gray-900">
-                        Features
+                    <Link href="/pricing" className="text-sm font-semibold leading-6 text-gray-900">
+                        Цены
                     </Link>
-                    <Link href="#" className="text-sm font-semibold leading-6 text-gray-900">
-                        Marketplace
-                    </Link>*/}
-
-                    {/* <Popover className="relative">
-                        <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
-                            Company
-                            <ChevronDownIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
-                        </PopoverButton>
-
-                        <PopoverPanel
-                            transition
-                            className="absolute -left-8 top-full z-10 mt-3 w-96 rounded-3xl bg-white p-4 shadow-lg ring-1 ring-gray-900/5 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
-                            >
-                            {company.map((item) => (
-                                <div key={item.name} className="relative rounded-lg p-4 hover:bg-gray-50">
-                                <a href={item.href} className="block text-sm font-semibold leading-6 text-gray-900">
-                                    {item.name}
-                                    <span className="absolute inset-0" />
-                                </a>
-                                <p className="mt-1 text-sm leading-6 text-gray-600">{item.description}</p>
-                                </div>
-                            ))}
-                        </PopoverPanel>
-                    </Popover> */}
+                    <Link href="/contacts" className="text-sm font-semibold leading-6 text-gray-900">
+                        Контакты
+                    </Link>
                 </PopoverGroup> 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                     { store.isAuth === false ?
@@ -225,28 +183,7 @@ const Header = () => {
                                         Главная
                                     </Link>
                                 </div>
-                                {/* <div className="space-y-2 py-6">
-                                    <Link
-                                        href='/consultations/previous/'
-                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                    >
-                                        Прошедшие консультации
-                                    </Link>
-                                </div> */}
-                                 
                                 <div className="space-y-2 py-6">
-                                    {/* {products.map((item) => (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                        >
-                                            <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                                                <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
-                                            </div>
-                                            {item.name}
-                                        </Link>
-                                    ))} */}
                                     <Link
                                         href="/consultations/current"
                                         className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
@@ -266,7 +203,22 @@ const Header = () => {
                                         Завершённые консультации
                                     </Link>
                                 </div>
-                                
+
+                                <div className="space-y-2 py-6">
+                                    <Link
+                                        href="/pricing"
+                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        Цены
+                                    </Link>
+                                    <Link
+                                        href="/contacts"
+                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        Контакты
+                                    </Link>
+                                </div>
+
                                 { store.isAuth === false ?
                                     <div className="py-6">
                                         <button
@@ -297,17 +249,6 @@ const Header = () => {
                             </div>
                         </div>
                     </div>
-                    {/* <div className="sticky bottom-0 grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50 text-center">
-                        {callsToAction.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className="p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-100"
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </div> */}
                 </DialogPanel>
             </Dialog>
         </header>
