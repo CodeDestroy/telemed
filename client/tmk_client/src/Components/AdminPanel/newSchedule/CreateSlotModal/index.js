@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-/* import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal'; */
 import Backdrop from '@mui/material/Backdrop';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -9,7 +7,6 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { BorderAllRounded } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import AdminService from '../../../../Services/AdminService';
 import PatientCreateModal from '../../Modals/Patients/Create';
@@ -70,7 +67,7 @@ const CreateSlotModal = (props) => {
             const start = dayjs(`${props.item.date}T${props.item.scheduleStartTime}`);
             const end = dayjs(`${props.item.date}T${props.item.scheduleEndTime}`);
             const durationInMinutes = end.diff(start, 'minute');
-            const response = await AdminService.createSlot(props.doctor, selectedPatient, dayjs(datetimeStr), durationInMinutes)
+            const response = await AdminService.createSlot(props.doctor, selectedPatient, dayjs(datetimeStr), durationInMinutes, 2)
             if (response.status == 200) {
                 alert('Успешно')
                 window.location.reload();
