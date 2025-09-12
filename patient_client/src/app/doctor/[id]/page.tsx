@@ -8,7 +8,7 @@ import DoctorListItemResponse from '@/types/main'
 import main from "@/services/main";
 import Header from "@/components/Header";
 import { store } from "@/store";
-import { Slot } from "@/types/consultaion";
+import { ScheduleSlot, Slot } from "@/types/consultaion";
 import Link from "next/link";
 
 import { TextField, MenuItem, Select, Button } from "@mui/material";
@@ -67,9 +67,10 @@ const DoctorPage = () => {
 
       const slots: string[] = [];
 
-      schedule.forEach((slot: Slot) => {
+      schedule.forEach((slot: ScheduleSlot) => {
         let start = dayjs(`${date}T${slot.scheduleStartTime}`);
         const end = dayjs(`${date}T${slot.scheduleEndTime}`);
+        const now = dayjs(); // текущее время
 
         while (start.isBefore(end)) {
           const formatted = start.format("HH:mm");
@@ -79,7 +80,7 @@ const DoctorPage = () => {
             dayjs(c.slotStartDateTime).isSame(start, "minute") && c.slotStatusId !== 5
           );
 
-          if (!isUnavailable) {
+          if (!isUnavailable && start.isAfter(now)) {
             slots.push(formatted);
           }
 
@@ -115,9 +116,10 @@ const DoctorPage = () => {
           startDateTime,
           60,
         );
-
         if (response.status === 200) {
-          alert("Вы успешно записаны!");
+          //alert("Вы успешно записаны!");
+          /* console.log( `/payments/${response.data?.newPayment?.uuid4}`) */
+          window.location.href = `/payments/${response.data?.newPayment?.uuid4}`;
         } else {
           alert("Не удалось записаться, попробуйте позже");
         }

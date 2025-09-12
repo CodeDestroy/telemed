@@ -8,6 +8,7 @@ const UrlManager = require('../Utils/UrlManager')
 const CLIENT_URL = process.env.CLIENT_URL;
 const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const MailManager = require("../Utils/MailManager");
+const PaymentService = require("../Services/PaymentService");
 class PatientController {
     async getConsultations (req, res) {
         try {
@@ -16,7 +17,6 @@ class PatientController {
             return res.status(200).json({data}) */
             const {userId} = req.query
             const previous = (req.query.previous === 'true' ? true : false)
-            console.log(previous)
             const patient = await PatientService.getPatientByUserId(userId)
             if (previous){
                 const activeSlots = await ConsultationService.getEndedPatientSlots(patient.id)
@@ -71,6 +71,7 @@ class PatientController {
             const doctor = await DoctorService.getDoctor(doctorId)
             const patient = await PatientService.getPatient(patientId)
             const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
+            const newPayment = await PaymentService.createPayment(patient.userId, 3, 1800, newSlot.id, 'Оплата ТМК')
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
             const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)
@@ -139,7 +140,7 @@ class PatientController {
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
             } */
-            res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom})
+            res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom, newPayment})
         }
         catch (e) {
             console.log(e)

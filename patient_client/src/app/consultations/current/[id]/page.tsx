@@ -45,6 +45,8 @@ const Page = () => {
     ? dayjs().isAfter(dayjs(consultation.slotStartDateTime).subtract(30, 'minute'))
     : false
 
+    const paymentStatus = consultation.Payment?.paymentStatusId
+
     return (
         <>
             <Header/>
@@ -61,24 +63,51 @@ const Page = () => {
                 <p className="mt-2">
                     Врач: {consultation.Doctor.secondName} {consultation.Doctor.firstName} {consultation.Doctor.patronomicName} — {consultation.Doctor.Post?.postName}
                 </p>
-                {url && (
-                    <div className="mt-6">
+                <div className="mt-6">
+                    {paymentStatus === 1 && (
                         <a
-                            className={`mt-6 p-4 border rounded ${
-                                canJoin ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'
+                            href={`/payments/${consultation.Payment?.uuid4}`} // сюда подставляешь свою ссылку на оплату
+                            className="p-4 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                        >
+                            Оплатить
+                        </a>
+                    )}
+
+                    {paymentStatus === 2 && (
+                        <p className="p-4 bg-blue-100 text-blue-700 rounded">
+                            Платёж находится в обработке
+                        </p>
+                    )}
+
+                    {(paymentStatus === 3) && (
+                        <a
+                            className={`p-4 border rounded ${
+                                canJoin ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-400 cursor-not-allowed text-gray-200'
                             }`}
-                            href={canJoin ? url.originalUrl : undefined}
+                            href={canJoin ? url?.originalUrl : undefined}
                             onClick={(e) => !canJoin && e.preventDefault()}
                         >
                             Подключиться
                         </a>
-                        {!canJoin && (
-                            <p className="text-sm text-gray-500 mt-4">
-                                Возможность подключиться появится за 30 минут до начала
-                            </p>
-                        )}
-                    </div>
-                )}
+                    )}
+                    {paymentStatus === 4 && (
+                        <p className="p-4 bg-blue-100 text-green-700 rounded">
+                            Консультация завершена
+                        </p>
+                    )}
+                    {paymentStatus === 5 && (
+                        <p className="p-4 bg-blue-100 text-red-500 rounded">
+                            Консультация отменена
+                        </p>
+                    )}
+
+                    {/* Для статусов 3 и 4 показываем сообщение про 30 минут */}
+                    {(paymentStatus === 3 || paymentStatus === 4) && !canJoin && (
+                        <p className="text-sm text-gray-500 mt-4">
+                            Возможность подключиться появится за 30 минут до начала
+                        </p>
+                    )}
+                </div>
             </div>
         </>
         

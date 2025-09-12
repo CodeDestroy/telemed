@@ -17,6 +17,7 @@ const Services = require('./models/services')
 const Slots = require('./models/slots')
 const Payments = require('./models/payments')
 const PayTypes = require('./models/paytypes')
+const PaymentStatus = require('./models/paymentstatus')
 const SlotStatus = require('./models/slotstatus')
 const ConfirmCodes = require('./models/confirmcodes')
 const MedicalOrgs = require('./models/medicalorgs')
@@ -63,6 +64,7 @@ module.exports = class Database {
       Slots: Slots(this.sequelize, DataTypes),
       Payments: Payments(this.sequelize, DataTypes),
       PayTypes: PayTypes(this.sequelize, DataTypes),
+      PaymentStatus: PaymentStatus(this.sequelize, DataTypes),
       SlotStatus: SlotStatus(this.sequelize, DataTypes),
       ConfirmCodes: ConfirmCodes(this.sequelize, DataTypes),
       MedicalOrgs: MedicalOrgs(this.sequelize, DataTypes),

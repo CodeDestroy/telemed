@@ -400,7 +400,7 @@ class ConsultationService {
         try {
             const currTime = new Date().toISOString();
                         
-            const slots = await database.sequelize.query(`
+            /* const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -426,6 +426,36 @@ class ConsultationService {
                     and ((r."ended" != true or r."ended" is null) and (s."slotStatusId" != 4 or s."slotStatusId" != 5)) `, 
             {
                 replacements: { patientId: patientId}, 
+                raw: true
+            }) */
+                        
+            const slots = await database.sequelize.query(`
+                select s.id as "id" , 
+                    p."firstName" as "pFirstName", 
+                    p."secondName" as "pSecondName", 
+                    p."patronomicName" as "pPatronomicName", 
+                    d."firstName" as "dFirstName", 
+                    d."secondName" as "dSecondName", 
+                    d."patronomicName" as "dPatronomicName", 
+                    post."postName" as "postName",
+                    url."shortUrl" as "dUrl", 
+                    url2."shortUrl" as "pUrl", usr."avatar" as "avatar", *
+                from "Slots" s 
+                left join "Rooms" r  on s.id = r."slotId" 
+                left join "Patients" p on p.id  = s."patientId" 
+                join "Doctors" d on d.id = s."doctorId" 
+                join "Users" usr on usr.id = d."userId"
+                join "Urls" url on url."userId" = d."userId" 
+                join "Urls" url2 on url2."userId" = p."userId" 
+                join "Posts" post on post.id = d."postId"
+                where 
+                    url2."roomId" = r.id 
+                    and url."roomId" = r.id 
+                    and s."patientId" = :patientId 
+                    and (r."ended" != true or r."ended" is null)
+                    and s."slotStatusId" NOT IN (4, 5)`, 
+            {
+                replacements: { patientId: patientId, currTime: currTime }, 
                 raw: true
             })
             /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
@@ -534,6 +564,10 @@ class ConsultationService {
                                 required: true
                             }
                         ]
+                    },
+                    {
+                        model: database["Payments"],
+                        required: false,
                     }
 
                 ]
@@ -683,7 +717,6 @@ class ConsultationService {
                 isBusy: true, 
                 patientId: patientId
             })
-            console.log(newSlot)
             return newSlot
         }
         catch (e) {

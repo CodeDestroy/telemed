@@ -110,6 +110,9 @@ const Header = () => {
                     <Link href="/contacts" className="text-sm font-semibold leading-6 text-gray-900">
                         Контакты
                     </Link>
+                    <Link href="/payments" className="text-sm font-semibold leading-6 text-gray-900">
+                        Платежи
+                    </Link>
                 </PopoverGroup> 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                     { store.isAuth === false ?
@@ -216,6 +219,12 @@ const Header = () => {
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Контакты
+                                    </Link>
+                                    <Link
+                                        href="/payments"
+                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        Платежи
                                     </Link>
                                 </div>
 
