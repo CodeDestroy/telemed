@@ -11,6 +11,12 @@ import { DialogActions, MenuItem, Select, InputLabel, FormControl } from '@mui/m
 import dayjs from 'dayjs';
 import AdminService from '../../../../Services/AdminService';
 import { Context } from '../../../..';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import {ru} from 'date-fns/locale/ru';
+import { DatePicker } from '@mui/x-date-pickers';
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -24,11 +30,10 @@ const style = {
 };
 
 const slotStatuses = [
-  { value: 'FREE', label: 'Свободно' },
-  { value: 'WAITING_PAYMENT', label: 'Ждёт оплаты' },
-  { value: 'PAID', label: 'Оплачено' },
-  { value: 'DONE', label: 'Завершено' },
-  { value: 'CANCELLED', label: 'Отменено' },
+  { value: 2, label: 'Ждёт оплаты' },
+  { value: 3, label: 'Оплачено' },
+  { value: 4, label: 'Завершено' },
+  { value: 5, label: 'Отменено' },
 ];
 
 const EditSlotModal = (props) => {
@@ -39,8 +44,8 @@ const EditSlotModal = (props) => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [status, setStatus] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
 
   const [error, setError] = useState(null);
 
@@ -66,11 +71,11 @@ const EditSlotModal = (props) => {
       fetchDoctors()
       setSelectedPatient(props.item.patient || null);
       setSelectedDoctor(props.item.doctor || null);
-      setStatus(props.item.status || '0');
-      setDate(props.item.date || dayjs().format('YYYY-MM-DD'));
-      setTime(props.item.scheduleStartTime || '09:00');
+      setStatus(props.item.slotStatusId || 1);
+      const slotDate = new Date(props.item.slotStartDateTime);
+      setDate(slotDate);
+      setTime(slotDate);
     }
-    console.log(props)
   }, [props.open, props.item]);
 
   useEffect(() => {
@@ -121,6 +126,16 @@ const EditSlotModal = (props) => {
     }
   };
 
+  const minDate = new Date();
+  minDate.setHours(8);
+  minDate.setMinutes(0);
+  minDate.setSeconds(0);
+  minDate.setMilliseconds(0);
+  const maxDate = new Date();
+  maxDate.setHours(21);
+  maxDate.setMinutes(1);
+  minDate.setSeconds(0);
+  minDate.setMilliseconds(0);
   if (!props.open || !props.item) return null;
 
   return (
@@ -148,6 +163,7 @@ const EditSlotModal = (props) => {
 
           {/* Пациент */}
           <Autocomplete
+            disabled
             disablePortal
             options={patients}
             renderInput={(params) => <TextField {...params} label="Пациент" />}
@@ -175,24 +191,30 @@ const EditSlotModal = (props) => {
           />
 
           {/* Дата */}
-          <TextField
-            label="Дата"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            sx={{ mt: 2, width: '100%' }}
-            InputLabelProps={{ shrink: true }}
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+            <DatePicker
+              label="Дата"
+              value={date}
+              onChange={setDate}
+              sx={{ mt: 2, width: '100%' }}
+              InputLabelProps={{ shrink: true }}
+            />
 
           {/* Время */}
-          <TextField
-            label="Время"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            sx={{ mt: 2, width: '100%' }}
-            InputLabelProps={{ shrink: true }}
-          />
+          
+            <TimePicker
+              label="Время"
+              value={time}
+              onChange={setTime}
+              minutesStep={30}
+              minTime={minDate}
+              maxTime={maxDate}
+              /* sx={{width: '100%'}} */
+              skipDisabled={true}
+              sx={{ mt: 2, width: '100%' }}
+            />
+          </LocalizationProvider>
+
 
           {/* Статус */}
           <FormControl fullWidth sx={{ mt: 2 }}>

@@ -49,16 +49,17 @@ export default class Store {
         this.setLoading(true)
         try {
             const response = await AuthService.login(login, password);   
-            console.log(response)
             if (response.status === 200) {
                 let tempUser = response.data.user;
                 if (tempUser.accessLevel === 1) {
                     this.setLoading(false)
-                    const res = {response: {
+                    const res = {
                         data: 'Запрещён вход для пациентов',
-                        redirect: process.env.REACT_APP_PATIENT_CLIENT_URL
-                    }}
-                    this.setError('Нет профиля')
+                        redirect: process.env.REACT_APP_PATIENT_CLIENT_URL,
+                    }
+                    
+                    window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
+                    this.setError('Запрещён вход для пациентов')
                     return res
                 }
                 if (tempUser.persons.length === 0 ) {
@@ -199,11 +200,12 @@ export default class Store {
                 else {
                     if (tempUser.accessLevel === 1) {
                         this.setLoading(false)
-                        const res = {response: {
+                        const res = {
                             data: 'Запрещён вход для пациентов',
                             redirect: process.env.REACT_APP_PATIENT_CLIENT_URL
-                        }}
-                        this.setError('Нет профиля')
+                        }
+                        window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
+                        this.setError('Запрещён вход для пациентов')
                         return res
                     }
                     if (tempUser.persons.length === 0 ) {

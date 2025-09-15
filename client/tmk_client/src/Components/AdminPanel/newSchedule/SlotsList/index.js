@@ -190,12 +190,11 @@ function Index() {
 
     const handleMenuClose = () => {
         setCustomMenu({ open: false, top: 0, left: 0, item: null });
-        setSelectedItem(null);
+        /* setSelectedItem(null); */
     };
 
     const handleEdit = () => {
         // Реализуй логику редактирования
-        console.log('Редактировать:', selectedItem);
         handleEditShowModal(selectedItem)
         /* handleMenuClose(); */
     };

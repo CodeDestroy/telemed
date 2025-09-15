@@ -27,8 +27,9 @@ const Login = () => {
         try {
             const response = await store.login(phone, password)
             if (response.status !== 200) {
-                /* alert(response.response.data) */
-                console.log(store.error)
+                /* if (response.redirect)
+                    window.location.href = response.redirect */
+
             }
         }
         catch (e) {
