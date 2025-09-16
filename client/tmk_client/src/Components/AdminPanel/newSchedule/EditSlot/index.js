@@ -76,6 +76,7 @@ const EditSlotModal = (props) => {
       setDate(slotDate);
       setTime(slotDate);
     }
+    console.log(props.item)
   }, [props.open, props.item]);
 
   useEffect(() => {
@@ -106,14 +107,16 @@ const EditSlotModal = (props) => {
 
   const handleSubmit = async () => {
     try {
-      const datetimeStr = `${date}T${time}`;
-      const response = await AdminService.updateSlot(
+      const datetimeStr = `${dayjs(date).format('YYYY-MM-DD')}T${dayjs(time).format('HH:mm:ss')}`;
+
+      const response = await AdminService.editSlot(props.item.slotId, selectedDoctor, selectedPatient, time, '60', status)
+      /* const response = await AdminService.updateSlot(
         props.item.id,
         selectedDoctor,
         selectedPatient,
         dayjs(datetimeStr),
         status
-      );
+      ); */
       if (response.status === 200) {
         alert('Изменения сохранены');
         window.location.reload();
@@ -193,6 +196,7 @@ const EditSlotModal = (props) => {
           {/* Дата */}
           <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
             <DatePicker
+              disabled
               label="Дата"
               value={date}
               onChange={setDate}
