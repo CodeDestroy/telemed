@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4, // автоматически генерируется
       },
     paymentStatusId: DataTypes.INTEGER,
+    yookassa_id: DataTypes.STRING,
+    yookassa_status: DataTypes.STRING,
+    yookassa_payment_method_type: DataTypes.STRING,
+    yookassa_confirmation_url: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Payments',

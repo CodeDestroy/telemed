@@ -10,7 +10,78 @@ const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const MailManager = require("../Utils/MailManager");
 const PaymentService = require("../Services/PaymentService");
 const ApiError = require("../Errors/api-error");
+const yookassaApi = require("../Api/yookassaApi");
 class PatientController {
+
+    async yookassaWebhook(req, res) {
+        try {
+            const notification = req.body;
+
+            if (notification.type !== "notification") {
+                return res.status(400).send("Invalid notification type");
+            }
+
+            const payment = notification.object;
+
+            switch (notification.event) {
+                case "payment.waiting_for_capture":
+                    // 💡 Тут можно решить: сразу списывать или ждать ручного подтверждения
+                    //await db.updatePaymentStatus(payment.id, "waiting_for_capture");
+                    console.log(`Платёж ${payment.id} ожидает подтверждения`);
+                    break;
+
+                case "payment.succeeded":
+                    //await db.updatePaymentStatus(payment.id, "succeeded");
+                    console.log(`Платёж ${payment.id} успешно оплачен`);
+                    break;
+
+                case "payment.canceled":
+                    //await db.updatePaymentStatus(payment.id, "canceled");
+                    console.log(`Платёж ${payment.id} отменён`);
+                    break;
+
+                default:
+                    console.log(`Необработанное событие: ${notification.event}`);
+            }
+
+            res.status(200).send("OK"); // YooKassa ожидает ответ 200
+        } catch (err) {
+            console.error("Ошибка обработки webhook:", err.message);
+            res.status(500).send("Internal Server Error");
+        }
+    }
+
+
+    async createPayment(req, res) {
+        try {
+            const { amount, currency, description, userId, consultationId } = req.body;
+            const payment = await PaymentService.createPayment(amount, currency, description, userId, consultationId)
+            const yookassaPayment = await yookassaApi.createPayment({
+                amount,
+                description,
+                returnUrl: "https://example.com/success",
+                idempotenceKey: payment.uuid4
+            });
+            res.status(200).json({
+                ...payment,
+                yookassaId: yookassaPayment.id,
+                confirmationUrl: yookassaPayment.confirmation.confirmation_url,
+            });
+        }
+        catch (e) {
+            if (payment) {
+                // ⚠️ обновляем статус платежа в БД на "failed"
+                await PaymentService.updatePayment(payment.id, { status: "failed" });
+                await PaymentService.updatePayment(payment.id, {
+                    yookassa_status: "failed",
+                    paymentStatusId: 5, // "Ошибка оплаты"
+                });
+            }
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    }
     async getPayment (req, res) {
         const { uuid } = req.query;
         try {

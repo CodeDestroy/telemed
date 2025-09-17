@@ -66,6 +66,26 @@ class PaymentService {
             throw e
         }
     }
+
+    async updatePayment(paymentId, data) {
+        const payment = await database.models.Payments.findByPk(paymentId);
+        if (!payment) {
+            throw new Error(`Платёж с id=${paymentId} не найден`);
+        }
+
+        // Если передаётся статус, то нужно найти ID по коду
+        if (data.paymentStatusId) {
+            const status = await database.models.PaymentStatus.findByPk(data.paymentStatusId);
+            if (!status) {
+                throw new Error(`Неизвестный статус: ${data.statusCode}`);
+            }
+            data.paymentStatusId = status.id;
+            delete data.statusCode;
+        }
+
+        await payment.update(data);
+        return payment;
+    }
 }
 
 

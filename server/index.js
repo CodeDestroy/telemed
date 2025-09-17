@@ -13,6 +13,7 @@ exports.HTTPS_PORT = HTTPS_PORT;
 const cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
 /* const Database = require('./Database')
 const database = new Database(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, process.env.DB_HOST) */
 /* DB_USER = "postgres"

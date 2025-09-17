@@ -10,6 +10,8 @@ const ApiError = require('./Errors/api-error');
 const { app, HTTP_PORT, HOST, HTTPS_PORT } = require('.');
 const {httpSocket, httpsSocket} = require('./Sockets/mainSocket');
 const healthyChildApi = require("./Api/healthyChildApi");
+const yookassaApi = require('./Api/yookassaApi')
+const PaymentService = require('./Services/PaymentService')
 /* var options = {
     key: fs.readFileSync('/etc/letsencrypt/live/clinicode.ru/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/clinicode.ru/fullchain.pem')
@@ -29,14 +31,25 @@ const start = async () => {
         else
             await database.sync(); */
         //const httpsServer = https.createServer(options, app);
-        const db = require('./models/index')
-        /* console.log(await db["Users"].findByPk(1)) */
         const httpServer = http.createServer(app);
         /* const chalk = await import('chalk'); */
-        const chalk = await import('chalk');
+        /* const chalk = await import('chalk'); userId, payTypeId, amount, slotId, paymentDetails*/
+        //const payment = await PaymentService.getPaymentByUUID('d22ce9bf-54bc-49d9-ab56-c2a3fe2e011e')
+        /* const yookassaPayment = await yookassaApi.createPayment({
+            amount: 100.00,
+            return_url: "https://dr.clinicode.ru",
+            description: "Оплата заказа №123",
+            payment_uuid: payment.uuid4
+        });
+         */
+        /* 305cdb6b-000f-5000-8000-196a08f40c31 */
+        //const yookassaPayment = await yookassaApi.getPayment('305cdb6b-000f-5000-8000-196a08f40c31')
+        //console.log(yookassaPayment)
         httpServer.listen(HTTP_PORT, () => {
+            
             console.log(`HTTP Server started on port ${HTTP_PORT} URL ${HOST}`);
         });
+
         /* httpsServer.listen(HTTPS_PORT, () => {
             console.log(`Server started on port ${HTTPS_PORT} URL ${HOST}`) 
         }); */

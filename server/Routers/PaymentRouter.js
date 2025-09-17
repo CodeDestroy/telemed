@@ -11,4 +11,6 @@ const PaymentController = require('../Controllers/PaymentController');
 router.get('/', PaymentController.getPayment)
 router.get('/all', PaymentController.getPayments)
 router.get('/statuses', PaymentController.getPaymentsStatuses)
+router.post('/webhook', PaymentController.yookassaWebhook)
+
 module.exports = router;
