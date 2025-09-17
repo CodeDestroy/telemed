@@ -294,13 +294,13 @@ function Index() {
                                                     <EditIcon fontSize="small"/>
                                                     Редактировать
                                                 </div>
-                                                <div
+                                                {/* <div
                                                     onClick={() => handleDelete(customMenu.item)}
                                                     style={{ cursor: 'pointer', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}
                                                 >
                                                     <DeleteIcon fontSize="small" />
                                                     Удалить
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )}
 

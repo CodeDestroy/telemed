@@ -18,3 +18,5 @@ server/config/config.json
 patient_client/.next
 patient_client/node_modules
 patient_client/.env
+secret_key.txt
+./secret_key.txt
