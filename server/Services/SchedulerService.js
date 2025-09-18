@@ -176,8 +176,8 @@ class SchedulerService {
                     date: {
                         [Op.eq]: date
                     },
-                    scheduleStartTime: { [Op.lte]: time },
-                    scheduleEndTime: { [Op.gte]: time },
+                    /* scheduleStartTime: { [Op.lte]: time },
+                    scheduleEndTime: { [Op.gte]: time }, */
                     scheduleStatus: 1,
 
                 },
