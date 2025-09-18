@@ -82,7 +82,7 @@ class PatientController {
             const doctor = await DoctorService.getDoctor(doctorId)
             const patient = await PatientService.getPatient(patientId)
 
-            
+            console.log(startDateTime)
             // Разбираем дату-время на отдельно дату и время
             const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
             const startTime = startDateTime.split('T')[1]; // HH:mm:ss
