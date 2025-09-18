@@ -168,6 +168,34 @@ class SchedulerService {
         }
     }
 
+    async getDoctorScheduleByDateTime (doctorId, date, time) {
+        try {
+            const doctorSchedule = await database["Schedule"].findOne({
+                where: {
+                    doctorId,
+                    date: {
+                        [Op.eq]: date
+                    },
+                    scheduleStartTime: { [Op.lte]: time },
+                    scheduleEndTime: { [Op.gte]: time },
+                    scheduleStatus: 1,
+
+                },
+                include: [
+                    { 
+                        model: database["WeekDays"],
+                        required: true ,
+                    }
+                ],
+            })
+            return doctorSchedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async getDoctorScheduleByDates (doctorId, startDate, endDate) {
         try {
             const doctorSchedule = await database["Schedule"].findAll({

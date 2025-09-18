@@ -25,6 +25,10 @@ export interface PaymentInformationPageResponse {
     userId: number,
     uuid4: string,
     Slot: SlotExtended,
+    yookassa_id: string,
+    yookassa_status: string,
+    yookassa_payment_method_type: string,
+    yookassa_confirmation_url: string
     
 }
 

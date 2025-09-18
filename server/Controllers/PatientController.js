@@ -9,6 +9,11 @@ const CLIENT_URL = process.env.CLIENT_URL;
 const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const MailManager = require("../Utils/MailManager");
 const PaymentService = require("../Services/PaymentService");
+const yookassaApi = require('../Api/yookassaApi');
+const SchedulerService = require("../Services/SchedulerService");
+const PricesService = require("../Services/PricesService");
+
+const moment = require('moment-timezone')
 class PatientController {
     async getConsultations (req, res) {
         try {
@@ -65,34 +70,108 @@ class PatientController {
     }
 
     async createConsultation(req, res) {
+        let newSlot = null;
+        let newPayment = null;
+        let newRoom = null;
+        let doctorShortUrl = null;
+        let patientShortUrl = null;
+        let yookassaPayment = null;
         try {
             const {doctorId, patientId, startDateTime, duration, slotStatusId } = req.body
             //console.log(doctorId, patientId, startDateTime, duration, slotStatusId)
             const doctor = await DoctorService.getDoctor(doctorId)
             const patient = await PatientService.getPatient(patientId)
-            const newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
-            const newPayment = await PaymentService.createPayment(patient.userId, 3, 1800, newSlot.id, 'Оплата ТМК')
+
+            
+            // Разбираем дату-время на отдельно дату и время
+            const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
+            const startTime = startDateTime.split('T')[1]; // HH:mm:ss
+            //ищем schedule по startDateTime и doctorId
+            const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
+
+
+            newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
+
+
+            const price = await PricesService.getPricesByScheduleId(scheduleSlot.id)
+
+            //Создаём платёж
+
+            const dateObj = new Date(startDateTime);
+            dateObj.setHours(dateObj.getHours() + 3);
+
+            const displayHours = String(dateObj.getHours()).padStart(2, '0');
+            const displayMinutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const displaySeconds = String(dateObj.getSeconds()).padStart(2, '0');
+            const displayTime = `${displayHours}:${displayMinutes}:${displaySeconds}`;
+
+            const description = `Оплата ТМК на ${moment(startDate).format('DD.MM.YYYY')} ${displayTime}`
+            newPayment = await PaymentService.createPayment(patient.userId, 3, price.price, newSlot.id, description)
+
+            //Отправляем в юкассу
+            if (!price.isFree) {
+                yookassaPayment = await yookassaApi.createPayment({
+                    amount: price.price,
+                    description,
+                    return_url: `https://dr.clinicode.ru/payments/${newPayment.uuid4}`,
+                    payment_uuid: newPayment.uuid4
+                });
+
+                if (yookassaPayment) {
+                    newPayment.yookassa_id = yookassaPayment.id
+                    newPayment.yookassa_status = yookassaPayment.status
+                    newPayment.yookassa_payment_method_type = yookassaPayment.payment_method.type
+                    newPayment.yookassa_confirmation_url = yookassaPayment.confirmation.confirmation_url
+                    
+                }
+            }
+            else {
+                newPayment.paymentStatusId = 4
+            }
+            await newPayment.save()
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
-            const newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
+            newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
             const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)
             const patientPayload = await ConsultationService.createPayloadPatient(patient.id, newRoom.id)
             const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
             const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
             const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`
             const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
-            const doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.User.id, newRoom.id)
-            const patientShortUrl = await UrlManager.createShort(patientUrl, patient.User.id, newRoom.id)
+            doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.User.id, newRoom.id)
+            patientShortUrl = await UrlManager.createShort(patientUrl, patient.User.id, newRoom.id)
             const transporter = await MailManager.getTransporter()
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
-            if (patient.User.email) {
+            try {
+                if (patient.User.email) {
+                    const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime);
+                    await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                }
+                if (doctor.User.email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime);
+                    await transporter.sendMail(mailOptionsDoctor);
+                }
+            } catch (mailErr) {
+                // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+                /* await EmailJobService.create({
+                    toPatient: patient.User.email || null,
+                    toDoctor: doctor.User.email || null,
+                    patientLink,
+                    doctorLink,
+                    startDateTime,
+                    payload: { newSlotId: newSlot.id, newRoomId: newRoom.id, newPaymentId: newPayment.id },
+                    attempts: 0
+                }); */
+                // возможно оповестить админов/логирование
+            }
+            /* if (patient.User.email) {
                 const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
                 transporter.sendMail(mailOptionsPatinet, (error, info) => {
                     if (error) {
                         throw new Error(error)
-                        /* return console.log(error); */
                     }
-                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Сообщение отправлено: %s', info.messageId);
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
             }
@@ -102,10 +181,10 @@ class PatientController {
                     if (error) {
                         throw new Error(error)
                     }
-                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Сообщение отправлено: %s', info.messageId);
                     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 });
-            }
+            } */
             /* if (patient.User.phone) {
                 const date = new Date(startDateTime);
                 const day = String(date.getDate()).padStart(2, '0');
@@ -143,6 +222,17 @@ class PatientController {
             res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom, newPayment})
         }
         catch (e) {
+            if (doctorShortUrl)
+                doctorShortUrl.destroy();
+            if (patientShortUrl)
+                patientShortUrl.destroy();
+            if (newRoom)
+                newRoom.destroy();
+            if (newPayment)
+                newPayment.destroy();
+            if (newSlot)
+                newSlot.destroy();
+            console.log('ОШИБКА ТУТ')
             console.log(e)
             res.status(500).json(e.message)
         }
