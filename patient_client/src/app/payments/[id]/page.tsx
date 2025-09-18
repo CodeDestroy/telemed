@@ -40,7 +40,11 @@ const PaymentPage = () => {
   };
 
   const handlePay = () => {
-    alert(`Оплата для платежа ${data?.uuid4} пока не реализована`);
+    if (data?.yookassa_confirmation_url) {
+      window.open(data.yookassa_confirmation_url, '_blank', 'noopener,noreferrer');
+    } else {
+      alert(`Для платежа ${data?.uuid4} ссылка на оплату отсутствует`);
+    }
   };
 
   const getStatusProps = (statusId: number) => {

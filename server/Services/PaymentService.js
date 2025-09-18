@@ -34,6 +34,28 @@ class PaymentService {
         }
     }
 
+    async getPaymentByYookassaId(yookassa_id) {
+        try {
+            const payment = await database.models.Payments.findOne({
+                where: { yookassa_id },
+                include: [
+                    {
+                        model: database.models.Slots,
+                        include: [
+                            { model: database.models.Doctors, include: [database.models.Posts, database.models.MedicalOrgs, database.models.Users] },
+                            { model: database.models.Patients },
+                        ],
+                    },
+                ],}
+            )
+            return payment
+        }
+        catch (e) {
+            console.log(e);
+            throw e
+        }
+    }
+
     async getPaymentsByUserId(userId) {
         try {
             const payments = await database.models.Payments.findAll({

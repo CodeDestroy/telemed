@@ -21,27 +21,38 @@ class PatientController {
                 return res.status(400).send("Invalid notification type");
             }
 
-            const payment = notification.object;
-
+            const yookassaPayment = notification.object;
+            const payment = await PaymentService.getPaymentByYookassaId(yookassaPayment.id)
             switch (notification.event) {
                 case "payment.waiting_for_capture":
                     // 💡 Тут можно решить: сразу списывать или ждать ручного подтверждения
                     //await db.updatePaymentStatus(payment.id, "waiting_for_capture");
-                    console.log(`Платёж ${payment.id} ожидает подтверждения`);
+                    
+                    payment.paymentStatusId = 2 // "Ожидает подтверждения"
+                    console.log(`Платёж ${yookassaPayment.id} ожидает подтверждения`);
                     break;
 
                 case "payment.succeeded":
                     //await db.updatePaymentStatus(payment.id, "succeeded");
-                    console.log(`Платёж ${payment.id} успешно оплачен`);
+                    payment.paymentStatusId = 3 // "Ожидает подтверждения"
+                    console.log(`Платёж ${yookassaPayment.id} успешно оплачен`);
                     break;
 
                 case "payment.canceled":
                     //await db.updatePaymentStatus(payment.id, "canceled");
-                    console.log(`Платёж ${payment.id} отменён`);
+                    payment.paymentStatusId = 4 // "Ожидает подтверждения"
+                    console.log(`Платёж ${yookassaPayment.id} ушёл в ошибку`);
                     break;
 
                 default:
                     console.log(`Необработанное событие: ${notification.event}`);
+                    if (payment)
+                        payment.paymentStatusId = 4
+                    console.log(notification)
+            }
+            if (payment) {
+                payment.yookassa_status = yookassaPayment.object.status
+                payment.save()
             }
 
             res.status(200).send("OK"); // YooKassa ожидает ответ 200
