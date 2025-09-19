@@ -22,6 +22,7 @@ class PatientController {
             }
 
             const yookassaPayment = notification.object;
+
             const payment = await PaymentService.getPaymentByYookassaId(yookassaPayment.id)
             switch (notification.event) {
                 case "payment.waiting_for_capture":
@@ -51,7 +52,7 @@ class PatientController {
                     console.log(notification)
             }
             if (payment) {
-                payment.yookassa_status = yookassaPayment.object.status
+                payment.yookassa_status = yookassaPayment.status
                 payment.save()
             }
 
