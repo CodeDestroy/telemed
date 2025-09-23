@@ -431,8 +431,8 @@ class SchedulerService {
             } else if (endDate) {
                 scheduleWhere.date = { [Op.lte]: endDate };
             }
-            const weekDays = await database["Schedule"].findAll({
-                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name']],
+            /* const weekDays = await database["Schedule"].findAll({
+                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
                 include: [
                     {
                         model: database["WeekDays"],
@@ -441,11 +441,28 @@ class SchedulerService {
                 ],
                 where: scheduleWhere,
                 raw: true
+            }); */
+            const weekDays = await database["Schedule"].findAll({
+                attributes: [
+                    [col('WeekDay.name'), 'name'],
+                    'date',
+                    'scheduleStartTime',
+                    'scheduleEndTime'
+                ],
+                include: [
+                    {
+                    model: database["WeekDays"],
+                    attributes: []
+                    }
+                ],
+                where: scheduleWhere,
+                group: ['WeekDay.name', 'Schedule.date', 'Schedule.scheduleStartTime', 'Schedule.scheduleEndTime'],
+                raw: true
             });
 
             // Преобразуем в массив строк
-            const result = weekDays.map(wd => wd.name);
-            return result;
+            /* const result = weekDays.map(wd => wd.name); */
+            return weekDays;
         }
         catch (e) {
             console.log(e)

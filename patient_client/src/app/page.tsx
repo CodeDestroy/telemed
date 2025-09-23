@@ -20,6 +20,7 @@ import { Doctor } from '@/types/doctor'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import Box from '@mui/material/Box';
 import Loader from '@/components/Loader'
+import { ScheduleShort } from '@/types/schedule'
 
 function Home () {
     const [date, setDate] = useState<Dayjs | null>(null);
@@ -199,55 +200,66 @@ function Home () {
                                     return (
                                         <li
                                             key={item.doctor.id}
-                                            className="relative grid grid-cols-12 items-center gap-x-6 py-5"
+                                            className="relative grid grid-cols-1 gap-y-4 gap-x-6 py-5 sm:grid-cols-12"
                                             >
                                             {/* Левая часть: фото + ФИО */}
-                                            <div className="col-span-12 sm:col-span-7 flex min-w-0 gap-x-4">
+                                            <div className="flex min-w-0 gap-x-4 sm:col-span-7">
                                                 <img
-                                                    alt=""
-                                                    //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                                    src={item.doctor.User?.avatar}
-                                                    className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                                                alt=""
+                                                src={item.doctor.User?.avatar}
+                                                className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                                 />
                                                 <div className="min-w-0 flex-auto">
-                                                    <p className="text-sm font-semibold leading-6 text-gray-900">
-                                                        <a href={`/doctor/${item.doctor.id}`}>
-                                                            <span className="absolute inset-x-0 -top-px bottom-0" />
-                                                            {item.doctor.secondName} {item.doctor.firstName} {item.doctor.patronomicName}
-                                                        </a>
-                                                    </p>
-                                                    <p className="mt-1 flex text-xs leading-5 text-gray-500">
-                                                        <a
-                                                            href={`/post/${item.doctor.Post.postName}`}
-                                                            className="relative truncate hover:underline"
-                                                        >
-                                                            {item.doctor.Post.postName}
-                                                        </a>
-                                                    </p>
+                                                <p className="text-sm font-semibold leading-6 text-gray-900">
+                                                    <a href={`/doctor/${item.doctor.id}`}>
+                                                    {item.doctor.secondName} {item.doctor.firstName} {item.doctor.patronomicName}
+                                                    </a>
+                                                </p>
+                                                <p className="mt-1 text-xs leading-5 text-gray-500 truncate">
+                                                    <a
+                                                    href={`/post/${item.doctor.Post.postName}`}
+                                                    className="hover:underline"
+                                                    >
+                                                    {item.doctor.Post.postName}
+                                                    </a>
+                                                </p>
                                                 </div>
                                             </div>
 
-                                            {/* СРЕДНЯЯ КОЛОНКА: schedule — один столбец строго по центру */}
-                                            <div className="col-span-12 sm:col-span-3 flex items-center gap-y-2">
-                                                {item.schedule.map((scheduleItem, index) => (
+                                            {/* Средняя колонка: расписание */}
+                                            <div className="flex flex-wrap gap-2 sm:col-span-3">
+                                                {item.schedule.length > 0 ? item.schedule.map((scheduleItem, index) => (
                                                     <div
                                                         key={index}
-                                                        className="mx-2 px-2 py-1 text-sm font-medium text-gray-800 bg-blue-100 border border-blue-300 rounded-md text-center min-w-[72px]"
+                                                        className="px-2 py-1 text-sm font-medium text-gray-800 bg-blue-100 border border-blue-300 rounded-md text-center min-w-[90px]"
                                                     >
-                                                        {scheduleItem}
+                                                        {scheduleItem.name} {dayjs(scheduleItem.date).format('DD.MM')}
                                                     </div>
-                                                ))}
+                                                    ))
+                                                    :
+                                                    <div
+                                                        key={item.doctor.id}
+                                                        className="px-2 py-1 text-sm font-medium text-gray-800 bg-red-100 border border-red-300 rounded-md text-center min-w-[90px]"
+                                                    >
+                                                        Нет свободных слотов
+                                                    </div>
+                                                }
                                             </div>
 
                                             {/* Правая колонка: действие */}
-                                            <div className="col-span-12 sm:col-span-2 flex items-center gap-x-4 sm:justify-self-end">
-                                                <div className="hidden sm:flex sm:flex-col sm:items-end">
-                                                    <a href={`/doctor/${item.doctor.id}`} className="cursor-pointer text-sm leading-6 text-gray-900">Записаться</a>
-                                                </div>
-                                                <ChevronRightIcon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
+                                            <div className="flex items-center justify-between sm:justify-end sm:col-span-2">
+                                                <a
+                                                    href={`/doctor/${item.doctor.id}`}
+                                                    className="cursor-pointer text-sm leading-6 text-gray-900"
+                                                >
+                                                    Записаться
+                                                </a>
+                                                <ChevronRightIcon
+                                                    aria-hidden="true"
+                                                    className="h-5 w-5 flex-none text-gray-400"
+                                                />
                                             </div>
                                         </li>
-
                                     )
                                 }
                             )}
