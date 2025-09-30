@@ -447,7 +447,7 @@ class SchedulerService {
                     [col('WeekDay.name'), 'name'],
                     'date',
                     'scheduleStartTime',
-                    'scheduleEndTime'
+                    'scheduleEndTime',
                 ],
                 include: [
                     {
@@ -457,6 +457,8 @@ class SchedulerService {
                 ],
                 where: scheduleWhere,
                 group: ['WeekDay.name', 'Schedule.date', 'Schedule.scheduleStartTime', 'Schedule.scheduleEndTime'],
+                /* order: [[database["WeekDays"], 'id', 'ASC']], */
+                order: [['date', 'ASC']],
                 raw: true
             });
 
