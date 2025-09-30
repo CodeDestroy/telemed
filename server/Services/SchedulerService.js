@@ -457,6 +457,7 @@ class SchedulerService {
                 ],
                 where: scheduleWhere,
                 group: ['WeekDay.name', 'Schedule.date', 'Schedule.scheduleStartTime', 'Schedule.scheduleEndTime'],
+                order: ['WeekDay.id'],
                 raw: true
             });
 
