@@ -83,8 +83,15 @@ class PatientController {
             const patient = await PatientService.getPatient(patientId)
 
             // Разбираем дату-время на отдельно дату и время
-            const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
-            const startTime = startDateTime.split('T')[1]; // HH:mm:ss
+            //const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
+           // const startTime = startDateTime.split('T')[1]; // HH:mm:ss
+            const startDate = new Date(startDateTime);
+
+            // добавляем 3 часа
+            startDate.setHours(startDate.getHours() + 3);
+
+            // получаем только время HH:mm:ss
+            const startTime = startDate.toISOString().split('T')[1].split('.')[0];
             //ищем schedule по startDateTime и doctorId
             const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
             console.log(scheduleSlot)
