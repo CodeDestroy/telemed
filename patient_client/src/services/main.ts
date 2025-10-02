@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios'
 import { $api } from '../api'
 import DoctorListItemResponse from "@/types/main";
 import Post from "@/types/posts";
-import { createCunsultationResponse } from "@/types/consultaion";
+import { consultaionPrice, createCunsultationResponse } from "@/types/consultaion";
 
 export default class MainService {
 
@@ -24,6 +24,10 @@ export default class MainService {
 
     static async createConsultation(doctorId: number, patientId: number, startDateTime: string | Date, duration: number): Promise<AxiosResponse<createCunsultationResponse>> {
         return $api.post<createCunsultationResponse>('/api/patient/consultations/create', {doctorId, patientId, startDateTime, duration, slotStatusId: 2})
+    }
+
+    static async getConsultationPrice(doctorId: number, startDateTime: Date | string): Promise<AxiosResponse<consultaionPrice>> {
+        return $api.post<consultaionPrice>('/api/patient/consultations/getPrice', {doctorId, startDateTime})
     }
 
     /* static async createSlot (doctor, patient, startDateTime, duration, slotStatusId) {

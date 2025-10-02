@@ -17,4 +17,7 @@ router.get('/scheduler/date/:id', SchedulerController.getDoctorSchedulerDate)
 router.get('/consultations/active', PatientController.getConsultationsByDoctorId)
 router.post('/consultations/create', PatientController.createConsultation)
 router.get('/consultation/url', PatientController.getConsultationUrl)
+router.post('/consultations/getPrice', PatientController.getConsultationPrice)
+
+
 module.exports = router;

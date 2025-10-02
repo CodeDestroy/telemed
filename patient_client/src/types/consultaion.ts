@@ -123,3 +123,14 @@ export interface createCunsultationResponse {
     newPayment: Payment,
     newRoom: Room
 }
+
+export interface consultaionPrice {
+    price: string | number | null
+    createdAt: string
+    endDate: string
+    id: number
+    isFree: boolean | null
+    scheduleId: number
+    startDate: string
+    updatedAt: string
+}

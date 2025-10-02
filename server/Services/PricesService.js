@@ -14,6 +14,25 @@ class PricesService {
         }
     }
 
+    async editPrice({scheduleId, price, isFree = false, startDate = null, endDate = null}) {
+        try {
+            console.log(scheduleId, price, isFree , startDate , endDate )
+            const newPrice = await database.models.SchedulePrices.update(
+                { 
+                    price, isFree, startDate, endDate
+                },
+                { 
+                    where: { scheduleId: scheduleId } 
+                }
+            )
+            return newPrice
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async getPricesByScheduleId(scheduleId) {
         try {
             const today = new Date();

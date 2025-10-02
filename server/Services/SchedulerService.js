@@ -120,7 +120,16 @@ class SchedulerService {
 
     async editScheduleDate (slotId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus) {
         try {
-            const newslot = await database["Schedule"].update(
+            const newSlot = await database["Schedule"].findOne({
+                where: { id: slotId } 
+            })
+            newSlot.date = date
+            newSlot.scheduleStartTime = scheduleStartTime
+            newSlot.scheduleEndTime = scheduleEndTime
+            newSlot.scheduleDayId = scheduleDay
+            newSlot.scheduleStatus = scheduleStatus
+            await newSlot.save()
+            /* const newslot = await database["Schedule"].update(
                 { 
                     date,
                     scheduleStartTime,
@@ -131,9 +140,9 @@ class SchedulerService {
                 { 
                     where: { id: slotId } 
                 }
-            )
+            ) */
                 
-            return newslot
+            return newSlot
         }
         catch (e) {
             console.log(e)
@@ -176,8 +185,8 @@ class SchedulerService {
                     date: {
                         [Op.eq]: date
                     },
-                    /* scheduleStartTime: { [Op.lte]: time },
-                    scheduleEndTime: { [Op.gte]: time }, */
+                    scheduleStartTime: { [Op.lte]: time },
+                    scheduleEndTime: { [Op.gte]: time },
                     scheduleStatus: 1,
 
                 },
@@ -224,7 +233,13 @@ class SchedulerService {
                         date: {
                             [Op.between]: [startDate, endDate]
                         }
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 }) 
                 return doctorSchedule;
             }
@@ -236,7 +251,13 @@ class SchedulerService {
                             [Op.gte]: startDate
                         }
 
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 })
                 return doctorSchedule
             }
@@ -248,7 +269,13 @@ class SchedulerService {
                             [Op.lte]: endDate
                         }
 
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 })
                 return doctorSchedule
             }

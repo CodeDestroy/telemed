@@ -12,6 +12,13 @@ import AdminService from '../../../../Services/AdminService';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import FormControl from '@mui/material/FormControl';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
 function CreateDateSchedule() {
     const { store } = useContext(Context);
     const [doctors, setDoctors] = useState([]);
@@ -20,9 +27,11 @@ function CreateDateSchedule() {
     const [endDate, setEndDate] = useState(dayjs(new Date()).add(7, 'd'));
     const [schedule, setSchedule] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalData, setModalData] = useState({ date: dayjs(new Date()), startTime: null, endTime: null });
+    const [modalData, setModalData] = useState({ date: dayjs(new Date()), startTime: null, endTime: null, price: 0, isFree: false});
+    const [previousPrice, setPreviousPrice] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [editingSlot, setEditingSlot] = useState(null);
+
 
     useEffect(() => {
         async function fetchDoctors() {
@@ -70,6 +79,8 @@ function CreateDateSchedule() {
                     modalData.date.add(3, 'h'),
                     modalData.startTime.format('HH:mm'),
                     modalData.endTime.format('HH:mm'),
+                    modalData.price,
+                    modalData.isFree
                 );
                 alert('Расписание обновлено');
             } else {
@@ -83,7 +94,9 @@ function CreateDateSchedule() {
                     selectedDoctor.id,
                     modalData.date.add(3, 'h'),
                     modalData.startTime.format('HH:mm'),
-                    modalData.endTime.format('HH:mm')
+                    modalData.endTime.format('HH:mm'),
+                    modalData.price,
+                    modalData.isFree
                 );
                 alert('Расписание добавлено');
             }
@@ -104,7 +117,9 @@ function CreateDateSchedule() {
         setModalData({
             date: dayjs(slot.date),
             startTime: dayjs(slot.scheduleStartTime, 'HH:mm'),
-            endTime: dayjs(slot.scheduleEndTime, 'HH:mm')
+            endTime: dayjs(slot.scheduleEndTime, 'HH:mm'),
+            price: slot.SchedulePrices[0].price,
+            isFree: slot.SchedulePrices[0].isFree
         });
         console.log((slot.date))
         setIsEditing(true);
@@ -133,6 +148,25 @@ function CreateDateSchedule() {
             alert('Ошибка удаления расписания');
         }
     };
+
+
+    useEffect(() => {
+        console.log(modalData)
+    }, [modalData])
+
+    const handleChangeFreeAppointment = (event) => {
+        if (event.target.checked) {
+            setPreviousPrice(modalData.price);
+            setModalData({ ...modalData, price: 0, isFree: true });
+        }
+        else {
+            if (previousPrice) {
+                setModalData({ ...modalData, price: previousPrice, isFree: false  });
+                setPreviousPrice(0);
+            }
+        }
+        modalData.isFree = event.target.checked
+    }
 
     return (
         <>
@@ -167,6 +201,8 @@ function CreateDateSchedule() {
                                         <TableRow>
                                             <TableCell>Дата</TableCell>
                                             <TableCell>Время</TableCell>
+                                            <TableCell>Цена</TableCell>
+                                            <TableCell>Бесплатно</TableCell>
                                             <TableCell>Действия</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -175,6 +211,8 @@ function CreateDateSchedule() {
                                             <TableRow key={slot.id}>
                                                 <TableCell>{dayjs(slot.date).format('DD.MM.YYYY')}</TableCell>
                                                 <TableCell>{slot.scheduleStartTime.substring(0,5)} - {slot.scheduleEndTime.substring(0,5)}</TableCell>
+                                                <TableCell>{slot.SchedulePrices[0].price}</TableCell>
+                                                <TableCell>{slot.SchedulePrices[0].isFree ? 'Да' : 'Нет'}</TableCell>
                                                 <TableCell>
                                                     <IconButton onClick={() => handleEditSlot(slot)}><EditIcon /></IconButton>
                                                     <IconButton onClick={() => handleDeleteSlot(slot.id)}><DeleteIcon /></IconButton>
@@ -223,6 +261,26 @@ function CreateDateSchedule() {
                             minutesStep={30}
                             skipDisabled={true}
                         />
+                        <FormControl fullWidth sx={{ mb: 2, width: '100%' }} >
+                            <InputLabel htmlFor="outlined-adornment-amount">Цена приёма</InputLabel>
+                            <OutlinedInput
+                                value={modalData.price}
+                                onChange={(e) => setModalData({ ...modalData, price: e.target.value })}  
+                                id="outlined-adornment-amount"
+                                endAdornment={<InputAdornment position="end">₽</InputAdornment>}
+                                label="Цена приёма"
+                            />
+                        </FormControl>
+                        <FormGroup sx={{ mb: 2, width: '100%' }}>
+                            <FormControlLabel 
+                                control={
+                                <Checkbox 
+                                    checked={modalData.isFree}
+                                    onChange={handleChangeFreeAppointment}
+                                    inputProps={{ 'aria-label': 'controlled' }} 
+                                />} 
+                                label="Бесплатная консультация" />
+                        </FormGroup>
                         <Button variant="contained" fullWidth onClick={handleAddSchedule}>{isEditing ? 'Сохранить' : 'Добавить'}</Button>
                     </Box>
                 </Modal>

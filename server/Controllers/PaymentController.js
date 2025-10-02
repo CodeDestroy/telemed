@@ -49,7 +49,6 @@ class PatientController {
                     console.log(`Необработанное событие: ${notification.event}`);
                     if (payment)
                         payment.paymentStatusId = 4
-                    console.log(notification)
             }
             if (payment) {
                 payment.yookassa_status = yookassaPayment.status
@@ -133,5 +132,58 @@ class PatientController {
         }
 
     }
+
+    async checkPaymentStatus(req, res) {
+        try {
+            const { uuid } = req.query;
+            if (!uuid) {
+                return res.status(400).json({ message: "uuid is required" });
+            }
+
+            // 1. Ищем платеж в БД
+            const payment = await PaymentService.getPaymentByUUID(uuid)
+
+            if (!payment) {
+                return res.status(404).json({ message: "Платёж не найден" });
+            }
+
+            if (!payment.yookassa_id) {
+                return res.status(400).json({ message: "Для этого платежа нет yookassa_id" });
+            }
+
+            // 2. Запрос к Юкассе
+            const yookassaPayment = await yookassaApi.getPayment(payment.yookassa_id);
+
+            // 3. Обновляем данные в БД
+            payment.yookassa_status = yookassaPayment.status;
+            payment.yookassa_payment_method_type = yookassaPayment.payment_method?.type || null;
+
+            // Меняем paymentStatusId в зависимости от статуса
+            if (yookassaPayment.status === "succeeded") {
+                payment.paymentStatusId = 3; // Оплачено
+            } else if (yookassaPayment.status === "canceled") {
+                payment.paymentStatusId = 5; // Отмена оплаты
+            } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {
+                payment.paymentStatusId = 2; // В обработке
+            }
+
+            await payment.save();
+
+            // 4. Возвращаем обновлённые данные
+            return res.status(200).json({
+                uuid4: payment.uuid4,
+                yookassa_status: payment.yookassa_status,
+                paymentStatusId: payment.paymentStatusId,
+                confirmation_url: payment.yookassa_confirmation_url
+            });
+
+        } catch (e) {
+            console.error("Ошибка при проверке платежа:", e);
+            return res.status(500).json({
+                message: e.message
+            });
+        }
+    }
+
 }
 module.exports = new PatientController();

@@ -20,5 +20,9 @@ export default class PaymentService {
         return $api.get<PaymentStatus[]>('/api/payment/statuses')
     }
 
+    static async checkPayment(uuid: string): Promise<AxiosResponse<PaymentInformationPageResponse>> {
+        return $api.get<PaymentInformationPageResponse>('/api/payment/checkPaymentStatus', {params: {uuid}})
+    }
+
     
 }

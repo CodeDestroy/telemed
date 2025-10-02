@@ -47,6 +47,20 @@ const PaymentPage = () => {
     }
   };
 
+  const handleCheckPay = async () => {
+    try {
+      const response = await PaymentService.checkPayment(data?.uuid4 || '');
+      if (response.status == 200) {
+        location.reload()
+      }
+    } 
+    catch (e) {
+      if (e instanceof Error) {
+        alert(e.message);
+      }
+    }
+  }
+
   const getStatusProps = (statusId: number) => {
     switch (statusId) {
       case 1: return { text: 'В ожидании', color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-300' };
@@ -145,13 +159,21 @@ const PaymentPage = () => {
           )}
 
           {/* Кнопка оплаты только для статуса 1 и если не просрочен */}
-          {!isExpired && (paymentStatusId === 1 || paymentStatusId === 4) && (
-            <button
-              onClick={handlePay}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
-            >
-              Оплатить
-            </button>
+          {!isExpired && (paymentStatusId === 1 || paymentStatusId === 2 || paymentStatusId === 4) && (
+            <>
+              <button
+                onClick={handlePay}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer"
+              >
+                Оплатить
+              </button>
+              <button
+                onClick={handleCheckPay}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer"
+              >
+                Проверить статус платежа
+              </button>
+            </>
           )}
         </div>
       </div>

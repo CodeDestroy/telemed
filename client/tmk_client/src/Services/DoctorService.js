@@ -42,11 +42,11 @@ export default class DoctorService {
         return $api.post('/api/doctor/scheduler/delete', {id})
     }
     
-    static async addSchedule (doctorId, date, startTime, endTime) {
-        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime })
+    static async addSchedule (doctorId, date, startTime, endTime, price, isFree) {
+        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime, price, isFree })
     }
-    static async updateSchedule (doctorId, slotId, date, startTime, endTime) {
-        return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime })
+    static async updateSchedule (doctorId, slotId, date, startTime, endTime, price, isFree) {
+        return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime, price, isFree })
     }
 
     static async setProtocol (roomId, protocol) {

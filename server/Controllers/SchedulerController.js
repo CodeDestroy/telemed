@@ -2,6 +2,7 @@
 const SchedulerService = require('../Services/SchedulerService')
 const { Op } = require('sequelize');
 const database = require('../models/index');
+const PricesService = require('../Services/PricesService');
 class SchedulerController {
     // Создание нового временного промежутка для расписания врача
     async createOrUpdateSchedule(req, res) {
@@ -9,7 +10,6 @@ class SchedulerController {
         const startTime = ((new Date(scheduleStartTime)).getHours() + 3) + ':' + (new Date(scheduleStartTime)).getMinutes();
         const endTime = ((new Date(scheduleEndTime)).getHours() + 3) + ':' + (new Date(scheduleEndTime)).getMinutes();
 
-        console.log(startTime, endTime)
         try {
             const weekDay = await database["WeekDays"].findOne({
                 where: {
@@ -157,7 +157,6 @@ class SchedulerController {
             const {id} = req.params
             const {startDate} = req.query
             const {endDate} = req.query
-            console.log(req.query)
             const schedule = await SchedulerService.getDoctorScheduleBetweenDays(id, startDate, endDate)
             return res.status(200).json(schedule)
             /* if (startDate && endDate) {
@@ -231,13 +230,12 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
     async addScheduleDate (req, res) {
         try {
             const slotData = req.body;
-            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
+            const { doctorId, date, startTime, endTime, scheduleStatus = 1, price, isFree } = req.body;
             const newDate = new Date(date)
             const day = newDate.getDay()
            /*  const startTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
             const endTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
              */
-            console.log({ doctorId, date, startTime, endTime, scheduleStatus })
             const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(doctorId, date, startTime, endTime)
             if (overlappingSchedules) {
                 return res.status(400).json({
@@ -246,7 +244,9 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
             }
 
             const newSchedule = await SchedulerService.createScheduleDate(doctorId, date, startTime, endTime, day, scheduleStatus);
-            console.log(newSchedule)
+            const aYearFromNow = new Date();
+            aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+            const newPrice = await PricesService.createPrice({scheduleId: newSchedule.id, price, isFree, startDate: new Date(), endDate: aYearFromNow})
             return res.status(200).json(newSchedule)
         }
         catch (e) {
@@ -258,7 +258,7 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
         try {
             const slotData = req.body;
             const { id } = req.params
-            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
+            const { doctorId, date, startTime, endTime, scheduleStatus = 1, price, isFree } = req.body;
             const newDate = new Date(date)
             const day = newDate.getDay()
             
@@ -269,6 +269,9 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
                 });
             }
             const newSchedule = await SchedulerService.editScheduleDate(id, date, startTime, endTime, day, scheduleStatus);
+            const aYearFromNow = new Date();
+            aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+            const newPrice = await PricesService.editPrice({scheduleId: newSchedule.id, price, isFree, startDate: new Date(), endDate: aYearFromNow})
             return res.status(200).json(newSchedule)
         }
         catch (e) {

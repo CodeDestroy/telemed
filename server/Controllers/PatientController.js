@@ -87,7 +87,7 @@ class PatientController {
             const startTime = startDateTime.split('T')[1]; // HH:mm:ss
             //ищем schedule по startDateTime и doctorId
             const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
-
+            console.log(scheduleSlot)
 
             newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
 
@@ -247,6 +247,27 @@ class PatientController {
             else {
                 throw new Error('slotId is required')
             }
+        }
+        catch (e) {
+            res.status(500).json({
+                error: e.message
+            })
+        }
+    }
+
+    async getConsultationPrice (req, res) {
+        try {
+            const {doctorId, startDateTime} = req.body
+            const startDate = new Date(startDateTime);
+
+            // добавляем 3 часа
+            startDate.setHours(startDate.getHours() + 3);
+
+            // получаем только время HH:mm:ss
+            const startTime = startDate.toISOString().split('T')[1].split('.')[0];
+            const schedule = await SchedulerService.getDoctorScheduleByDateTime(doctorId, startDate, startTime)
+            const price = await PricesService.getPricesByScheduleId(schedule.id)
+            res.status(200).json(price)
         }
         catch (e) {
             res.status(500).json({

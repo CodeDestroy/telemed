@@ -14,7 +14,6 @@ import Link from "next/link";
 import { TextField, MenuItem, Select, Button } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
 import { ruRU } from '@mui/x-date-pickers/locales';
 interface Consultation {
   id: number;
@@ -102,6 +101,32 @@ const DoctorPage = () => {
     if (date) {
       fetchDoctorSchedule(date.format("YYYY-MM-DD"));
     }
+  };
+
+  const [price, setPrice] = useState<number | string | null>(null);
+  const [loadingPrice, setLoadingPrice] = useState(false);
+
+
+  const handleSelectTime = async (event: any) => {
+    const time = event.target.value;
+    setSelectedTime(time);
+    if (!doctor || !selectedDate) return;
+
+    try {
+      setLoadingPrice(true);
+      const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${time}`).toISOString();
+
+      // запрос цены к бэку
+      const response = await main.getConsultationPrice(doctor.doctor.id, startDateTime);
+
+      setPrice(response.data.price); // например, { price: 2500 }
+    } catch (e) {
+      console.error("Ошибка получения цены", e);
+      setPrice(null);
+    } finally {
+      setLoadingPrice(false);
+    }
+
   };
 
   const handleBooking = async () => {
@@ -196,7 +221,8 @@ const DoctorPage = () => {
               select
               label="Время"
               value={selectedTime}
-              onChange={(e) => setSelectedTime(e.target.value)}
+              //onChange={(e) => setSelectedTime(e.target.value)}
+              onChange={handleSelectTime}
               fullWidth
             >
               {availableTimes.length > 0 ? (
@@ -209,6 +235,20 @@ const DoctorPage = () => {
                 <MenuItem disabled>Нет доступного времени</MenuItem>
               )}
             </TextField>
+          )}
+          
+          {selectedTime && (
+            <div className="mt-4">
+              {loadingPrice ? (
+                <p className="text-gray-500">Загрузка цены...</p>
+              ) : price !== null ? (
+                <p className="text-lg font-semibold text-gray-900">
+                  Цена: {price} ₽
+                </p>
+              ) : (
+                <p className="text-gray-500">Выберите время, чтобы увидеть цену</p>
+              )}
+            </div>
           )}
 
           <Button
