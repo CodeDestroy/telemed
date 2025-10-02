@@ -63,7 +63,7 @@ const PaymentPage = () => {
 
   const getStatusProps = (statusId: number) => {
     switch (statusId) {
-      case 1: return { text: 'В ожидании', color: 'text-yellow-700', bg: 'bg-yellow-100 border-yellow-300' };
+      case 1: return { text: 'В обработке', color: 'text-blue-700', bg: 'bg-blue-100 border-blue-300' };
       case 2: return { text: 'В обработке', color: 'text-blue-700', bg: 'bg-blue-100 border-blue-300' };
       case 3: return { text: 'Оплачено', color: 'text-green-700', bg: 'bg-green-100 border-green-300' };
       case 4: return { text: 'Ошибка оплаты', color: 'text-red-700', bg: 'bg-red-100 border-red-300' };
