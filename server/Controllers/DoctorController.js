@@ -71,6 +71,19 @@ class DoctorController {
         }
     }
 
+
+    async getConsultationBySlotId (req, res) {
+        try {
+            const {id} = req.params
+            const consultation = await ConsultationService.getSlotById(id)
+            console.log(id)
+            res.status(200).json(consultation)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
     async getDoctorList (req, res) {
         try {
             const {dateStart} = req.query

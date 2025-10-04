@@ -132,7 +132,8 @@ class ConsultationService {
 
             if (admin.medOrgId) {
                 const slots = await database.sequelize.query(`
-                    select s.id as "id" , 
+                    select s.id as "id" , s.id as "slot_id", 
+                    p."firstName" as "pFirstName",  
                         p."firstName" as "pFirstName", 
                         p."secondName" as "pSecondName", 
                         p."patronomicName" as "pPatronomicName", 
@@ -181,7 +182,8 @@ class ConsultationService {
                 }]
             }); */
             const slots = await database.sequelize.query(`
-                select s.id as "id" , 
+                select s.id as "id" , s.id as "slot_id", 
+                    p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
                     p."patronomicName" as "pPatronomicName", 
@@ -278,7 +280,8 @@ class ConsultationService {
             const currTime = new Date().toISOString();
                         
             const slots = await database.sequelize.query(`
-                select s.id as "id" , 
+                select s.id as "id" , s.id as "slot_id", 
+                    p."firstName" as "pFirstName",  s.id as "slot_id", 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
                     p."patronomicName" as "pPatronomicName", 
@@ -286,13 +289,17 @@ class ConsultationService {
                     d."secondName" as "dSecondName", 
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
-                    url2."shortUrl" as "pUrl", *
+                    url2."shortUrl" as "pUrl", 
+                    pmt."payTypeId" as "payTypeId", pmt."yookassa_status" as "yookassa_status", pmt.id as "pmt_id",
+                    pmtst."code" as "paymentStatusCode", pmtst."description" as "paymentStatusDescription", pmtst.id as "pmtst_id", p.id as "patient_id", d.id as "doctor_id" *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
                 join "Doctors" d on d.id = s."doctorId" 
                 join "Urls" url on url."userId" = d."userId" 
                 join "Urls" url2 on url2."userId" = p."userId" 
+                left join "Payments" pmt on pmt."slotId" = s.id
+                left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -362,7 +369,8 @@ class ConsultationService {
             const currTime = new Date().toISOString();
                         
             const slots = await database.sequelize.query(`
-                select s.id as "id" , 
+                select s.id as "id" , s.id as "slot_id", 
+                    p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
                     p."patronomicName" as "pPatronomicName", 
@@ -370,13 +378,17 @@ class ConsultationService {
                     d."secondName" as "dSecondName", 
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
-                    url2."shortUrl" as "pUrl", *
+                    url2."shortUrl" as "pUrl",
+                    pmt."payTypeId" as "payTypeId", pmt."yookassa_status" as "yookassa_status", pmt.id as "pmt_id",
+                    pmtst."code" as "paymentStatusCode", pmtst."description" as "paymentStatusDescription", pmtst.id as "pmtst_id", *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
                 join "Doctors" d on d.id = s."doctorId" 
                 join "Urls" url on url."userId" = d."userId" 
                 join "Urls" url2 on url2."userId" = p."userId" 
+                left join "Payments" pmt on pmt."slotId" = s.id
+                left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -473,7 +485,8 @@ class ConsultationService {
         try {
             const currTime = (new Date(date).toISOString()).substring(0, 10);
             const slots = await database.sequelize.query(`
-                select s.id as "id" , 
+                select s.id as "id" , s.id as "slot_id", 
+                    p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
                     p."patronomicName" as "pPatronomicName", 
@@ -481,13 +494,17 @@ class ConsultationService {
                     d."secondName" as "dSecondName", 
                     d."patronomicName" as "dPatronomicName", 
                     url."shortUrl" as "dUrl", 
-                    url2."shortUrl" as "pUrl", *
+                    url2."shortUrl" as "pUrl",
+                    pmt."payTypeId" as "payTypeId", pmt."yookassa_status" as "yookassa_status", pmt.id as "pmt_id",
+                    pmtst."code" as "paymentStatusCode", pmtst."description" as "paymentStatusDescription", pmtst.id as "pmtst_id", *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
                 join "Doctors" d on d.id = s."doctorId" 
                 join "Urls" url on url."userId" = d."userId" 
                 join "Urls" url2 on url2."userId" = p."userId" 
+                left join "Payments" pmt on pmt."slotId" = s.id
+                left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -546,6 +563,13 @@ class ConsultationService {
                     {
                         model: database["Rooms"],
                         required: false,
+                        include: [
+                            {
+                                model: database["Url"],
+                                required: true
+                            }
+                        ]
+
                     },
                     {
                         model: database["Patients"],
@@ -568,6 +592,16 @@ class ConsultationService {
                     {
                         model: database["Payments"],
                         required: false,
+                        include: [
+                            {
+                                model: database["PaymentStatus"],
+                                required: true
+                            },
+                            {
+                                model: database["PayTypes"],
+                                required: true
+                            }
+                        ]
                     }
 
                 ]

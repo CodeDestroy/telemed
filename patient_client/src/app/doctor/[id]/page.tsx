@@ -15,6 +15,7 @@ import { TextField, MenuItem, Select, Button } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ruRU } from '@mui/x-date-pickers/locales';
+import Footer from "@/components/Footer";
 interface Consultation {
   id: number;
   slotStartDateTime: string;
@@ -170,7 +171,9 @@ const DoctorPage = () => {
 
   return (
     <>
+    <div className='flex flex-col min-h-screen bg-gray-50'>
       <Header />
+      <div className="flex-grow">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <Link
           href="/"
@@ -263,6 +266,9 @@ const DoctorPage = () => {
           </Button>
         </div>
       </div>
+      </div>
+      <Footer/>
+    </div>
     </>
   );
 }

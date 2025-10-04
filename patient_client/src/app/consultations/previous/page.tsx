@@ -1,4 +1,5 @@
 'use client'
+import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import ConsultationService from '@/services/consultations'
 import { useStore } from '@/store'
@@ -114,6 +115,7 @@ const Page = () => {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     )
 }

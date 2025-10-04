@@ -13,6 +13,9 @@ import AdminRegistrationSecondStep from '../Components/AdminPanel/Registration/R
 import AdminRegistrationThirdStep from '../Components/AdminPanel/Registration/RegistrationThirdStage'
 
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
+import RestoreFirstStep from "../Components/AdminPanel/RestorePassword/RestoreFirstStep";
+import RestoreSecondStep from "../Components/AdminPanel/RestorePassword/RestoreSecondStep";
+import RestoreThirdStep from "../Components/AdminPanel/RestorePassword/RestoreThirdStep";
 const authRouter = createBrowserRouter([
     {
         path: "*",
@@ -45,6 +48,18 @@ const authRouter = createBrowserRouter([
     {
       path: '/protocol/:protocolId',
       element: <ProtocolPage/>
+    },
+    {
+      path: authLocations.doctorRestorePasswordStep1,
+      element: <RestoreFirstStep/>,
+    },
+    {
+      path: authLocations.doctorRestorePasswordStep2,
+      element: <RestoreSecondStep/>,
+    },
+    {
+      path: authLocations.doctorRestorePasswordStep1,
+      element: <RestoreThirdStep/>,
     }
 ]);
 

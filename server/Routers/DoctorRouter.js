@@ -8,6 +8,9 @@ router.get('/v2/consultations/active', DoctorController.getConsultationsByDoctor
 
 router.get('/consultations/ended', DoctorController.getEndedConsultations)
 router.get('/v2/consultations/ended', DoctorController.getEndedConsultationsByDoctorId)
+
+router.get('/v2/consultation/:id', DoctorController.getConsultationBySlotId)
+
 router.get('/scheduler/:id', SchedulerController.getDoctorScheduler)
 router.get('/scheduler/date/:id', SchedulerController.getDoctorSchedulerDate)
 router.post('/scheduler', SchedulerController.createOrUpdateSchedule)

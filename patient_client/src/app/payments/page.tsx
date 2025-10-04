@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import { useStore } from '@/store'
 import { PaymentInformationPageResponse } from "@/types/payment";
 import PaymentService from "@/services/payments";
+import Footer from "@/components/Footer";
 
 const PaymentsPage = () => {
   const store = useStore()
@@ -36,6 +37,7 @@ const PaymentsPage = () => {
         <div className="max-w-4xl mx-auto p-6 text-center">
           <p className="text-gray-500">Загрузка платежей...</p>
         </div>
+        <Footer/>
       </>
     );
   }
@@ -123,6 +125,7 @@ const PaymentsPage = () => {
           )}
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

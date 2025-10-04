@@ -60,8 +60,8 @@ const Login = () => {
                 <main >
                     <div className={styles.fullScreen}>
                         <div className={`${styles.container} ${styles.flexRow}`}>
-                            <div className={styles.fullScreenContent} style={{margin: '0 auto'}}>
-                                <form className={styles.authForm} onSubmit={handleLoginSubmit} style={{paddingTop: '50%important'}}>
+                            <div className={styles.fullScreenContent} style={{margin: '0 auto', paddingRight: 0}}>
+                                <form className={styles.authForm} onSubmit={handleLoginSubmit} style={{marginTop: '8rem'}}>
                                     <p className={styles.formTitle}>
                                         Вход в личный кабинет
                                     </p>
@@ -93,7 +93,7 @@ const Login = () => {
                                     <input type="submit" className={styles.buttonPrimary} value="Войти"/>
                                 </form>
                                 <p>
-                                    Забыли пароль? Перейдите на страницу<br></br> <a href="#">восстановления доступа</a>
+                                    Забыли пароль? Перейдите на страницу<br></br> <a href={authLocations.doctorRestorePasswordStep1}>восстановления доступа</a>
                                 </p>
                                 <p>
                                     Если Вы никогда не пользовались личныму<br></br>кабинетом, то <a href={authLocations.doctorRegistration}>зарегистрируйтесь</a>

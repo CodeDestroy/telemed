@@ -8,6 +8,7 @@ import AuthService from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { AxiosError } from '@/types/errors'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 const Registration = () => {
 
     
@@ -291,6 +292,7 @@ const Registration = () => {
                 </div>
             </div>
         </div>
+        <Footer/>
         
     </>
   )

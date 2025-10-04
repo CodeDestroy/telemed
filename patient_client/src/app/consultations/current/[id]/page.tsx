@@ -7,6 +7,8 @@ import dayjs from 'dayjs'
 import Header from '@/components/Header'
 import { useStore } from '@/store'
 import duration from 'dayjs/plugin/duration'
+import Footer from '@/components/Footer'
+import PageLoader from '@/components/PageLoader'
 dayjs.extend(duration)
 const Page = () => {
     const params = useParams() as { id?: string | string[] } | null
@@ -50,6 +52,7 @@ const Page = () => {
     return (
         <>
             <Header/>
+            <PageLoader/>
             <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 mt-7">
                 <h1 className="text-2xl font-bold mb-4">
                     Консультация 
@@ -109,6 +112,7 @@ const Page = () => {
                     )}
                 </div>
             </div>
+            <Footer/>
         </>
         
     )
