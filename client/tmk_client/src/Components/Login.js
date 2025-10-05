@@ -61,7 +61,7 @@ const Login = () => {
                     <div className={styles.fullScreen}>
                         <div className={`${styles.container} ${styles.flexRow}`}>
                             <div className={styles.fullScreenContent} style={{margin: '0 auto', paddingRight: 0}}>
-                                <form className={styles.authForm} onSubmit={handleLoginSubmit} style={{marginTop: '8rem'}}>
+                                <form className={styles.authForm} onSubmit={handleLoginSubmit} style={{marginTop: '0'}}>
                                     <p className={styles.formTitle}>
                                         Вход в личный кабинет
                                     </p>
@@ -96,7 +96,7 @@ const Login = () => {
                                     Забыли пароль? Перейдите на страницу<br></br> <a href={authLocations.doctorRestorePasswordStep1}>восстановления доступа</a>
                                 </p>
                                 <p>
-                                    Если Вы никогда не пользовались личныму<br></br>кабинетом, то <a href={authLocations.doctorRegistration}>зарегистрируйтесь</a>
+                                    Если Вы никогда не пользовались личным<br></br>кабинетом, то <a href={authLocations.doctorRegistration}>зарегистрируйтесь</a>
                                 </p>
                             </div>
                             {/* <span className={styles.fullScreenImage} style={{backgroundImage: "url(/assets/img/auth-image.jpg)"}}  ></span> */}

@@ -19,6 +19,7 @@ import generalLocations from '../Locations/GeneralLocations';
 import Settings from "../Components/AdminPanel/Profile/Settings/DoctorSettings";
 import CreateDateSchedule from "../Components/AdminPanel/CreateScheduler/Dates";
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
+import ConsultationDetailsPage from "../Components/AdminPanel/ConsultationDetailsPage";
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -60,6 +61,10 @@ const doctorRouter = createBrowserRouter([
     {
       path: '/protocol/:protocolId',
       element: <ProtocolPage/>
+    },
+    {
+      path: doctorLocations.consultationPage,
+      element: <ConsultationDetailsPage/>
     }
 
 

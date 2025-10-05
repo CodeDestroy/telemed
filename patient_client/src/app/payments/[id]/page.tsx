@@ -62,6 +62,17 @@ const PaymentPage = () => {
     }
   }
 
+  const handleOpenConsultation = async () => {
+    try {
+      window.location.href = `/consultations/current/${Slot.id}`;
+    } 
+    catch (e) {
+      if (e instanceof Error) {
+        console.log(e.message);
+      }
+    }
+  }
+
   const getStatusProps = (statusId: number) => {
     switch (statusId) {
       case 1: return { text: 'В обработке', color: 'text-blue-700', bg: 'bg-blue-100 border-blue-300' };
@@ -177,6 +188,16 @@ const PaymentPage = () => {
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer"
                 >
                   Проверить статус платежа
+                </button>
+              </>
+            )}
+            {!isExpired && (paymentStatusId === 3) && (
+              <>
+                <button
+                  onClick={handleOpenConsultation}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition cursor-pointer"
+                >
+                  Перейти к консультации
                 </button>
               </>
             )}

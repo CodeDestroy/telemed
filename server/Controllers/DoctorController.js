@@ -76,7 +76,6 @@ class DoctorController {
         try {
             const {id} = req.params
             const consultation = await ConsultationService.getSlotById(id)
-            console.log(id)
             res.status(200).json(consultation)
         }
         catch (e) {

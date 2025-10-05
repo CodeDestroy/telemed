@@ -576,6 +576,10 @@ class ConsultationService {
                         required: false
                     },
                     {
+                        model: database["Attachments"],
+                        required: false
+                    },
+                    {
                         model: database["Doctors"],
                         required: false,
                         include: [
@@ -715,8 +719,6 @@ class ConsultationService {
         catch (e)
         {
             throw e
-            console.log(e)
-            throw e
         }
     }
 
@@ -734,8 +736,6 @@ class ConsultationService {
         }
         catch (e)
         {
-            throw e
-            console.log(e)
             throw e
         }
     }

@@ -107,6 +107,7 @@ export interface ScheduleSlot {
 }
 
 export interface SlotExtended {
+    id: number,
     slotStartDateTime: string
     slotEndDateTime: string
     serviceId: number

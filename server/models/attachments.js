@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
         originalname: DataTypes.STRING,
         mime: DataTypes.STRING,
         size: DataTypes.BIGINT,
-        url: DataTypes.STRING
+        url: DataTypes.STRING,
+        hash: { type: DataTypes.STRING, allowNull: true },
     }, {
         sequelize,
         modelName: 'Attachments',

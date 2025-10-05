@@ -17,6 +17,9 @@ const getEstimatedColumnWidth = (rows, field, headerName) => {
     else if (field == 'url') {
         return 350
     }
+    else if (field == 'status') {
+        return 250
+    }
     else {
         const headerWidth = getTextWidth(field, 'bold 2rem Arial') + 50; // добавим небольшой запас на отступы
         const cellWidths = rows.map(row => {

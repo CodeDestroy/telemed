@@ -283,7 +283,7 @@ button {
     flex-direction: column;
     justify-content: center;
     max-width: 531px;
-    padding: 11.6rem 6rem 9.7rem 0;
+    padding: 0rem 6rem 9.7rem 0;
     position: relative;
     z-index: 1
 }

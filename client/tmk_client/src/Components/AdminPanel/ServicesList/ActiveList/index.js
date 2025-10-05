@@ -47,14 +47,14 @@ function Index() {
 
   const statusColor = (status) => {
     const code = (status || "").toLowerCase();
-    if (code.includes("оплачен") || code.includes("paid")) return "success";
+    if (code.includes("оплачен") || code.includes("успешно")) return "success";
     if (code.includes("ожид") || code.includes("wait") || code.includes("pending")) return "warning";
     if (code.includes("отмен") || code.includes("fail")) return "error";
     return "default";
   };
 
   const columns = [
-    { field: "patient", headerName: "Пациент", disableColumnSort: true },
+    { field: "patient", headerName: "Пациент", disableColumnSort: false },
     {
       field: "slotStartDateTime",
       headerName: "Начало конференции",
@@ -62,7 +62,9 @@ function Index() {
         const t = moment(params.row.slotStartDateTime);
         return <Box sx={{ color: t.isBefore(now) ? "red" : "inherit" }}>{t.format("DD.MM.YYYY HH:mm")}</Box>;
       },
-      disableColumnSort: true,
+      
+      width: 200,
+      disableColumnSort: false,
     },
     {
       field: "status",
@@ -74,7 +76,9 @@ function Index() {
           size="small"
         />
       ),
-      disableColumnSort: true,
+      
+      width: 300,
+      disableColumnSort: false,
     },
     {
       field: "details",
@@ -85,7 +89,7 @@ function Index() {
         </Button>
       ),
       width: 130,
-      disableColumnSort: true,
+      disableColumnSort: false,
     },
   ];
 

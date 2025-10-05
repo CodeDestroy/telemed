@@ -17,6 +17,7 @@ serverCopy/
 server/config/config.json
 patient_client/.next
 patient_client/node_modules
+patient_client/tmk_client
 patient_client/.env
 
 

@@ -60,5 +60,9 @@ export default class DoctorService {
     static async getConsultationBySlotId(slotId) {
         return $api.get(`/api/doctor/v2/consultation/${slotId}`)
     }
+
+    static async getFilesBySlotId(slotId) {
+        return $api.get(`/api/patient/consultations/${slotId}/files`)
+    }
     
 }

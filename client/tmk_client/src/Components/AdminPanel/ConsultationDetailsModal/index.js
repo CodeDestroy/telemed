@@ -42,6 +42,11 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
         .then((res) => setDetails(res.data))
         .catch(() => setDetails({ error: "Ошибка загрузки данных" }))
         .finally(() => setLoading(false));
+      DoctorService.getFilesBySlotId(slotId).then((res) => {
+        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+          setDetails((prev) => ({ ...prev, files: res.data }));
+        }
+      });
     } else {
       setDetails(null);
     }
@@ -70,13 +75,19 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
   if (details?.Room?.Urls?.length) {
     for (const u of details.Room.Urls) {
       if (u.userId === store.user.id) doctorUrl = u.originalUrl;
-      else patientUrl = u.originalUrl;
+      else {
+        patientUrl = process.env.REACT_APP_SERVER_URL + '/short/' + u.shortUrl
+        //patientUrl = u.originalUrl;
+      }
     }
   }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Детали консультации</DialogTitle>
+      <DialogTitle>
+        Консультация {moment(details.slotStartDateTime).format("DD.MM.YYYY HH:mm")} –{" "}
+                    {moment(details.slotEndDateTime).format("HH:mm")}
+      </DialogTitle>
       <DialogContent dividers>
         {loading ? (
           <Box display="flex" justifyContent="center" p={4}>
@@ -92,7 +103,7 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
                 {details.Patient.patronomicName}
               </Typography>
               <Typography variant="subtitle1" gutterBottom>
-                <b>Доктор:</b> {details.Doctor.secondName} {details.Doctor.firstName}{" "}
+                <b>Врач:</b> {details.Doctor.secondName} {details.Doctor.firstName}{" "}
                 {details.Doctor.patronomicName}
               </Typography>
               <Typography variant="body2" gutterBottom>
@@ -110,9 +121,9 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
               </Typography>
 
               {/* --- Ссылки и кнопки подключения --- */}
-              {canShowJoin && (
+              {(
                 <Box mt={3}>
-                  {doctorUrl && (
+                  {canShowJoin && doctorUrl ? (
                     <Box mb={2}>
                       <Button
                         variant="contained"
@@ -123,13 +134,20 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
                         Подключиться к консультации
                       </Button>
                     </Box>
-                  )}
+                  )
+                  : 
+                  (
+                    <Typography variant="body2" color="text.secondary" mb={2}>
+                      Ваша кнопка для подключения появится за 20 минут до начала консультации
+                    </Typography>
+                  )
+                  }
                   {patientUrl && (
                     <Box display="flex" alignItems="center">
                       <Typography variant="body2" mr={1}>
                         Ссылка для пациента:
                       </Typography>
-                      <Link href={patientUrl} target="_blank" underline="hover">
+                      <Link href={patientUrl} target="_blank" underline="hover" variant="body2">
                         {patientUrl}
                       </Link>
                       <Tooltip title={copied ? "Скопировано!" : "Скопировать"}>
@@ -145,9 +163,9 @@ export default function ConsultationDetailsModal({ open, onClose, slotId }) {
               {/* --- Файлы --- */}
               <Box mt={3}>
                 <Typography variant="subtitle1">Прикреплённые файлы:</Typography>
-                {details.files && details.files.length > 0 ? (
+                {details.Attachments && details.Attachments.length > 0 ? (
                   <List dense>
-                    {details.files.map((f) => (
+                    {details.Attachments.map((f) => (
                       <ListItem key={f.id} sx={{ pl: 0 }}>
                         <ListItemText
                           primary={
