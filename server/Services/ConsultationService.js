@@ -291,7 +291,7 @@ class ConsultationService {
                     url."shortUrl" as "dUrl", 
                     url2."shortUrl" as "pUrl", 
                     pmt."payTypeId" as "payTypeId", pmt."yookassa_status" as "yookassa_status", pmt.id as "pmt_id",
-                    pmtst."code" as "paymentStatusCode", pmtst."description" as "paymentStatusDescription", pmtst.id as "pmtst_id", p.id as "patient_id", d.id as "doctor_id" *
+                    pmtst."code" as "paymentStatusCode", pmtst."description" as "paymentStatusDescription", pmtst.id as "pmtst_id", p.id as "patient_id", d.id as "doctor_id", *
                 from "Slots" s 
                 left join "Rooms" r  on s.id = r."slotId" 
                 left join "Patients" p on p.id  = s."patientId" 
