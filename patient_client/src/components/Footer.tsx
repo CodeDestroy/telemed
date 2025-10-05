@@ -126,7 +126,7 @@ const Footer = () => {
         {/* Нижняя часть */}
         <div className="mt-6 border-t border-gray-100 pt-8 sm:mt-20">
           <p className="text-xs leading-5 text-gray-500 text-center">
-            &copy; {new Date().getFullYear()} ООО "Клиникод"
+            &copy; {new Date().getFullYear()} ООО &laquo;Клиникод&raquo;
           </p>
         </div>
       </div>

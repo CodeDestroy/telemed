@@ -8,9 +8,8 @@ import Header from '@/components/Header'
 import { useStore } from '@/store'
 import duration from 'dayjs/plugin/duration'
 import Footer from '@/components/Footer'
-import PageLoader from '@/components/PageLoader'
 import Loader from '@/components/Loader'
-
+import { File } from '@/types/file'
 dayjs.extend(duration)
 
 const Page = () => {
@@ -21,7 +20,7 @@ const Page = () => {
   const id = Array.isArray(rawId) ? rawId[0] : rawId
   const [consultation, setConsultation] = useState<SlotWithRoomPatient | null>(null)
   const [url, setUrl] = useState<Url | null>(null)
-  const [files, setFiles] = useState<any[]>([])
+  const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const store = useStore()
@@ -92,7 +91,6 @@ const Page = () => {
   return (
     <>
       <Header />
-      <PageLoader />
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 mt-7">
         <h1 className="text-2xl font-bold mb-4">Консультация</h1>
 

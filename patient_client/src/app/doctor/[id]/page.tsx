@@ -17,6 +17,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ruRU } from '@mui/x-date-pickers/locales';
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
+import { SelectChangeEvent } from "@mui/material";
+
 interface Consultation {
   id: number;
   slotStartDateTime: string;
@@ -110,7 +112,7 @@ const DoctorPage = () => {
   const [loadingPrice, setLoadingPrice] = useState(false);
 
 
-  const handleSelectTime = async (event: any) => {
+  const handleSelectTime = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const time = event.target.value;
     setSelectedTime(time);
     if (!doctor || !selectedDate) return;

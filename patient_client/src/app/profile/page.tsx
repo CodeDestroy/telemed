@@ -11,7 +11,6 @@ import AuthService from '@/services/auth'
 import { observer } from 'mobx-react-lite'
 import { AxiosError } from '@/types/errors'
 import Footer from '@/components/Footer'
-import PageLoader from '@/components/PageLoader'
 import Link from 'next/link'
 const Page = () => {
     const store = useStore()
@@ -93,7 +92,6 @@ const Page = () => {
     return (
         <>
             <Header/>
-            <PageLoader/>
             <div className='mx-auto max-w-7xl px-6 lg:px-8'>
                 <div className="space-y-10 divide-y divide-gray-900/10">
                     {/* <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
