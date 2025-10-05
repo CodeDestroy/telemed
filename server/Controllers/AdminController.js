@@ -158,7 +158,7 @@ class AdminController {
                     await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
                 }
                 if (doctor.User.email) {
-                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime);
+                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorLink, newSlot.id, startDateTime);
                     await transporter.sendMail(mailOptionsDoctor);
                 }
             } catch (mailErr) {
