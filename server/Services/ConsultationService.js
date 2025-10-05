@@ -557,7 +557,7 @@ class ConsultationService {
 
     //Слот по id
     async getSlotById (slotId) {
-        try {
+        try { 
             const slot = await database["Slots"].findByPk(slotId, {
                     include: [
                     {
