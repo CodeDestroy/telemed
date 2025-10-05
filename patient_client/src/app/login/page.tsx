@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
 import Header from '@/components/Header'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 const LoginPage = () => {
     const store = useStore()
     const router = useRouter()
@@ -43,6 +44,7 @@ const LoginPage = () => {
     }
     return (
         <>
+        <div className='flex flex-col min-h-screen bg-gray-50'>
             <Header/>
             <div className="flex min-h-full flex-1">
                 <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -199,6 +201,8 @@ const LoginPage = () => {
                     />
                 </div>
             </div>
+            <Footer/>
+        </div>
         </>
     )
 }

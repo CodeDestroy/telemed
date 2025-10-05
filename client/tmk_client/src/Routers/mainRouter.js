@@ -10,6 +10,7 @@ import {
 import PriateRouter from "./priateRouter";
 import PageNotFound from '../Components/Errors/PageNotFound'
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
+import authLocations from "../Locations/AuthLocations";
 const mainRouter = createBrowserRouter([
     {
       path: "*",

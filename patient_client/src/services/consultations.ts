@@ -23,6 +23,19 @@ export default class ConsultationService {
         return $api.get<Url>('/api/patient/consultation/url', {params: {slotId, userId}})
     }
 
+    static async uploadFile(slotId: number, file: File, patientId: number | undefined) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("patientId", patientId ? patientId.toString() : "");
+        return $api.post(`/api/patient/consultations/${slotId}/files`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+    }
+
+    static async getFiles(slotId: number) {
+        return $api.get(`/api/patient/consultations/${slotId}/files`);
+    }
+
 
     
 }

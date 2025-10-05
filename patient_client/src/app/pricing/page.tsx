@@ -1,6 +1,8 @@
 import { Fragment } from 'react'
 import { CheckIcon, MinusIcon } from '@heroicons/react/20/solid'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import PageLoader from '@/components/PageLoader'
 
 interface tierInterface {
     name: TierName,
@@ -151,6 +153,7 @@ export default function Example() {
     return (
         <>
             <Header/>
+            <PageLoader/>
             <div className="bg-white py-24 sm:py-32">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl text-center">
@@ -290,6 +293,7 @@ export default function Example() {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     )
 }

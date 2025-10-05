@@ -70,6 +70,7 @@ const DoctorEdit = () => {
     const [endTime, setEndTime] = useState(new Date());
     const [theme, setTheme] = useState(defaultTheme);
     const [error, setError] = useState(null)
+    const [specialties, setSpecialties] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleOpenModal = () => setModalOpen(true);
@@ -121,6 +122,16 @@ const DoctorEdit = () => {
                     console.log(e);
                 }
             }
+
+            async function fetchSpecialties() {
+                try {
+                    const response = await AdminService.getSpecialties()
+                    setSpecialties(response.data)
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            fetchSpecialties();
             fetchDoctor();
         }
     }, [store]);
@@ -226,17 +237,9 @@ return (
                 <h2 style={{margin: '2rem 0'}}>Редактировать врача {doctor.secondName} {doctor.firstName}</h2>
                 <Box component="form" noValidate autoComplete="off" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {error?.length > 0 && error ? <h4 style={{color: 'red'}}>{error}</h4> : ''}
-                        <TextField label="Фамилия" variant="outlined" fullWidth value={doctor.secondName} onChange={setName}/>
-                        <TextField label="Имя" variant="outlined" fullWidth value={doctor.firstName} onChange={setSecondName}/>
+                        <TextField label="Фамилия" variant="outlined" fullWidth value={doctor.secondName} onChange={setSecondName}/>
+                        <TextField label="Имя" variant="outlined" fullWidth value={doctor.firstName} onChange={setName}/>
                         <TextField label="Отчество" variant="outlined" fullWidth value={doctor.patronomicName} onChange={setPatronomicName}/>
-                        {/* <LocalizationProvider  dateAdapter={AdapterDayjs} adapterLocale="ru">
-                            <DatePicker
-                                label="Дата рождения"
-                                value={patient.birthDate}
-                                onChange={(event) => setBirthDate(event)}
-                                renderInput={(params) => <TextField {...params} fullWidth />}
-                            />
-                        </LocalizationProvider> */}
                         <TextField label="Телефон" variant="outlined" fullWidth value={doctor.User.phone} onChange={setPhone}/>
                         <TextField label="СНИЛС" variant="outlined" fullWidth value={doctor.snils} onChange={handleSnilsChange}/>
                         <TextField label="Email" variant="outlined" fullWidth value={doctor.User.email} onChange={setEmail}/>
@@ -249,6 +252,28 @@ return (
                             } 
                                 label="Подтверждён" />
                         </FormGroup>
+                        <FormControl fullWidth>
+                            <InputLabel id="specialty-select-label">Специальность</InputLabel>
+                            <Select
+                                labelId="specialty-select-label"
+                                value={doctor.Post?.id || ''}
+                                label="Специальность"
+                                onChange={(e) => {
+                                    const selected = specialties.find(s => s.id === e.target.value);
+                                    setDoctor({
+                                        ...doctor,
+                                        Post: selected
+                                    });
+                                }}
+                            >
+                                {specialties.map((spec) => (
+                                    <MenuItem key={spec.id} value={spec.id}>
+                                        {spec.postName}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
 
                         <Button variant="contained" color="primary" onClick={handleSave}>
                             Сохранить

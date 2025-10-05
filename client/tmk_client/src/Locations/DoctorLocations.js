@@ -7,7 +7,8 @@ const doctorLocations = {
     createSchedule: '/profile/schedule',
     createDateSchedule: '/profile/dateSchedule',
     schedule: '/profile/calendar',
-    settings: '/profile/settings'
+    settings: '/profile/settings',
+    consultationPage: '/consultation/:id',
     
 };
 

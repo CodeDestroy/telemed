@@ -56,5 +56,13 @@ export default class DoctorService {
     static async sendProtocol (roomId) {
         return $api.post('/api/doctor/conference/protocol/send', {roomId})
     }
+
+    static async getConsultationBySlotId(slotId) {
+        return $api.get(`/api/doctor/v2/consultation/${slotId}`)
+    }
+
+    static async getFilesBySlotId(slotId) {
+        return $api.get(`/api/patient/consultations/${slotId}/files`)
+    }
     
 }

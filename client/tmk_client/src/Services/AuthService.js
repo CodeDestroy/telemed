@@ -38,5 +38,13 @@ export default class AuthService {
         return $api.post(`/api/user/${userId}/setPassword`, {password});
     }
 
+    static async sendRecoveryCode(phone) {
+        return $api.post(`/api/user/send-recovery-code`, {phone});
+    }
+
+    static async resetPassword(phone, code, password) {
+        return await $api.post('/api/user/reset-password', { phone, code, password })
+    }
+
     
 }

@@ -29,6 +29,7 @@ const UsersRooms = require('./models/usersrooms')
 const UsersSettings = require('./models/userssettings')
 const SchedulePrices = require('./models/scheduleprices')
 const PromoCodes = require('./models/promocodes')
+const Attachments = require('./models/attachments')
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = class Database {
@@ -75,7 +76,8 @@ module.exports = class Database {
       Schedule: Schedule(this.sequelize, DataTypes),
       WeekDays: WeekDays(this.sequelize, DataTypes),
       SchedulePrices: SchedulePrices(this.sequelize, DataTypes),
-      PromoCodes: PromoCodes(this.sequelize, DataTypes)
+      PromoCodes: PromoCodes(this.sequelize, DataTypes),
+      Attachments: Attachments(this.sequelize, DataTypes)
     };
 
     Object.keys(this.models).forEach(modelName => {

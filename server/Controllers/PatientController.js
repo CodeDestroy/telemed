@@ -12,6 +12,7 @@ const PaymentService = require("../Services/PaymentService");
 const yookassaApi = require('../Api/yookassaApi');
 const SchedulerService = require("../Services/SchedulerService");
 const PricesService = require("../Services/PricesService");
+const FileService = require("../Services/FileService");
 
 const moment = require('moment-timezone')
 class PatientController {
@@ -94,7 +95,6 @@ class PatientController {
             const startTime = startDate.toISOString().split('T')[1].split('.')[0];
             //ищем schedule по startDateTime и doctorId
             const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
-            console.log(scheduleSlot)
 
             newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
 
@@ -280,6 +280,32 @@ class PatientController {
             res.status(500).json({
                 error: e.message
             })
+        }
+    }
+
+    async uploadFile (req, res) {
+       try {
+            const { id } = req.params;
+            const patientId = req.body.patientId;
+            //const patientId = req.user?.personId; // если в req.user хранится пациент
+            
+            const file = req.file;
+            const uploaded = await FileService.saveFile(file, id, patientId);
+            return res.json(uploaded);
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ error: e.message });
+        }
+    }
+
+    async getFiles(req, res) {
+        try {
+            const { id } = req.params;
+            const files = await FileService.getFilesBySlot(id);
+            res.json(files);
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при получении файлов' });
         }
     }
     

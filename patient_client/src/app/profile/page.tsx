@@ -10,6 +10,9 @@ import dayjs from 'dayjs'
 import AuthService from '@/services/auth'
 import { observer } from 'mobx-react-lite'
 import { AxiosError } from '@/types/errors'
+import Footer from '@/components/Footer'
+import PageLoader from '@/components/PageLoader'
+import Link from 'next/link'
 const Page = () => {
     const store = useStore()
     const [user, setUser] = useState<User | null>(store.user)
@@ -90,6 +93,7 @@ const Page = () => {
     return (
         <>
             <Header/>
+            <PageLoader/>
             <div className='mx-auto max-w-7xl px-6 lg:px-8'>
                 <div className="space-y-10 divide-y divide-gray-900/10">
                     {/* <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
@@ -149,148 +153,155 @@ const Page = () => {
                         </form>
                     </div> */}
 
-                    <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
-                        <div className="px-4 sm:px-0">
+                    <div className="grid grid-cols-1 gap-y-8 pt-10 md:grid-cols-3 md:gap-x-8">
+                        <div className="px-4 md:px-0">
                             <h2 className="text-base font-semibold leading-7 text-gray-900">Персональная информация</h2>
                             <p className="mt-1 text-sm leading-6 text-gray-600">Ваши персональные данные</p>
                         </div>
 
-                        <form onSubmit={handleSaveUser} className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+                        <form
+                            onSubmit={handleSaveUser}
+                            className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl md:col-span-2"
+                        >
                             <div className="px-4 py-6 sm:p-8">
-                                <div className="grid max-w-4xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="secondName" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Фамилия
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="secondName"
-                                                name="secondName"
-                                                type="text"
-                                                value={user?.secondName}
-                                                onChange={handleChange}
-                                                autoComplete="secondName"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Имя
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="firstName"
-                                                name="firstName"
-                                                type="text"
-                                                value={user?.firstName}
-                                                onChange={handleChange}
-                                                autoComplete="firstName"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
+                            <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+                                <div>
+                                <label htmlFor="secondName" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Фамилия
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="secondName"
+                                    name="secondName"
+                                    type="text"
+                                    value={user?.secondName}
+                                    onChange={handleChange}
+                                    autoComplete="secondName"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
 
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="patronomicName" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Отчество
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="patronomicName"
-                                                name="patronomicName"
-                                                value={user?.patronomicName}
-                                                onChange={handleChange}
-                                                type="text"
-                                                disabled
-                                                autoComplete="patronomicName"
-                                                className="bg-gray-300 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="birthDate" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Дата рождения
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="birthDate"
-                                                name="birthDate"
-                                                value={dayjs(user?.birthDate).format('DD.MM.YYYY')}
-                                                onChange={handleChange}
-                                                type="text"
-                                                disabled
-                                                autoComplete="birthDate"
-                                                className="bg-gray-300 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
+                                <div>
+                                <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Имя
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="firstName"
+                                    name="firstName"
+                                    type="text"
+                                    value={user?.firstName}
+                                    onChange={handleChange}
+                                    autoComplete="firstName"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
 
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Email
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="email"
-                                                value={user?.email}
-                                                onChange={handleChange}
-                                                name="email"
-                                                type="text"
-                                                autoComplete="email"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
+                                <div>
+                                <label htmlFor="patronomicName" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Отчество
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="patronomicName"
+                                    name="patronomicName"
+                                    value={user?.patronomicName}
+                                    onChange={handleChange}
+                                    type="text"
+                                    disabled
+                                    autoComplete="patronomicName"
+                                    className="bg-gray-300 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
 
-                                    <div className="sm:col-span-4">
-                                        <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
-                                            Телефон
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="phone"
-                                                name="phone"
-                                                value={user?.phone}
-                                                onChange={handleChange}
-                                                type="text"
-                                                autoComplete="phone"
-                                                className="px-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
+                                <div>
+                                <label htmlFor="birthDate" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Дата рождения
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="birthDate"
+                                    name="birthDate"
+                                    value={dayjs(user?.birthDate).format('DD.MM.YYYY')}
+                                    onChange={handleChange}
+                                    type="text"
+                                    disabled
+                                    autoComplete="birthDate"
+                                    className="bg-gray-300 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
 
-                                    <div className="col-span-4">
-                                        <label htmlFor="snils" className="block text-sm font-medium leading-6 text-gray-900">
-                                            СНИЛС
-                                        </label>
-                                        <div className="mt-2">
-                                            <input
-                                                id="snils"
-                                                value={user?.snils}
-                                                onChange={handleChange}
-                                                name="snils"
-                                                type="text"
-                                                autoComplete="snils"
-                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                            />
-                                        </div>
-                                    </div>
+                                <div>
+                                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Email
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="email"
+                                    value={user?.email}
+                                    onChange={handleChange}
+                                    name="email"
+                                    type="text"
+                                    autoComplete="email"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
+
+                                <div>
+                                <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
+                                    Телефон
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="phone"
+                                    name="phone"
+                                    value={user?.phone}
+                                    onChange={handleChange}
+                                    type="text"
+                                    autoComplete="phone"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
+                                </div>
+
+                                <div>
+                                <label htmlFor="snils" className="block text-sm font-medium leading-6 text-gray-900">
+                                    СНИЛС
+                                </label>
+                                <div className="mt-2">
+                                    <input
+                                    id="snils"
+                                    value={user?.snils}
+                                    onChange={handleChange}
+                                    name="snils"
+                                    type="text"
+                                    autoComplete="snils"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    />
+                                </div>
                                 </div>
                             </div>
+                            </div>
+
                             <div className="flex items-center justify-end gap-x-6 border-t border-gray-900/10 px-4 py-4 sm:px-8">
-                                <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                                    Отмена
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                >
-                                    Сохранить
-                                </button>
+                            <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
+                                Отмена
+                            </button>
+                            <button
+                                type="submit"
+                                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >
+                                Сохранить
+                            </button>
                             </div>
                         </form>
                     </div>
+
 
                     <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
                         <div className="px-4 sm:px-0">
@@ -416,8 +427,78 @@ const Page = () => {
                             </div>
                         </form>
                     </div>
+
+                    {/* ✅ Блок согласий */}
+                    {/* ✅ Блок согласий */}
+                    <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
+                        <div className="px-4 sm:px-0">
+                            <h2 className="text-base font-semibold leading-7 text-gray-900">Согласия</h2>
+                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                            Подтверждения, данные при регистрации
+                            </p>
+                        </div>
+
+                        <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+                            <div className="px-4 py-6 sm:p-8">
+                                <div className="space-y-6">
+                                    {/* ✅ Согласие на обработку персональных данных */}
+                                    <div className="flex items-start gap-x-3">
+                                        <input
+                                            type="checkbox"
+                                            checked
+                                            disabled
+                                            readOnly
+                                            className="h-4 w-4 mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        />
+                                        <div className="text-sm leading-6 text-gray-700">
+                                            <p>
+                                            Согласен(а) с{' '}
+                                            <Link
+                                                href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/Доктор_Рядом_Перечень_Обрабатываемых_Персональных_Данных.pdf`}
+                                                target="_blank"
+                                                className="text-indigo-600 hover:underline font-medium"
+                                            >
+                                                правилами обработки персональных данных
+                                            </Link>
+                                            </p>
+                                            <p className="text-gray-500 text-xs mt-1">
+                                            Дата согласия: {dayjs(user?.createdAt).format('DD.MM.YYYY')}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* ✅ Согласие с информированным согласием */}
+                                    <div className="flex items-start gap-x-3">
+                                        <input
+                                            type="checkbox"
+                                            checked
+                                            disabled
+                                            readOnly
+                                            className="h-4 w-4 mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        />
+                                        <div className="text-sm leading-6 text-gray-700">
+                                            <p>
+                                            Принимаю{' '}
+                                            <Link
+                                                href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/ДокторРядом_Положение_Информированное_Добровольное_Согласие_ТМК.pdf`}
+                                                target="_blank"
+                                                className="text-indigo-600 hover:underline font-medium"
+                                            >
+                                                условия информированного согласия
+                                            </Link>
+                                            </p>
+                                            <p className="text-gray-500 text-xs mt-1">
+                                            Дата согласия: {dayjs(user?.createdAt).format('DD.MM.YYYY')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <Footer/>
         </>
     )
 }

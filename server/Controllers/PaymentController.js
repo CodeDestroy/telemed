@@ -153,7 +153,7 @@ class PatientController {
 
             // 2. Запрос к Юкассе
             const yookassaPayment = await yookassaApi.getPayment(payment.yookassa_id);
-
+            const slot = await ConsultationService.getSlotById(payment.consultationId);
             // 3. Обновляем данные в БД
             payment.yookassa_status = yookassaPayment.status;
             payment.yookassa_payment_method_type = yookassaPayment.payment_method?.type || null;
@@ -161,12 +161,16 @@ class PatientController {
             // Меняем paymentStatusId в зависимости от статуса
             if (yookassaPayment.status === "succeeded") {
                 payment.paymentStatusId = 3; // Оплачено
+                slot.slotStatusId = 3; // Помечаем слот как "Оплачено"
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты
+                slot.slotStatusId = 5; // Помечаем слот как "Отменено"
             } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {
                 payment.paymentStatusId = 2; // В обработке
+                slot.slotStatusId = 2; // Помечаем слот как "Ждёт оплаты"
             }
 
+            await slot.save()
             await payment.save();
 
             // 4. Возвращаем обновлённые данные

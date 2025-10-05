@@ -5,6 +5,7 @@ import ConsultationService from '@/services/consultations'
 import { SlotWithRoomPatient } from '@/types/consultaion'
 import dayjs from 'dayjs'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 
 const ConsultationPage = () => {
     const params = useParams() as { id?: string | string[] } | null
@@ -52,6 +53,7 @@ const ConsultationPage = () => {
                     <p>{consultation.Room.protocol}</p>
                 </div>
             </div>
+            <Footer/>
         </>
         
     )
