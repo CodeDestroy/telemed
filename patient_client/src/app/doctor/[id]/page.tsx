@@ -16,6 +16,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ruRU } from '@mui/x-date-pickers/locales';
 import Footer from "@/components/Footer";
+import Loader from "@/components/Loader";
 interface Consultation {
   id: number;
   slotStartDateTime: string;
@@ -34,6 +35,7 @@ const DoctorPage = () => {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [activeConsultations, setActiveConsultations] = useState<Consultation[]>([]);
 
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (id) {
       fetchDoctor();
@@ -136,6 +138,7 @@ const DoctorPage = () => {
     try {
       if (store.user?.id) {
         const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime}`).toISOString();
+        setLoading(true)
         const response = await main.createConsultation(
           doctor.doctor.id,
           store.user?.personId,
@@ -146,13 +149,17 @@ const DoctorPage = () => {
           //alert("Вы успешно записаны!");
           /* console.log( `/payments/${response.data?.newPayment?.uuid4}`) */
           window.location.href = `/payments/${response.data?.newPayment?.uuid4}`;
+          setLoading(false)
         } else {
+          setLoading(false)
           alert("Не удалось записаться, попробуйте позже");
         }
       } else {
+        setLoading(false)
         window.location.href = "/login";
       }
     } catch (error) {
+      setLoading(false)
       console.error(error);
       alert("Ошибка при записи");
     }
@@ -169,6 +176,19 @@ const DoctorPage = () => {
     );
   }
 
+  if (loading) {
+      return (
+          <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 flex items-center justify-center">
+                  <Loader />
+              </main>
+              <Footer />
+          </div>
+      )
+  }
+  else
+
   return (
     <>
     <div className='flex flex-col min-h-screen bg-gray-50'>
@@ -177,6 +197,7 @@ const DoctorPage = () => {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <Link
           href="/"
+          onClick={() => setLoading(true)}
           className="inline-flex items-center text-sm text-blue-600 hover:underline"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> Назад

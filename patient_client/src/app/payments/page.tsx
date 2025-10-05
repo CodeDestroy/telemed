@@ -9,8 +9,11 @@ import { useStore } from '@/store'
 import { PaymentInformationPageResponse } from "@/types/payment";
 import PaymentService from "@/services/payments";
 import Footer from "@/components/Footer";
+import Loader from "@/components/Loader";
 
 const PaymentsPage = () => {
+  
+  const [loading, setLoading] = useState(false)
   const store = useStore()
   const [payments, setPayments] = useState<PaymentInformationPageResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,6 +72,7 @@ const PaymentsPage = () => {
       <Link
         key={id}
         href={`/payments/${uuid4}`}
+        onClick={() => setLoading(true)}
         className="block bg-white shadow rounded-lg p-6 hover:shadow-md transition"
       >
         <div className="flex gap-4 items-center">
@@ -104,12 +108,27 @@ const PaymentsPage = () => {
     );
   };
 
+      
+  if (loading) {
+      return (
+          <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 flex items-center justify-center">
+                  <Loader />
+              </main>
+              <Footer />
+          </div>
+      )
+  }
+  else
+
   return (
     <>
       <Header />
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         <Link
           href="/"
+          onClick={() => setLoading(true)}
           className="inline-flex items-center text-sm text-blue-600 hover:underline"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> На главную

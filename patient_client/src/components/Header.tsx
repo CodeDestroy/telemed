@@ -11,6 +11,9 @@ import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import Link from 'next/link'
+import PageLoader from './PageLoader'
+import Footer from './Footer'
+import Loader from './Loader'
 
 const Header = () => {
     const router = useRouter()
@@ -18,6 +21,7 @@ const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     
     const openProfile = () => {
+        setLoading(true)
         router.push('/profile')
     }
 
@@ -25,6 +29,22 @@ const Header = () => {
         store.logout()
         location.reload()
     }
+
+    const [loading, setLoading] = useState(false)
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <Loader />
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    else
+
 
     return (
         <header className="bg-white">
@@ -47,7 +67,7 @@ const Header = () => {
                 </div>
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
 
-                    <Link href="/" className="text-sm font-semibold leading-6 text-gray-900">
+                    <Link href="/" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
                         Главная
                     </Link>
                     <Popover className="relative">
@@ -68,7 +88,7 @@ const Header = () => {
                                         <LockOpenIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                     </div>
                                     <div className="flex-auto">
-                                        <Link href='/consultations/current/' className="block font-semibold text-gray-900">
+                                        <Link href='/consultations/current/' onClick={() => setLoading(true)} className="block font-semibold text-gray-900">
                                             Активные консультации
                                             <span className="absolute inset-0" />
                                         </Link>
@@ -82,7 +102,7 @@ const Header = () => {
                                         <LockClosedIcon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                                     </div>
                                     <div className="flex-auto">
-                                        <Link href='/consultations/previous/' className="block font-semibold text-gray-900">
+                                        <Link href='/consultations/previous/' onClick={() => setLoading(true)} className="block font-semibold text-gray-900">
                                             Завершённые консультации
                                             <span className="absolute inset-0" />
                                         </Link>
@@ -104,19 +124,19 @@ const Header = () => {
                             </div> */}
                         </PopoverPanel>
                     </Popover>
-                    <Link href="/pricing" className="text-sm font-semibold leading-6 text-gray-900">
+                    <Link href="/pricing" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
                         Цены
                     </Link>
-                    <Link href="/contacts" className="text-sm font-semibold leading-6 text-gray-900">
+                    <Link href="/contacts" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
                         Контакты
                     </Link>
-                    <Link href="/payments" className="text-sm font-semibold leading-6 text-gray-900">
+                    <Link href="/payments" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
                         Платежи
                     </Link>
                 </PopoverGroup> 
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                     { store.isAuth === false ?
-                        <Link href='/login' className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+                        <Link href='/login' onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                             Войти <span aria-hidden="true">&rarr;</span>
                         </Link>
                         :
@@ -181,6 +201,7 @@ const Header = () => {
                                 <div className="space-y-2 py-6">
                                     <Link
                                         href="/"
+                                        onClick={() => setLoading(true)}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Главная
@@ -189,6 +210,7 @@ const Header = () => {
                                 <div className="space-y-2 py-6">
                                     <Link
                                         href="/consultations/current"
+                                        onClick={() => setLoading(true)}
                                         className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
@@ -198,6 +220,7 @@ const Header = () => {
                                     </Link>
                                     <Link
                                         href="/consultations/previous"
+                                        onClick={() => setLoading(true)}
                                         className="group -mx-3 flex items-center gap-x-6 rounded-lg p-3 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
@@ -210,18 +233,21 @@ const Header = () => {
                                 <div className="space-y-2 py-6">
                                     <Link
                                         href="/pricing"
+                                        onClick={() => setLoading(true)}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Цены
                                     </Link>
                                     <Link
                                         href="/contacts"
+                                        onClick={() => setLoading(true)}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Контакты
                                     </Link>
                                     <Link
                                         href="/payments"
+                                        onClick={() => setLoading(true)}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
                                         Платежи

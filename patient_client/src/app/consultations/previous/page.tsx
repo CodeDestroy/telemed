@@ -1,6 +1,7 @@
 'use client'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import Loader from '@/components/Loader'
 import ConsultationService from '@/services/consultations'
 import { useStore } from '@/store'
 import { ConsultationFull } from '@/types/consultaion'
@@ -11,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 
 const Page = () => {
 
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
     const store = useStore()
 
@@ -41,6 +43,19 @@ const Page = () => {
             router.push('/login')
         }
     }, [store])
+    
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <Loader />
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    else
     
     return (
         <>
@@ -101,7 +116,7 @@ const Page = () => {
                                 {/* Правая часть — кнопка */}
                                 <div className="mt-4 sm:mt-0 sm:ml-6 flex-shrink-0 self-center">
                                     <a
-                                        onClick={() => router.push(`previous/${(consultation.slotId)?.toString()}`)}
+                                        onClick={() => {setLoading(true); router.push(`previous/${(consultation.slotId)?.toString()}`)}}
                                         /* href={`./${(consultation.slotId)?.toString()}`} */
                                         className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 cursor-pointer"
                                     >

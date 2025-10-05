@@ -7,6 +7,7 @@ import AuthService from '@/services/auth'
 import { useRouter } from 'next/navigation'
 import { AxiosError } from '@/types/errors'
 import Link from 'next/link'
+import Loader from '@/components/Loader'
 
 const Registration = () => {
   const store = useStore()
@@ -52,6 +53,7 @@ const Registration = () => {
 
   const registration = async (event: FormEvent<HTMLFormElement>) => {
     try {
+      setLoading(true)
       event.preventDefault()
       setErrors([])
       if (chechFormData()) {
@@ -67,6 +69,7 @@ const Registration = () => {
             password,
             snils
           )
+          setLoading(false)
           router.push(`/registration/registration-step3?phone=${response2.data[0]?.phone}`)
         }
       }
@@ -77,6 +80,21 @@ const Registration = () => {
       else setErrors(['Неизвестная ошибка'])
     }
   }
+
+  const [loading, setLoading] = useState(false)
+      
+  if (loading) {
+      return (
+          <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 flex items-center justify-center">
+                  <Loader />
+              </main>
+              <Footer />
+          </div>
+      )
+  }
+  else
 
   return (
     <>

@@ -19,9 +19,9 @@ const ChildComponent = ({message, files, user}) => {
     const {store} = useContext(Context);
 
 
-    /* useEffect(()=>{
+    useEffect(()=>{
         console.log(user)
-    }, []) */
+    }, [])
 
     if (store.user)
     return (
@@ -30,14 +30,14 @@ const ChildComponent = ({message, files, user}) => {
                 <div key={`div_${Date.now()}_${message.id}`} className={`message-data ${parseInt(user.id) === parseInt(store.user.id) ? 'text-right' : '' }`} >
                     <span key={`span_${Date.now()}_${message.id}`} className="message-data-time">
                     <strong style={{fontWeight: 'bold', fontSize: 'medium' }}>
-                            {user?.Doctor ? 
-                                user.Doctor.secondName + ' ' + user.Doctor.firstName + ' '
+                            {user?.Doctors.length > 0 ? 
+                                user.Doctors[0].secondName + ' ' + user.Doctors[0].firstName + ' '
                                 : 
                                 (user?.Patient ? 
                                     user.Patient.secondName + ' ' + user.Patient.firstName + ' '
                                     : 
-                                    (user?.Admin ? 
-                                        user.Admin.secondName + ' ' + user.Admin.firstName + ' '
+                                    (user?.Admins.length > 0 ? 
+                                        user.Admins[0].secondName + ' ' + user.Admins[0].firstName + ' '
                                         :
                                         ''
                                     )

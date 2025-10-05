@@ -1,8 +1,25 @@
 'use client'
 
 import Link from 'next/link'
+import Header from './Header'
+import Loader from './Loader'
+import { useState } from 'react'
 
 const Footer = () => {
+    const [loading, setLoading] = useState(false)
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <Loader />
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    else
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
       <h2 id="footer-heading" className="sr-only">Футер</h2>
@@ -30,17 +47,17 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold leading-6 text-gray-900">Навигация</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li>
-                    <Link href="/" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Главная
                     </Link>
                   </li>
                   <li>
-                    <Link href="/consultations/current" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/consultations/current" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Активные консультации
                     </Link>
                   </li>
                   <li>
-                    <Link href="/consultations/previous" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/consultations/previous" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Завершённые консультации
                     </Link>
                   </li>
@@ -50,17 +67,17 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold leading-6 text-gray-900">О компании</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li>
-                    <Link href="/pricing" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/pricing" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Цены
                     </Link>
                   </li>
                   <li>
-                    <Link href="/contacts" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/contacts" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Контакты
                     </Link>
                   </li>
                   <li>
-                    <Link href="/payments" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                    <Link href="/payments" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                       Платежи
                     </Link>
                   </li>

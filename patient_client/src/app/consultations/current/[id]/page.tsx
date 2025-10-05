@@ -9,10 +9,13 @@ import { useStore } from '@/store'
 import duration from 'dayjs/plugin/duration'
 import Footer from '@/components/Footer'
 import PageLoader from '@/components/PageLoader'
+import Loader from '@/components/Loader'
 
 dayjs.extend(duration)
 
 const Page = () => {
+  
+  const [loading, setLoading] = useState(false)
   const params = useParams() as { id?: string | string[] } | null
   const rawId = params?.id
   const id = Array.isArray(rawId) ? rawId[0] : rawId
@@ -72,6 +75,19 @@ const Page = () => {
       : false
 
   const paymentStatus = consultation.Payment?.paymentStatusId
+  
+  if (loading) {
+      return (
+          <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 flex items-center justify-center">
+                  <Loader />
+              </main>
+              <Footer />
+          </div>
+      )
+  }
+  else
 
   return (
     <>
@@ -141,6 +157,7 @@ const Page = () => {
           {paymentStatus === 1 && (
             <a
               href={`/payments/${consultation.Payment?.uuid4}`}
+              onClick={() => setLoading(true)}
               className="p-4 bg-blue-500 hover:bg-blue-600 text-white rounded"
             >
               Оплатить

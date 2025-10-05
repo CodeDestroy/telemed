@@ -7,6 +7,7 @@ import { Box, Snackbar, Chip, Button } from "@mui/material";
 import moment from "moment-timezone";
 import { LocalizationContext } from "../../../../Utils/LocalizationContext";
 import ConsultationDetailsModal from "../../ConsultationDetailsModal";
+import doctorLocations from "../../../../Locations/DoctorLocations";
 
 function Index() {
   const { store } = useContext(Context);
@@ -36,8 +37,9 @@ function Index() {
   }, [store]);
 
   const handleOpenModal = (slotId) => {
-    setSelectedSlot(slotId);
-    setModalOpen(true);
+    window.location.href = `/consultation/${slotId}`;
+    /* setSelectedSlot(slotId);
+    setModalOpen(true); */
   };
 
   const handleCloseModal = () => {
@@ -108,11 +110,11 @@ function Index() {
       </Box>
 
       {/* Подключаем модалку */}
-      <ConsultationDetailsModal
+      {/* <ConsultationDetailsModal
         open={modalOpen}
         onClose={handleCloseModal}
         slotId={selectedSlot}
-      />
+      /> */}
     </LocalizationContext>
   );
 }
