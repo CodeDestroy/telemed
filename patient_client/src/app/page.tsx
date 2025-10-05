@@ -22,7 +22,6 @@ import Box from '@mui/material/Box';
 import Loader from '@/components/Loader'
 import { ScheduleShort } from '@/types/schedule'
 import Footer from '@/components/Footer'
-import PageLoader from '@/components/PageLoader'
 
 function Home () {
     const [date, setDate] = useState<Dayjs | null>(null);
@@ -122,7 +121,6 @@ function Home () {
         <>
         <div className='flex flex-col min-h-screen bg-gray-50'>
             <Header/>
-            <PageLoader/>
             <div className="flex-grow">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'> 

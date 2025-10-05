@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import Link from 'next/link'
-import PageLoader from './PageLoader'
 import Footer from './Footer'
 import Loader from './Loader'
 
