@@ -48,7 +48,7 @@ class DoctorController {
     }
 
     async getEndedConsultations (req, res) {
-        try {
+        try { 
             const {userId} = req.query
             const doctor = await DoctorService.getDoctorByUserId(userId)
             const activeSlots = await ConsultationService.getEndedDoctorSlots(doctor.id)
