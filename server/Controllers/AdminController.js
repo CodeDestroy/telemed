@@ -123,7 +123,10 @@ class AdminController {
                     amount: price.price,
                     description,
                     return_url: `https://dr.clinicode.ru/payments/${newPayment.uuid4}`,
-                    payment_uuid: newPayment.uuid4
+                    payment_uuid: newPayment.uuid4,
+                    
+                    customerEmail: patient.User.email,
+                    customerPhone: patient.User.phone
                 });
 
                 if (yookassaPayment) {
