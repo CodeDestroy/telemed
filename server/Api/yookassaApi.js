@@ -24,26 +24,49 @@ class yookassaApi {
         return request.data
     }
 
-    async createPayment({ amount, currency = "RUB", description, return_url, payment_uuid, payment_method_data = "bank_card", idempotenceKey }) {
+    async createPayment({ amount, currency = "RUB", description, return_url, payment_uuid, payment_method_data = "bank_card", customerEmail, customerPhone }) {
         try {
-            const response = await $api.post(
-                "/payments", 
-                {
-                    amount: {
-                        value: amount.toFixed(2), 
-                        currency,
-                    },
-                    confirmation: {
-                        type: "redirect",
-                        return_url: return_url,
-                    },
-                    payment_method_data: {
-                        type: payment_method_data
-                    },
-                    capture: true, // Сразу списывать деньги
-                    description,
-                    test: YOOKASSA_TEST,
+            const paymentData = {
+                amount: {
+                    value: amount.toFixed(2),
+                    currency,
                 },
+                confirmation: {
+                    type: "redirect",
+                    return_url: return_url,
+                },
+                payment_method_data: {
+                    type: payment_method_data
+                },
+                capture: true, // сразу списывать деньги
+                description,
+                test: YOOKASSA_TEST,
+            };
+
+            // Добавляем receipt только если есть email или телефон покупателя
+            if (customerEmail || customerPhone) {
+                paymentData.receipt = {
+                    customer: {},
+                    items: [
+                        {
+                            description,
+                            quantity: 1,
+                            amount: {
+                                value: amount.toFixed(2),
+                                currency: currency,
+                            },
+                            vat_code: 1 // НДС 20%
+                        }
+                    ]
+                };
+
+                if (customerEmail) paymentData.receipt.customer.email = customerEmail;
+                if (customerPhone) paymentData.receipt.customer.phone = customerPhone;
+            }
+
+            const response = await $api.post(
+                "/payments",
+                paymentData,
                 {
                     headers: {
                         "Idempotence-Key": payment_uuid,
@@ -57,6 +80,7 @@ class yookassaApi {
             throw error;
         }
     }
+
 
     // Получение информации о платеже
     async getPayment(paymentId) {
