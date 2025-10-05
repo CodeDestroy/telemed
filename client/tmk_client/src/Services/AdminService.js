@@ -41,6 +41,10 @@ export default class AdminService {
         return $api.post(`/api/admin/doctors/${doctorId}`, {user: doctor});
     }
 
+    static async getSpecialties() {
+        return $api.get('/api/admin/doctors/specialties/all');
+    }
+
 
     static async createDoctor(formData, profileId = null) {
         return $apiMultipartData.post('/api/admin/doctors/create', formData, {params: {profileId}});

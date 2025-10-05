@@ -6,7 +6,8 @@ class DoctorService {
             const doctor = await database["Doctors"].findOne({
                 where: {
                     userId: userId
-                }
+                },
+                
             })
             return doctor;
         }
@@ -19,10 +20,16 @@ class DoctorService {
     async getAllDoctors() {
         try {
             const doctors = await database["Doctors"].findAll({
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true
+                    }
+                ]
             })
             return doctors;
         }
@@ -38,10 +45,16 @@ class DoctorService {
                 where: {
                     medOrgId: medorgId
                 },
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true
+                    }
+                ]
             })
             return doctors
         }
@@ -51,11 +64,11 @@ class DoctorService {
         }
     }
 
-    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null) {
+    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null, postId = 2) {
         try {
             const doctor = await database["Doctors"].create({
                 
-                userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId
+                userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId, postId
             })
             return doctor
       
@@ -69,10 +82,16 @@ class DoctorService {
     async getDoctor(id) {
         try {
             const doctor = await database["Doctors"].findByPk(id, {
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true
+                    }
+                ]
             })
             return doctor;
         }

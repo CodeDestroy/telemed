@@ -385,6 +385,7 @@ class AdminController {
             doctor.User.email = user.User.email
             doctor.User.confirmed = user.User.confirmed
             doctor.User.phone = user.User.phone
+            doctor.postId = user.Post.id
             doctor.save()
             doctor.User.save()
             res.status(200).json(doctor)
@@ -430,9 +431,9 @@ class AdminController {
                 birthDate,
                 info,
                 inn,
-                snils
+                snils,
+                postId
             } = req.body;
-            
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             let errors = ''
@@ -451,7 +452,7 @@ class AdminController {
 
             if (req.user.accessLevel == 4) {
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1)
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1, postId)
 
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
             }

@@ -74,15 +74,32 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold leading-6 text-gray-900">Правовая информация</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   <li>
-                    <Link href="/privacy" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                      Политика конфиденциальности
+                    <Link target='_blank' href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/Доктор_Рядом_Перечень_Обрабатываемых_Персональных_Данных.pdf`} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Политика обработки персональных данных
                     </Link>
                   </li>
                   <li>
-                    <Link href="/terms" className="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                      Условия использования
+                    <Link target='_blank' href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/ДокторРядом_Положение_Информированное_Добровольное_Согласие_ТМК.pdf`} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Добровольное информированное согласие
                     </Link>
                   </li>
+                  <li>
+                    <Link target='_blank' href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/ДокторРядом_ВнутреннийРаспорядокПотребителейМедицинскихУслуг.pdf`} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Внутренний распорядок потребителей медицинских услуг
+                    </Link>
+                  </li>
+                  <li>
+                    <Link target='_blank' href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/ДокторРядом_Положение_ТМК.pdf`} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Положение об организации и оказания медицинской помощи
+                    </Link>
+                  </li>
+                  <li>
+                    <Link target='_blank' href={`${process.env.NEXT_PUBLIC_SERVER_URL}/license/ДокторРядом_ПорядокИУсловияПроведения_ТМК.pdf`} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Порядок и условия проведения ТМК
+                    </Link>
+                  </li>
+                  
+                  
                 </ul>
               </div>
             </div>

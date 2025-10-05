@@ -7,6 +7,7 @@ function RegistratinStep1() {
         const html = document.querySelector('html')
         html.style.fontSize = '10px'
     }, [])
+    const [consent, setConsent] = useState(false);
 
     const [phone, setPhone] = useState('')
 
@@ -17,10 +18,18 @@ function RegistratinStep1() {
     const clearPhone = () => {
         setPhone('')
     }
+    const handleConsentChange = (event) => {
+        setConsent(event.target.checked);
+    }
+
 
     const handleNext = async (event) => {
         event.preventDefault()
         /* console.log(phone) */
+        if (!consent) {
+            alert('Вы должны согласиться на обработку персональных данных');
+            return;
+        }
         try {
             const response = await AuthService.checkPhone(phone.trim())
             if (response.status === 200) {
@@ -34,6 +43,7 @@ function RegistratinStep1() {
         catch (e) {
             alert(e.response.data)
         }
+        
         
     }
     return (
@@ -57,6 +67,21 @@ function RegistratinStep1() {
                                     </svg>
                                 </span>
                             </div>
+                            <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        checked={consent} 
+                                        onChange={handleConsentChange} 
+                                        style={{ margin: 0, verticalAlign: 'middle', accentColor: 'red' }}
+                                    />
+                                    <span>
+                                    Я ознакомлен(а) и согласен(а) с{' '} <a href={`${process.env.REACT_APP_SERVER_URL}/license/Доктор_Рядом_Перечень_Обрабатываемых_Персональных_Данных.pdf`} target="_blank" >политикой обработки персональных данных</a>
+                                    </span>
+                                </label>
+                            </div>
+
+
                             <input type="button" onClick={handleNext} className={styles.buttonPrimary} value="Далее"/>
                         </form>
                         <p>

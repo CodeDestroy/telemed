@@ -32,4 +32,8 @@ router.get('/doctors/all', AdminController.getAllDoctors)
 router.get('/doctors/:id', AdminController.getDoctor)
 router.post('/doctors/:id', AdminController.editDoctor)
 router.get('/slotStatuses/all', AdminController.getAllSlotStatuses)
+
+router.get('/doctors/specialties/all', DoctorController.getPostsList)
+
+
 module.exports = router;
