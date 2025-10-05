@@ -38,6 +38,7 @@ function Home () {
     const [doctorListWithSchedule, setDoctorListWithSchedule] = useState<DoctorListItemResponse[]>([])
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null)
     const [inputDoctorValue, setinputDoctorValue] = useState('')
+    const [loading, setLoading] = useState(false)
     const medOrgId = process.env.NEXT_PUBLIC_MED_ORG_ID
     const fetchDoctorsList = async () => {
         try {
@@ -105,6 +106,18 @@ function Home () {
         console.log(doctor)
     } */
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <Loader />
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    else
     return (
         <>
         <div className='flex flex-col min-h-screen bg-gray-50'>
@@ -253,6 +266,7 @@ function Home () {
                                                 {/* Правая колонка: действие */}
                                                 <div className="flex items-center justify-between sm:justify-end sm:col-span-2">
                                                     <a
+                                                        onClick={() => {setLoading(true)}}
                                                         href={`/doctor/${item.doctor.id}`}
                                                         className="cursor-pointer text-sm leading-6 text-gray-900"
                                                     >

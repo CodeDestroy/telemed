@@ -7,7 +7,10 @@ import { useStore } from '@/store'
 import Header from '@/components/Header'
 import Link from 'next/link'
 import Footer from '@/components/Footer'
+import Loader from '@/components/Loader'
 const LoginPage = () => {
+    
+    const [loading, setLoading] = useState(false)
     const store = useStore()
     const router = useRouter()
     const [phone, setPhone] = useState('')
@@ -22,19 +25,24 @@ const LoginPage = () => {
         setError('')
         
        try {
+            setLoading(true)
             const res = await store.login(phone, password)
 
             // проверяем, что это AxiosResponse (есть status и data)
             if ('status' in res && res.status === 200) {
+                setLoading(false)
                 router.push('/')
             } else if ('response' in res && res.response?.data) {
+                setLoading(false)
                 setError(res.response.data)
             } else {
+                setLoading(false)
                 setError('Ошибка авторизации')
             }
 
             console.log(res)
         } catch (err: unknown) {
+            setLoading(false)
             if (err instanceof Error) {
                 setError(err.message)
             } else {
@@ -42,6 +50,19 @@ const LoginPage = () => {
             }
         }
     }
+    
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <Header />
+                <main className="flex-1 flex items-center justify-center">
+                    <Loader />
+                </main>
+                <Footer />
+            </div>
+        )
+    }
+    else
     return (
         <>
         <div className='flex flex-col min-h-screen bg-gray-50'>
@@ -60,7 +81,7 @@ const LoginPage = () => {
                             </h2>
                             <p className="mt-2 text-sm leading-6 text-gray-500">
                                 Не зарегистрированы?{' '}
-                                <Link href='/registration' className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
+                                <Link href='/registration' onClick={() => setLoading(true)} className="font-semibold text-indigo-600 hover:text-indigo-500 cursor-pointer">
                                     Регистрация
                                 </Link>
                             </p>
