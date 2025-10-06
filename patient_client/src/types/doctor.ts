@@ -10,7 +10,7 @@ export interface Doctor {
   patronomicName: string | null,
   birthDate: string | null,
   snils: string | null,
-  Post: Post | null
+  Posts: Post[] | null
   info: string | null,
   MedOrg: MedicalOrg | null,
   User: User | null

@@ -7,12 +7,12 @@ import Post from "@/types/posts";
 
 export default class ConsultationService {
 
-    static async getPreviousConsultations(userId: number | undefined): Promise<AxiosResponse<ConsultationFull[]>> {
-        return $api.get<ConsultationFull[]>('/api/patient/consultations', {params: {userId, previous: true}})
+    static async getPreviousConsultations(userId: number | undefined): Promise<AxiosResponse<SlotWithRoomPatient[]>> {
+        return $api.get<SlotWithRoomPatient[]>('/api/patient/consultations', {params: {userId, previous: true}})
     }
 
-    static async getCurrentConsultations(userId: number | undefined): Promise<AxiosResponse<ConsultationFull[]>> {
-        return $api.get<ConsultationFull[]>('/api/patient/consultations', {params: {userId, previous: false}})
+    static async getCurrentConsultations(userId: number | undefined): Promise<AxiosResponse<SlotWithRoomPatient[]>> {
+        return $api.get<SlotWithRoomPatient[]>('/api/patient/consultations', {params: {userId, previous: false}})
     }
 
     static async getConsultationById(id: number): Promise<AxiosResponse<SlotWithRoomPatient>> {

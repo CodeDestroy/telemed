@@ -1,9 +1,10 @@
-const database = require('../models/index');
-const { Op } = require('sequelize')
+/* const database = require('../models/index'); */
+const database = require('../Database/setDatabase')
 const DateTimeManager = require('../Utils/DateTimeManager')
 const moment = require('moment-timezone');
 const { raw } = require('body-parser');
 const UrlManager = require('../Utils/UrlManager');
+const { Op } = require('sequelize');
 
 const JITSI_APP_ID = process.env.JITSI_APP_ID;
 const JITSI_SERVER_URL = process.env.JITSI_SERVER_URL;
@@ -81,9 +82,9 @@ class ConsultationService {
 
     async getAllSlotsInMO (userId) {
         try {
-            const user = await database["Users"].findByPk(userId, {
+            const user = await database.models.Users.findByPk(userId, {
                 include: [{
-                    model: database["Admins"],
+                    model: database.models.Admins,
                     required: true,
                 }]
             })
@@ -128,7 +129,7 @@ class ConsultationService {
 
     async getAllSlotsInMOByAdminId (adminId) {
         try {
-            const admin = await database["Admins"].findByPk(adminId)
+            const admin = await database.models.Admins.findByPk(adminId)
 
             if (admin.medOrgId) {
                 const slots = await database.sequelize.query(`
@@ -218,7 +219,7 @@ class ConsultationService {
     async getAllActiveSlots () {
         try {
             const currTime = await DateTimeManager.getCurrentDateTimeWithTimezone(3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
-            const slots = await database["Slots"].findAll({ 
+            const slots = await database.models.Slots.findAll({ 
                 where: {
                     doctorId: { 
                         [Op.ne]: null
@@ -230,11 +231,11 @@ class ConsultationService {
                 },
                 include: [
                     {
-                        model: database["Rooms"],
+                        model: database.models.Rooms,
                         required: false
                     },
                     {
-                        model: database["Patients"],
+                        model: database.models.Patients,
                         required: false
                     }
                 ]
@@ -252,16 +253,16 @@ class ConsultationService {
     //Возвращаем все слоты по врачу
     async getAllDoctorSlots(doctorId) {
         try {
-            const slots = await database["Slots"].findAll({
+            const slots = await database.models.Slots.findAll({
                 where: {
                     doctorId: doctorId
                 },
                 include: [{
-                    model: database["Rooms"],
+                    model: database.models.Rooms,
                     required: false
                 },
                 {
-                    model: database["Patients"],
+                    model: database.models.Patients,
                     required: false
                 }]
             })
@@ -324,7 +325,7 @@ class ConsultationService {
         try {
             const currTime = new Date().toISOString();
                         
-            const slots = await database.sequelize.query(`
+            /* const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -352,7 +353,50 @@ class ConsultationService {
             {
                 replacements: { patientId: patientId, currTime: currTime }, 
                 raw: true
-            })
+            }) */
+            const slots = await database.models.Slots.findAll({
+                where: {
+                    patientId,
+                },
+                include: [
+                    {
+                        model: database.models.Rooms,
+                        where: { ended: true },
+                        required: true
+                    },
+                    {
+                        model: database.models.Patients,
+                        /* as: 'Patient',
+                        attributes: ['firstName', 'secondName', 'patronomicName'], */
+                        include: [{ 
+                            model: database.models.Users,
+                                include: [{
+                                    model: database.models.Url,
+                                    where: { type: 'room' },
+                                    required: false
+                                }]
+                        }]
+                    },
+                    {
+                        model: database.models.Doctors,
+                        include: [
+                            { 
+                                model: database.models.Users,
+                                include: [{
+                                    model: database.models.Url,
+                                    where: { type: 'room' },
+                                    required: false
+                                }]
+                            },
+                            { 
+                                model: database.models.Posts,
+                                required: false
+                            },
+                        ]
+                    }
+                ],
+                order: [['slotStartDateTime', 'DESC']]
+            });
             /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
             /* console.log(slots) */
             return slots;
@@ -441,7 +485,7 @@ class ConsultationService {
                 raw: true
             }) */
                         
-            const slots = await database.sequelize.query(`
+            /* const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -469,7 +513,57 @@ class ConsultationService {
             {
                 replacements: { patientId: patientId, currTime: currTime }, 
                 raw: true
-            })
+            }) */
+            const slots = await database.models.Slots.findAll({
+                where: { patientId },
+                include: [
+                    {
+                        model: database.models.Rooms,
+                        required: true,
+                        where: {
+                            [Op.or]: [
+                                { ended: false },
+                                { ended: null }
+                            ]
+                        }
+                    },
+                    {
+                        model: database.models.Patients,
+                        include: [{ 
+                            model: database.models.Users,
+                                include: [{
+                                    model: database.models.Url,
+                                    where: { type: 'room' },
+                                    required: false
+                                }]
+                        }]
+                    },
+                    {
+                        model: database.models.Doctors,
+                        include: [
+                            {   model: database.models.Users,
+                                include: [{
+                                    model: database.models.Url,
+                                    where: { type: 'room' },
+                                    required: false
+                                }]
+                            },
+                            { 
+                                model: database.models.Posts,
+                                through: { attributes: [] }
+                            }
+                        ]
+                    },
+                    {
+                        model: database.models.Payments,
+                        required: false,
+                        include: [
+                            { model: database.models.PaymentStatus }
+                        ]
+                    }
+                ],
+                order: [['slotStartDateTime', 'ASC']]
+            });
             /* const slots = await database.sequelize.query(`SELECT * FROM slots s join "Rooms" r on s.id = r."slotId" where s."doctorId" = ${doctorId}`, {raw: false}) */
             /* console.log(slots) */
             return slots;
@@ -528,7 +622,7 @@ class ConsultationService {
         try {
             const startParsedDate = await DateTimeManager.getDateTimeWithTimezone(startDateTime, 3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
             const endParsedDate = await DateTimeManager.getDateTimeWithTimezone(endDateTime, 3) //Заглушка, 3 - часовой пояс (+3 - мск), необходимо реализовать поиск по ip по таймзоне
-            const slots = await database["Slots"].findAll({
+            const slots = await database.models.Slots.findAll({
                 where: {
                     doctorId: doctorId,
                     slotStartDateTime: {
@@ -539,11 +633,11 @@ class ConsultationService {
                     }
                 },
                 include: [{
-                    model: database["Rooms"],
+                    model: database.models.Rooms,
                     required: false
                 },
                 {
-                    model: database["Patients"],
+                    model: database.models.Patients,
                     required: false
                 }]
             });
@@ -558,51 +652,51 @@ class ConsultationService {
     //Слот по id
     async getSlotById (slotId) {
         try { 
-            const slot = await database["Slots"].findByPk(slotId, {
+            const slot = await database.models.Slots.findByPk(slotId, {
                     include: [
                     {
-                        model: database["Rooms"],
+                        model: database.models.Rooms,
                         required: false,
                         include: [
                             {
-                                model: database["Url"],
+                                model: database.models.Url,
                                 required: true
                             }
                         ]
 
                     },
                     {
-                        model: database["Patients"],
+                        model: database.models.Patients,
                         required: false
                     },
                     {
-                        model: database["Attachments"],
+                        model: database.models.Attachments,
                         required: false
                     },
                     {
-                        model: database["Doctors"],
+                        model: database.models.Doctors,
                         required: false,
                         include: [
                             {
-                                model: database["Posts"],
+                                model: database.models.Posts,
                                 required: true
                             },
                             {
-                                model: database["Users"],
+                                model: database.models.Users,
                                 required: true
                             }
                         ]
                     },
                     {
-                        model: database["Payments"],
+                        model: database.models.Payments,
                         required: false,
                         include: [
                             {
-                                model: database["PaymentStatus"],
+                                model: database.models.PaymentStatus,
                                 required: true
                             },
                             {
-                                model: database["PayTypes"],
+                                model: database.models.PayTypes,
                                 required: true
                             }
                         ]
@@ -632,19 +726,19 @@ class ConsultationService {
     //Слот по id комнаты
     async getSlotByRoomId (roomId) {
         try {
-            const room = await database["Rooms"].findByPk(roomId);
-            const slot = await database["Slots"].findByPk(room.slotId, {
+            const room = await database.models.Rooms.findByPk(roomId);
+            const slot = await database.models.Slots.findByPk(room.slotId, {
                 include: [
                     {
-                        model: database["Rooms"],
+                        model: database.models.Rooms,
                         required: false
                     },
                     {
-                        model: database["Patients"],
+                        model: database.models.Patients,
                         required: false,
                         include: [
                             {
-                                model: database["Users"],
+                                model: database.models.Users,
                                 required: false
                             }
                         ]
@@ -662,23 +756,23 @@ class ConsultationService {
     //Слот по названию комнаты
     async getSlotByRoomName (roomName) {
         try {
-            const room =  await database["Rooms"].findOne({
+            const room =  await database.models.Rooms.findOne({
                 where: {
                     roomName: roomName
                 }
             })
-            const slot = await database["Slots"].findByPk(room.slotId, {
+            const slot = await database.models.Slots.findByPk(room.slotId, {
                 include: [
                     {
-                        model: database["Rooms"],
+                        model: database.models.Rooms,
                         required: false
                     },
                     {
-                        model: database["Patients"],
+                        model: database.models.Patients,
                         required: false,
                         include: [
                             {
-                                model: database["Users"],
+                                model: database.models.Users,
                                 required: false
                             }
                         ]
@@ -695,7 +789,7 @@ class ConsultationService {
 
     async getRoomById (roomId) {
         try {
-            const room = await database["Rooms"].findByPk(roomId);
+            const room = await database.models.Rooms.findByPk(roomId);
             return room;
         }
         catch (e) {
@@ -706,10 +800,10 @@ class ConsultationService {
 
     async getDoctorBySlotId (slotId) {
         try {
-            const slot = await database["Slots"].findByPk(slotId, {
+            const slot = await database.models.Slots.findByPk(slotId, {
                 include: [
                     {
-                        model: database["Doctors"],
+                        model: database.models.Doctors,
                         required: false,
                     }
                 ]
@@ -724,10 +818,10 @@ class ConsultationService {
 
     async getPatientBySlotId (slotId) {
         try {
-            const slot = await database["Slots"].findByPk(slotId, {
+            const slot = await database.models.Slots.findByPk(slotId, {
                 include: [
                     {
-                        model: database["Patients"],
+                        model: database.models.Patients,
                         required: false,
                     }
                 ]
@@ -742,7 +836,7 @@ class ConsultationService {
 
     async createSlot (doctorId, patientId, startDateTime, duration, slotStatusId = null) {
         try {
-            const newSlot = await database["Slots"].create({
+            const newSlot = await database.models.Slots.create({
                 doctorId: doctorId, 
                 slotStartDateTime: moment(new Date(startDateTime)).toDate(), 
                 slotEndDateTime: moment(new Date(startDateTime)).add(duration, 'm').toDate(), 
@@ -761,7 +855,7 @@ class ConsultationService {
 
     async updateSlot(slotId, doctorId, patientId, startDateTime, duration, slotStatusId = null) {
         try {
-            const slot = await database["Slots"].findByPk(slotId);
+            const slot = await database.models.Slots.findByPk(slotId);
             if (!slot) {
                 throw new Error(`Слот с ID ${slotId} не найден`);
             }
@@ -785,10 +879,10 @@ class ConsultationService {
 
     async createRoom (slotId, roomName) {
         try {
-            const slot = await database["Slots"].findByPk(slotId)
+            const slot = await database.models.Slots.findByPk(slotId)
             /* const roomName = await UserManager.translit(`${testDoctor.secondName}_${testPatient.secondName}_${testSlot.slotStartDateTime.getTime()}`)
         */
-            const newRoom = await database["Rooms"].create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id})
+            const newRoom = await database.models.Rooms.create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id})
             return newRoom
         }
         catch(e) {
@@ -801,12 +895,12 @@ class ConsultationService {
 
     async createPayloadDoctor (doctorId, roomId) {
         try {
-            const doctor = await database["Doctors"].findByPk(doctorId, {include: [{
-                model: database["Users"],
+            const doctor = await database.models.Doctors.findByPk(doctorId, {include: [{
+                model: database.models.Users,
                 required: true
             }]})
-            const room = await database["Rooms"].findByPk(roomId)
-            const slot = await database["Slots"].findByPk(room.slotId)
+            const room = await database.models.Rooms.findByPk(roomId)
+            const slot = await database.models.Slots.findByPk(room.slotId)
             const payload = {
                 aud: room.roomName, // аудитория (аудитория приложения, например jitsi)
                 iss: JITSI_APP_ID, // издатель токена
@@ -834,12 +928,12 @@ class ConsultationService {
 
     async createPayloadPatient (patientId, roomId) {
         try {
-            const patinet = await database["Patients"].findByPk(patientId, {include: [{
-                model: database["Users"],
+            const patinet = await database.models.Patients.findByPk(patientId, {include: [{
+                model: database.models.Users,
                 required: true
             }]})
-            const room = await database["Rooms"].findByPk(roomId)
-            const slot = await database["Slots"].findByPk(room.slotId)
+            const room = await database.models.Rooms.findByPk(roomId)
+            const slot = await database.models.Slots.findByPk(room.slotId)
             const payload = {
                 aud: room.roomName, // аудитория (аудитория приложения, например jitsi)
                 iss: JITSI_APP_ID, // издатель токена
@@ -868,7 +962,7 @@ class ConsultationService {
 
     async getSlotStatuses() {
         try {
-            const statuses = await database["SlotStatus"].findAll(); 
+            const statuses = await database.models.SlotStatus.findAll(); 
             return statuses;
         }
         catch (e) {

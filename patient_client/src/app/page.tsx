@@ -22,6 +22,7 @@ import Box from '@mui/material/Box';
 import Loader from '@/components/Loader'
 import { ScheduleShort } from '@/types/schedule'
 import Footer from '@/components/Footer'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 function Home () {
     const [date, setDate] = useState<Dayjs | null>(null);
@@ -39,6 +40,34 @@ function Home () {
     const [inputDoctorValue, setinputDoctorValue] = useState('')
     const [loading, setLoading] = useState(false)
     const medOrgId = process.env.NEXT_PUBLIC_MED_ORG_ID
+
+
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    
+    const initialPostId = searchParams?.get('postId') || null
+    const initialPostName = searchParams?.get('post') || null
+
+    useEffect(() => {
+        if (postsList.length > 0 && (initialPostId || initialPostName)) {
+            let matchedPost: Post | undefined
+            if (initialPostId) {
+            matchedPost = postsList.find(p => p.id === Number(initialPostId))
+            } else if (initialPostName) {
+            matchedPost = postsList.find(p =>
+                p.transliterationName.toLowerCase() === decodeURIComponent(initialPostName.toLowerCase())
+            )
+            }
+
+            if (matchedPost) {
+            setSelectedPost(matchedPost)
+            setInputPostValue(matchedPost.postName)
+            }
+        }
+    }, [postsList, initialPostId, initialPostName])
+
+
+
     const fetchDoctorsList = async () => {
         try {
             const response = await main.getDoctorList(new Date(), medOrgId)
@@ -81,8 +110,11 @@ function Home () {
 
         // Фильтрация по специальности
         if (selectedPost) {
-            filtered = filtered.filter(item => item.doctor?.Post?.id === selectedPost.id)
+            filtered = filtered.filter(item =>
+                item.doctor?.Posts?.some(post => post.id === selectedPost.id)
+            )
         }
+
 
         // Фильтрация по врачу
         if (selectedDoctor) {
@@ -208,7 +240,7 @@ function Home () {
                             <ul role="list" className="divide-y divide-gray-100">
                                 {sortedList.length > 0 && sortedList.map((item) => 
                                     {
-                                        if (!item?.doctor || !item.doctor?.Post) {
+                                        if (!item?.doctor || !item.doctor?.Posts || item.doctor.Posts.length === 0) {
                                             console.warn('Неполные данные у элемента:', item)
                                             return null
                                         }
@@ -230,14 +262,28 @@ function Home () {
                                                         {item.doctor.secondName} {item.doctor.firstName} {item.doctor.patronomicName}
                                                         </a>
                                                     </p>
-                                                    <p className="mt-1 text-xs leading-5 text-gray-500 truncate">
+                                                    {/* {item.doctor.Posts.map((post: Post) => {
+                                                        return (
+                                                            <p className="mt-1 text-xs leading-5 text-gray-500 truncate">
+                                                                <a
+                                                                    href={`/post/${post.postName}`}
+                                                                    className="hover:underline"
+                                                                >
+                                                                {post.postName}
+                                                                </a>
+                                                            </p>
+                                                        )
+                                                    })} */}
+                                                    {item.doctor.Posts.map((post, idx) => (
                                                         <a
-                                                        href={`/post/${item.doctor.Post.postName}`}
-                                                        className="hover:underline"
+                                                            key={post.id}
+                                                            href={`/?post=${post.transliterationName}`}
+                                                            className="hover:underline mt-1 text-xs leading-5 text-gray-500 truncate"
                                                         >
-                                                        {item.doctor.Post.postName}
+                                                            {post.postName}{' '}
                                                         </a>
-                                                    </p>
+                                                    ))}
+                                                    
                                                     </div>
                                                 </div>
 

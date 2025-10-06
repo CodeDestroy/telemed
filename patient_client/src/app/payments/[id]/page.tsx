@@ -142,7 +142,16 @@ const PaymentPage = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 {doctor?.secondName} {doctor?.firstName} {doctor?.patronomicName}
               </h1>
-              <p className="text-gray-600">{doctor?.Post?.postName}</p>
+              {doctor?.Posts && doctor?.Posts.length > 0 && 
+                doctor?.Posts.map((post) => (
+                  <p
+                      key={post.id}
+                      className="mt-1 text-xs leading-5 text-gray-500 truncate"
+                  >
+                      {post.postName}{' '}
+                  </p>
+                ))
+              }
               <p className="text-gray-500">{doctor?.MedOrg?.medOrgName}</p>
             </div>
           </div>

@@ -85,7 +85,16 @@ const PaymentsPage = () => {
             <h3 className="text-lg font-semibold text-gray-900">
               {doctor?.secondName} {doctor?.firstName} {doctor?.patronomicName}
             </h3>
-            <p className="text-gray-600">{doctor?.Post?.postName}</p>
+            {doctor?.Posts && doctor?.Posts.length > 0 && 
+              doctor?.Posts.map((post) => (
+                <p
+                    key={post.id}
+                    className="mt-1 text-xs leading-5 text-gray-500 truncate text-gray-600"
+                >
+                    {post.postName}{' '}
+                </p>
+              ))
+            }
             <p className="text-gray-500">{dayjs(Slot.slotStartDateTime).format("DD.MM.YYYY HH:mm")}</p>
 
             {/* Предупреждение о времени оплаты */}

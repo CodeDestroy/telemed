@@ -46,7 +46,15 @@ const ConsultationPage = () => {
                     Пациент: {consultation.Patient.secondName} {consultation.Patient.firstName} {consultation.Patient.patronomicName}
                 </p>
                 <p className="mt-2">
-                    Врач: {consultation.Doctor.secondName} {consultation.Doctor.firstName} {consultation.Doctor.patronomicName} — {consultation.Doctor.Post?.postName}
+                    Врач: {consultation.Doctor.secondName} {consultation.Doctor.firstName} {consultation.Doctor.patronomicName} — 
+                    {consultation.Doctor.Posts && consultation.Doctor.Posts.length > 0 && 
+                        consultation.Doctor.Posts.map((post) => {
+                            return (
+                                post.postName
+                            )
+                        })
+                    }
+                    {/* {consultation.Doctor.Post?.postName} */}
                 </p>
                 <div className="mt-6 p-4 border rounded bg-gray-50">
                     <h2 className="font-semibold mb-2">Протокол</h2>

@@ -8,17 +8,16 @@ import DoctorListItemResponse from '@/types/main'
 import main from "@/services/main";
 import Header from "@/components/Header";
 import { store } from "@/store";
-import { ScheduleSlot, Slot } from "@/types/consultaion";
+import { ScheduleSlot } from "@/types/consultaion";
 import Link from "next/link";
 
-import { TextField, MenuItem, Select, Button } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { ruRU } from '@mui/x-date-pickers/locales';
+import { TextField, MenuItem, Button } from "@mui/material";
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
-import { SelectChangeEvent } from "@mui/material";
 
+import "dayjs/locale/ru";
+
+dayjs.locale("ru");
 interface Consultation {
   id: number;
   slotStartDateTime: string;
@@ -100,13 +99,23 @@ const DoctorPage = () => {
   };
 
 
-  const handleDateChange = (date: Dayjs | null) => {
+  /* const handleDateChange = (date: Dayjs | null) => {
     setSelectedDate(date);
     setSelectedTime("");
     if (date) {
       fetchDoctorSchedule(date.format("YYYY-MM-DD"));
     }
+  }; */
+  const handleDateChange = (date: Dayjs | null) => {
+    setSelectedDate(date);
+    setSelectedTime("");
+    if (date) {
+      fetchDoctorSchedule(date.format("YYYY-MM-DD"));
+    } else {
+      setAvailableTimes([]);
+    }
   };
+
 
   const [price, setPrice] = useState<number | string | null>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
@@ -216,14 +225,31 @@ const DoctorPage = () => {
             <h1 className="text-2xl font-bold text-gray-900">
               {doctor?.doctor.secondName} {doctor?.doctor.firstName} {doctor?.doctor.patronomicName}
             </h1>
-            <p className="text-gray-600">{doctor?.doctor.Post?.postName}</p>
+            {/* {doctor?.doctor.Posts.map((post) => (
+              <span className="text-gray-600">{post.postName}</p>
+            ))} */}
+            {doctor?.doctor?.Posts && doctor.doctor.Posts.length > 0 ? (
+              doctor.doctor.Posts.map((post) => (
+                <a
+                  key={post.id}
+                  href={`/?post=${post.transliterationName}`}
+                  className="hover:underline mt-1 text-xs leading-5 text-gray-500 truncate"
+                >
+                  {post.postName}{', '}
+                </a>
+              ))
+            ) : (
+              <p className="mt-1 text-xs leading-5 text-gray-500">Специальность не указана</p>
+            )}
+
+            
           </div>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Записаться на прием</h2>
 
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
+          {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
             <DatePicker
               className="mt-4"
               label="Дата"
@@ -239,7 +265,37 @@ const DoctorPage = () => {
                 },
               }}
             />
-          </LocalizationProvider>
+          </LocalizationProvider> */}
+          {/* ====== ВЫБОР ДАТЫ ====== */}
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Выберите дату:</h3>
+            <div className="flex flex-wrap gap-2">
+              {doctor?.schedule && doctor.schedule.length > 0 ? (
+                [...new Set(doctor.schedule.map(s => s.date))].map((dateStr) => {
+                  const date = dayjs(dateStr);
+                  const formatted = `${date.format("dd").charAt(0).toUpperCase() + date.format("dd").slice(1)} ${date.format("DD.MM")}`;
+                  const isSelected = selectedDate?.isSame(date, "day");
+
+                  return (
+                    <button
+                      key={dateStr}
+                      onClick={() => handleDateChange(date)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                        isSelected
+                          ? "bg-blue-600 text-white"
+                          : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                      }`}
+                    >
+                      {formatted}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="text-gray-500">Нет доступных дат</p>
+              )}
+            </div>
+          </div>
+
 
           {selectedDate && (
             <TextField

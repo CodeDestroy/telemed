@@ -3,7 +3,7 @@ const ConsultationService = require('../Services/ConsultationService')
 const PatientService = require('../Services/PatientService')
 const userService = require('../Services/user-service')
 const moment = require('moment-timezone')
-const database = require('../models/index');
+const database = require('../Database/setDatabase')
 const UserManager = require('../Utils/UserManager')
 const JITSI_SECRET = process.env.JITSI_SECRET;
 const jwt = require('jsonwebtoken');
@@ -397,29 +397,47 @@ class AdminController {
             res.status(404).json(e.message)
         }
     }
-
-    async editDoctor (req, res) {
+    
+    async editDoctor(req, res) {
         try {
-            const id = req.params.id
-            const {user} = req.body
+            const id = req.params.id;
+            const { user } = req.body; // теперь весь объект user
             const doctor = await DoctorService.getDoctor(id);
-            doctor.secondName = user.secondName
-            doctor.firstName = user.firstName
-            doctor.patronomicName = user.patronomicName
-            doctor.snils = user.snils
-            doctor.User.email = user.User.email
-            doctor.User.confirmed = user.User.confirmed
-            doctor.User.phone = user.User.phone
-            doctor.postId = user.Post.id
-            doctor.save()
-            doctor.User.save()
-            res.status(200).json(doctor)
-            
-        }
-        catch (e) {
-            res.status(404).json(e.message)
+
+            if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+            // Обновляем поля доктора
+            doctor.secondName = user.secondName;
+            doctor.firstName = user.firstName;
+            doctor.patronomicName = user.patronomicName;
+            doctor.snils = user.snils;
+            doctor.info = user.info;
+            await doctor.save();
+
+            // Обновляем пользователя
+            doctor.User.email = user.User.email;
+            doctor.User.confirmed = user.User.confirmed;
+            doctor.User.phone = user.User.phone;
+            await doctor.User.save();
+
+            // Обновляем посты через setPosts
+            if (Array.isArray(user.postIds) && user.postIds.length > 0) {
+                await doctor.setPosts(user.postIds);
+            } else if (Array.isArray(user.Posts) && user.Posts.length > 0) {
+                const postIdsFromPosts = user.Posts.map(p => p.id);
+                await doctor.setPosts(postIdsFromPosts);
+            }
+
+            // Возвращаем обновленного доктора
+            const updatedDoctor = await DoctorService.getDoctor(id);
+            res.status(200).json(updatedDoctor);
+
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: e.message });
         }
     }
+
 
     async editPatient (req, res) {
         try {
@@ -446,6 +464,8 @@ class AdminController {
 
     async createDoctor (req, res) {
         try {
+            /* console.log(req.body)
+            return res.status(201).json({ message: 'Врач создан успешно'}); */
             const {
                 secondName,
                 name,
@@ -457,8 +477,29 @@ class AdminController {
                 info,
                 inn,
                 snils,
-                postId
+                postIds 
             } = req.body;
+            let postIdsArray = [];
+
+            if (Array.isArray(postIds)) {
+                postIdsArray = postIds.map(id => parseInt(id, 10));
+            } else if (typeof postIds === 'string') {
+                try {
+                    // Пробуем разобрать JSON-строку
+                    const parsed = JSON.parse(postIds);
+                    if (Array.isArray(parsed)) {
+                        postIdsArray = parsed.map(id => parseInt(id, 10));
+                    } else {
+                        postIdsArray = [parseInt(parsed, 10)];
+                    }
+                } catch (e) {
+                    // Если JSON.parse не сработал, пробуем взять как одно число
+                    postIdsArray = [parseInt(postIds, 10)];
+                }
+            }
+
+            const firstPostId = postIdsArray[0];
+            const remainingPostIds = postIdsArray.slice(1);
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
             let errors = ''
@@ -477,7 +518,15 @@ class AdminController {
             const transporter = await MailManager.getTransporter()
             if (req.user.accessLevel == 4) {
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1, postId)
+                
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1, firstPostId)
+                if (remainingPostIds.length > 0) {
+                    const postLinks = remainingPostIds.map(postId => ({
+                        doctorId: newDoctor.id,
+                        postId
+                    }));
+                    await database.models.DoctorPosts.bulkCreate(postLinks);
+                }
                 if (email) {
                     const mailOptionsDoctor = await MailManager.getMailOptionsRegisterDoctor(
                         email,
@@ -496,7 +545,15 @@ class AdminController {
                     throw ApiError.BadRequest('Ошибка определения медицинской организации. Обратитесь в поддержку.')
                 }
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
-                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, medOrg.id)
+                
+                const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, medOrg.id, firstPostId)
+                if (remainingPostIds.length > 0) {
+                    const postLinks = remainingPostIds.map(postId => ({
+                        doctorId: newDoctor.id,
+                        postId
+                    }));
+                    await database.models.DoctorPosts.bulkCreate(postLinks);
+                }
                 if (email) {
                     const mailOptionsDoctor = await MailManager.getMailOptionsRegisterDoctor(
                         email,

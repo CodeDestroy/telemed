@@ -27,7 +27,8 @@ class DoctorService {
                     },
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     }
                 ]
             })
@@ -52,7 +53,8 @@ class DoctorService {
                     },
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     }
                 ]
             })
@@ -64,20 +66,44 @@ class DoctorService {
         }
     }
 
-    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null, postId = 2) {
+    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null, postIds = 2) {
         try {
+            // Создаем доктора без привязки к постам
             const doctor = await database["Doctors"].create({
-                
-                userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId, postId
-            })
-            return doctor
-      
-        }
-        catch (e) {
-            console.log(e)
-            throw e
+                userId,
+                secondName,
+                firstName,
+                patronomicName,
+                birthDate,
+                info,
+                snils,
+                medOrgId
+            });
+
+            // Универсальная обработка postIds
+            let postIdsArray = [];
+            if (Array.isArray(postIds)) {
+                postIdsArray = postIds.map(id => parseInt(id, 10));
+            } else if (postIds) {
+                postIdsArray = [parseInt(postIds, 10)];
+            }
+
+            // Если есть postIds, создаем связи в DoctorPosts
+            if (postIdsArray.length > 0) {
+                const postLinks = postIdsArray.map(postId => ({
+                    doctorId: doctor.id,
+                    postId
+                }));
+                await database["DoctorPosts"].bulkCreate(postLinks);
+            }
+
+            return doctor;
+        } catch (e) {
+            console.log(e);
+            throw e;
         }
     }
+
 
     async getDoctor(id) {
         try {
@@ -89,7 +115,7 @@ class DoctorService {
                     },
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
                     }
                 ]
             })
@@ -165,7 +191,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -187,7 +214,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -216,7 +244,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -245,6 +274,33 @@ class DoctorService {
         catch {
             console.log(e)
             throw e
+        }
+    }
+    async updateDoctorPosts(doctorId, postIds) {
+        // Преобразуем id в числа
+        const ids = postIds.map(id => parseInt(id, 10));
+
+        // Удаляем связи, которых нет в новом списке
+        await database['DoctorPosts'].destroy({
+            where: {
+                doctorId,
+                postId: { [Sequelize.Op.notIn]: ids }
+            }
+        });
+
+        // Находим текущие связи
+        const existingLinks = await database['DoctorPosts'].findAll({
+            where: { doctorId }
+        });
+        const existingPostIds = existingLinks.map(link => link.postId);
+
+        // Создаём только новые связи
+        const newLinks = ids
+            .filter(id => !existingPostIds.includes(id))
+            .map(postId => ({ doctorId, postId }));
+
+        if (newLinks.length > 0) {
+            await database['DoctorPosts'].bulkCreate(newLinks);
         }
     }
 }

@@ -1,4 +1,5 @@
 export default interface Post {
     id: number,
-    postName: string
+    postName: string,
+    transliterationName: string
 }

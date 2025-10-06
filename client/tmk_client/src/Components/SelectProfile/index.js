@@ -76,7 +76,15 @@ const SelectProfile = () => {
                                     {profile.MedicalOrg.medOrgName}
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
-                                    {profile.Post.postName}
+                                    {profile.Posts.map(post => (
+                                        <>
+                                            <br></br>
+                                            <span key={`${profile.id}_${post.postName}`}>{post.postName}</span>
+                                        </>
+                                            
+                                        )
+                                    )}
+                                    
                                 </Typography>
                                 </CardContent>
                                 <Button

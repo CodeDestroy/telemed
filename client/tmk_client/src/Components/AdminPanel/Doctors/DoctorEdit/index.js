@@ -76,7 +76,7 @@ const DoctorEdit = () => {
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
 
-    const handleSave = async () => {
+    /* const handleSave = async () => {
 
         try {
             const response = await AdminService.editDoctor(id, doctor)
@@ -91,20 +91,35 @@ const DoctorEdit = () => {
         catch (e) {
             setError(e.response.data.message)
         }
-      // Здесь должна быть логика сохранения изменений
-        /* navigate('/doctors'); */
+    }; */
+    const handleSave = async () => {
+        try {
+            const postIds = doctor.Posts?.map(p => p.id) || [];
+
+            const response = await AdminService.editDoctor(id, {
+                ...doctor,
+                postIds, // 👈 добавляем массив id специальностей
+            });
+
+            if (response.status === 200) {
+                window.location = adminLocations.doctorManagement;
+            } else {
+                setError(response.data.message);
+            }
+        } catch (e) {
+            setError(e.response?.data?.message || 'Ошибка при сохранении');
+        }
     };
+
 
     useEffect(() => {
         if (store?.user?.id) {
             async function fetchDoctor() {
                 try {
                     const response = await AdminService.getDoctor(id)
-                    /* let array = response.data */
 
                     setDoctor(response.data);
-                    /* console.log(response.data) */
-                    const scheduleResponse = await SchedulerService.getDcotorSchedule(id)
+                    /* const scheduleResponse = await SchedulerService.getDcotorSchedule(id)
                     const newSchedule = { ...schedule };
                     scheduleResponse.data.forEach(el => {
                         const day = el.WeekDay.name;
@@ -116,7 +131,7 @@ const DoctorEdit = () => {
                         newSchedule[day].push({ start, end, id });
                     });
         
-                    setSchedule(newSchedule);
+                    setSchedule(newSchedule); */
 
                 } catch (e) {
                     console.log(e);
@@ -252,7 +267,7 @@ return (
                             } 
                                 label="Подтверждён" />
                         </FormGroup>
-                        <FormControl fullWidth>
+                        {/* <FormControl fullWidth>
                             <InputLabel id="specialty-select-label">Специальность</InputLabel>
                             <Select
                                 labelId="specialty-select-label"
@@ -272,7 +287,37 @@ return (
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>
+                        </FormControl> */}
+                        <FormControl fullWidth>
+                            <InputLabel id="specialty-select-label">Специальности</InputLabel>
+                            <Select
+                                labelId="specialty-select-label"
+                                multiple
+                                value={doctor.Posts?.map(p => p.id) || []}
+                                label="Специальности"
+                                onChange={(e) => {
+                                const selectedIds = e.target.value;
+                                const selected = specialties.filter(s => selectedIds.includes(s.id));
+                                setDoctor({
+                                    ...doctor,
+                                    Posts: selected,
+                                });
+                                }}
+                                renderValue={(selected) =>
+                                specialties
+                                    .filter((s) => selected.includes(s.id))
+                                    .map((s) => s.postName)
+                                    .join(', ')
+                                }
+                            >
+                                {specialties.map((spec) => (
+                                <MenuItem key={spec.id} value={spec.id}>
+                                    {spec.postName}
+                                </MenuItem>
+                                ))}
+                            </Select>
+                            </FormControl>
+
 
 
                         <Button variant="contained" color="primary" onClick={handleSave}>

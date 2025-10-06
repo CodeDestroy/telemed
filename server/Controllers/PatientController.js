@@ -26,11 +26,11 @@ class PatientController {
             const patient = await PatientService.getPatientByUserId(userId)
             if (previous){
                 const activeSlots = await ConsultationService.getEndedPatientSlots(patient.id)
-                res.status(200).json(activeSlots[0])
+                res.status(200).json(activeSlots)
             }
             else {
                 const activeSlots = await ConsultationService.getActivePatientSlots(patient.id)
-                res.status(200).json(activeSlots[0])
+                res.status(200).json(activeSlots)
             }
             
         }

@@ -120,7 +120,8 @@ class UserService {
                             },
                             {
                                 model: database["Posts"],
-                                required: false
+                                required: false,
+                                through: { attributes: [] }
                             }
                         ]
                     })
@@ -252,7 +253,8 @@ class UserService {
                             },
                             {
                                 model: database["Posts"],
-                                required: false
+                                required: false,
+                                through: { attributes: [] }
                             }
                         ]
                     })
