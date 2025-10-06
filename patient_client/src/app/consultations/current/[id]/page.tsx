@@ -105,7 +105,12 @@ const Page = () => {
               {consultation.Doctor?.secondName} {consultation.Doctor?.firstName}{' '}
               {consultation.Doctor?.patronomicName}
             </h1>
-            <p className="text-gray-600">{consultation.Doctor?.Post?.postName}</p>
+            
+            {
+                consultation.Doctor.Posts && consultation.Doctor.Posts.length > 0 &&consultation.Doctor.Posts.map((post) => (
+                    <p key={`${consultation.id}_${post.id}`} className="text-gray-600">{post.postName}</p>
+                ))
+            }
             <p className="text-gray-500">{consultation.Doctor?.MedOrg?.medOrgName}</p>
             <p className="text-gray-500">
               Дата: {dayjs(consultation.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
