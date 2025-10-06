@@ -24,6 +24,11 @@ class PatientController {
             const yookassaPayment = notification.object;
 
             const payment = await PaymentService.getPaymentByYookassaId(yookassaPayment.id)
+            const slot = await ConsultationService.getSlotById(payment.slotId)
+            const doctor = await DoctorService.getDoctor(slot.doctorId)
+            const patient = await PatientService.getPatient(slot.patientId)
+            const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
+            const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
             switch (notification.event) {
                 case "payment.waiting_for_capture":
                     // 💡 Тут можно решить: сразу списывать или ждать ручного подтверждения
@@ -35,13 +40,39 @@ class PatientController {
 
                 case "payment.succeeded":
                     //await db.updatePaymentStatus(payment.id, "succeeded");
-                    payment.paymentStatusId = 3 // "Ожидает подтверждения"
+                    if (payment.paymentStatusId != 3) {
+                        payment.paymentStatusId = 3 // "Оплачен"
+                        try {
+                            if (patient.User.email) {
+                                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl.originalUrl, slot.slotStartDateTime);
+                                await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                            }
+                            if (doctor.User.email) {
+                                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorUrl.originalUrl, slot.id, slot.slotStartDateTime);
+                                await transporter.sendMail(mailOptionsDoctor);
+                            }
+                        } catch (mailErr) {
+                            // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                            console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+                            /* await EmailJobService.create({
+                                toPatient: patient.User.email || null,
+                                toDoctor: doctor.User.email || null,
+                                patientLink,
+                                doctorLink,
+                                startDateTime,
+                                payload: { newSlotId: newSlot.id, newRoomId: newRoom.id, newPaymentId: newPayment.id },
+                                attempts: 0
+                            }); */
+                            // возможно оповестить админов/логирование
+                        }
+                    }
+                    
                     console.log(`Платёж ${yookassaPayment.id} успешно оплачен`);
                     break;
 
                 case "payment.canceled":
                     //await db.updatePaymentStatus(payment.id, "canceled");
-                    payment.paymentStatusId = 4 // "Ожидает подтверждения"
+                    payment.paymentStatusId = 4 // "Ошибка"
                     console.log(`Платёж ${yookassaPayment.id} ушёл в ошибку`);
                     break;
 
@@ -142,6 +173,11 @@ class PatientController {
 
             // 1. Ищем платеж в БД
             const payment = await PaymentService.getPaymentByUUID(uuid)
+            const slot = await ConsultationService.getSlotById(payment.slotId)
+            const doctor = await DoctorService.getDoctor(slot.doctorId)
+            const patient = await PatientService.getPatient(slot.patientId)
+            const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
+            const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
 
             if (!payment) {
                 return res.status(404).json({ message: "Платёж не найден" });
@@ -153,14 +189,41 @@ class PatientController {
 
             // 2. Запрос к Юкассе
             const yookassaPayment = await yookassaApi.getPayment(payment.yookassa_id);
-            const slot = await ConsultationService.getSlotById(payment.consultationId);
+            
             // 3. Обновляем данные в БД
             payment.yookassa_status = yookassaPayment.status;
             payment.yookassa_payment_method_type = yookassaPayment.payment_method?.type || null;
 
             // Меняем paymentStatusId в зависимости от статуса
             if (yookassaPayment.status === "succeeded") {
-                payment.paymentStatusId = 3; // Оплачено
+                if (payment.paymentStatusId != 3) { // Если платеж ещё не оплачен
+                    payment.paymentStatusId = 3; // Оплачено
+                    try {
+                        if (patient.User.email) {
+                            const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl.originalUrl, slot.slotStartDateTime);
+                            await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                        }
+                        if (doctor.User.email) {
+                            const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorUrl.originalUrl, slot.id, slot.slotStartDateTime);
+                            await transporter.sendMail(mailOptionsDoctor);
+                        }
+                    } catch (mailErr) {
+                        // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                        console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+                        /* await EmailJobService.create({
+                            toPatient: patient.User.email || null,
+                            toDoctor: doctor.User.email || null,
+                            patientLink,
+                            doctorLink,
+                            startDateTime,
+                            payload: { newSlotId: newSlot.id, newRoomId: newRoom.id, newPaymentId: newPayment.id },
+                            attempts: 0
+                        }); */
+                        // возможно оповестить админов/логирование
+                    }
+
+                }
+                
                 slot.slotStatusId = 3; // Помечаем слот как "Оплачено"
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты

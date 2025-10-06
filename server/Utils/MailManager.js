@@ -185,9 +185,6 @@ class MailManager {
                         <div class="content">
                             Если вы не регистрировались на проведение консультации, пожалуйста, проигнорируйте это письмо. 
                             <br><br>
-                            Также Вы можете использовать URL-адрес ниже, чтобы скопировать:
-                            <br><br>
-                            <p style="text-align: center; color: blue;">${link}</p>
                         </div>
                         <div class="footer">
                             &copy; 2025. Все права защищены.
@@ -288,9 +285,6 @@ class MailManager {
                         <div class="content">
                             Если вы не регистрировались на проведение консультации, пожалуйста, проигнорируйте это письмо. 
                             <br><br>
-                            Также Вы можете использовать URL-адрес ниже, чтобы скопировать:
-                            <br><br>
-                            <p style="text-align: center; color: blue;">${link}</p>
                         </div>
                         <div class="footer">
                             &copy; 2025. Все права защищены.
@@ -451,6 +445,174 @@ class MailManager {
                         </div>
                         <div class="content">
                             Если это не Вы - пожалуйста, проигнорируйте это письмо. 
+                            <br><br>
+                        </div>
+                        <div class="footer">
+                            &copy; 2025. Все права защищены.
+                        </div>
+                    </div>
+                </body>
+                </html>` // HTML-содержание письма
+        };
+        return mailOptions
+    }
+
+    async getMailOptionsRegisterPatient(to, phone, password) {
+        let mailOptions = {
+            from: '"ТМК" <tmk@clinicode.ru>', // Отправитель
+            to: to, // Получатель
+            subject: 'Регистрация в системе Телемедицинских Консультаций', // Тема письма
+            text: 'Регистрация в системе Телемедицинских Консультаций', // Текстовое содержание письма
+            html: `
+                <!DOCTYPE html>
+                <html lang="ru">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Вы были зарегистрированы в системе Телемедицинских Консультаций</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .container {
+                            width: 100%;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }
+                        .code {
+                            font-size: 24px;
+                            color: red;
+                            text-align: center;
+                            margin: 20px 0;
+                        }
+                        .content {
+                            font-size: 16px;
+                            color: #333333;
+                            margin-bottom: 20px;
+                        }
+                        .link {
+                            font-size: 16px;
+                            color: #0066cc;
+                            text-align: center;
+                            display: block;
+                            margin: 20px 0;
+                            text-decoration: none;
+                        }
+                        .footer {
+                            font-size: 12px;
+                            color: #999999;
+                            text-align: center;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="content">
+                            Пожалуйста, используйте следующую ссылку и данные для доступа к Вашему личному кабинету:
+                        </div>
+                        <div class="content">
+                            Учётные данные:
+                            <br><br>
+                            Телефон: ${phone}
+                            <br><br>
+                            Пароль: ${password}
+                        </div>
+                        <div class="code">
+                            <a style="font-size: larger; color: red;" href="https://dr.clinicode.ru" class="link">Открыть личный кабинет</a>
+                        </div>
+                        <div class="content">
+                            Если это не Вы - пожалуйста, напишите нам на данную почту с описанием проблемы. 
+                            <br><br>
+                        </div>
+                        <div class="footer">
+                            &copy; 2025. Все права защищены.
+                        </div>
+                    </div>
+                </body>
+                </html>` // HTML-содержание письма
+        };
+        return mailOptions
+    }
+
+    async getMailOptionsRegisterDoctor(to, phone, password) {
+        let mailOptions = {
+            from: '"ТМК" <tmk@clinicode.ru>', // Отправитель
+            to: to, // Получатель
+            subject: 'Регистрация в системе Телемедицинских Консультаций', // Тема письма
+            text: 'Регистрация в системе Телемедицинских Консультаций', // Текстовое содержание письма
+            html: `
+                <!DOCTYPE html>
+                <html lang="ru">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Вы были зарегистрированы в системе Телемедицинских Консультаций</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .container {
+                            width: 100%;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }
+                        .code {
+                            font-size: 24px;
+                            color: red;
+                            text-align: center;
+                            margin: 20px 0;
+                        }
+                        .content {
+                            font-size: 16px;
+                            color: #333333;
+                            margin-bottom: 20px;
+                        }
+                        .link {
+                            font-size: 16px;
+                            color: #0066cc;
+                            text-align: center;
+                            display: block;
+                            margin: 20px 0;
+                            text-decoration: none;
+                        }
+                        .footer {
+                            font-size: 12px;
+                            color: #999999;
+                            text-align: center;
+                            margin-top: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="content">
+                            Пожалуйста, используйте следующую ссылку и данные для доступа к Вашему личному кабинету:
+                        </div>
+                        <div class="content">
+                            Учётные данные:
+                            <br><br>
+                            Телефон: ${phone}
+                            <br><br>
+                            Пароль: ${password}
+                        </div>
+                        <div class="code">
+                            <a style="font-size: larger; color: red;" href="https://clinicode.ru" class="link">Открыть личный кабинет</a>
+                        </div>
+                        <div class="content">
+                            Если это не Вы - пожалуйста, напишите нам на данную почту с описанием проблемы. 
                             <br><br>
                         </div>
                         <div class="footer">

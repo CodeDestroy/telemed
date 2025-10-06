@@ -1,249 +1,193 @@
 import React, { useEffect, useContext, useState } from 'react';
+import { Box, Button, Snackbar } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import moment from 'moment-timezone';
 import AdminHeader from '../../Header';
 import DoctorService from '../../../../Services/DoctorService';
 import { Context } from '../../../..';
-import DataGrid from '../../../DataGrid'; // Здесь изменил импорт
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Box, IconButton, Input, FormControl, InputLabel, InputAdornment, Snackbar, Button } from "@mui/material";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import moment from 'moment-timezone';
 import { LocalizationContext } from '../../../../Utils/LocalizationContext';
 import EditProtocolModal from '../../Modals/Protocol/Edit';
 
-function Index() {
-    const { store } = useContext(Context);
-    const [consultations, setConsultations] = useState([]);
-    const [expandedRowIds, setExpandedRowIds] = useState([]);
+function EndedTMKPage() {
+  const { store } = useContext(Context);
+  const [consultations, setConsultations] = useState([]);
+  const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const [editProtocolModalOpen, setEditProtocolModalOpen] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-    const [selectedConsultation, setSelectedConsultation] = useState(null);
-    const [editProtocolModalOpen, setEditProtocolModalOpen] = useState(false);
-    const handleChangeProtocolModalOpen = () => {setEditProtocolModalOpen(true)}
-    const handleChangeProtocolModalClose = () => {setEditProtocolModalOpen(false)}
+  const handleEditOpen = (consultation) => {
+    setSelectedConsultation(consultation);
+    setEditProtocolModalOpen(true);
+  };
 
+  const handleEditClose = () => {
+    setSelectedConsultation(null);
+    setEditProtocolModalOpen(false);
+  };
 
+  const handleCopy = (url) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setOpenSnackbar(true);
+    });
+  };
 
-    const handleExpandClick = (id) => {
-        setExpandedRowIds((prevState) => {
-            return (prevState.includes(id) ? prevState.filter(rowId => rowId !== id) : [...prevState, id]);
-        });
-    };
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setOpenSnackbar(false);
+  };
 
-
-    const handleChangeProtocol = (id) => {
-
+  useEffect(() => {
+    if (store?.user?.id) {
+      async function fetchConsultations() {
+        try {
+          const response = await DoctorService.getEndedConsultationsByDoctorId(store.user.personId);
+          let array = response.data[0] || [];
+          array = array.filter((item) => item.type !== 'protocol');
+          array = array.map((item) => ({
+            ...item,
+            id: item.slot_id,
+            patient: `Пациент: ${item.pSecondName} ${item.pFirstName} ${item.pPatronomicName || ''}`.trim(),
+            doctor: `${item.dSecondName} ${item.dFirstName} ${item.dPatronomicName || ''}`.trim(),
+            start: moment(item.slotStartDateTime).format('DD.MM.YYYY HH:mm'),
+            end: moment(item.slotEndDateTime).format('DD.MM.YYYY HH:mm'),
+          }));
+          setConsultations(array);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      fetchConsultations();
     }
+  }, [store]);
 
-    const columns = [
-        {
-            field: "expand",
-            headerName: "",
-            renderCell: (cellValues) => {
-                if (cellValues.row.detail) {
-                    return '';
-                }
-                return (
-                    <IconButton onClick={() => handleExpandClick(cellValues.row.id)}>
-                        {expandedRowIds.includes(cellValues.row.id) ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                );
+  const columns = [
+    {
+      field: 'patient',
+      headerName: 'Пациент',
+      flex: 1,
+      minWidth: 200,
+    },
+    {
+      field: 'start',
+      headerName: 'Начало конференции',
+      flex: 0.8,
+      minWidth: 180,
+    },
+    {
+      field: 'end',
+      headerName: 'Конец конференции',
+      flex: 0.8,
+      minWidth: 180,
+    },
+    {
+      field: 'protocol',
+      headerName: 'Протокол ТМК',
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) => (
+        <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {params.row.protocol ? params.row.protocol.slice(0, 40) : '-'}
+        </Box>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Действия',
+      flex: 0.7,
+      minWidth: 200,
+      sortable: false,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            flexWrap: 'nowrap',
+            width: '100%',
+          }}
+        >
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{
+              minWidth: 100,
+              textTransform: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontSize: '0.8rem',
+                paddingX: '5px'
+            }}
+            onClick={() => handleEditOpen(params.row)}
+          >
+            Изменить
+          </Button>
+
+          {/* {params.row.dUrl && (
+            <Button
+              variant="outlined"
+              size="small"
+              sx={{
+                minWidth: 120,
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '0.8rem',
+                paddingX: '5px'
+              }}
+              onClick={() => handleCopy(params.row.dUrl)}
+            >
+              Копировать ссылку
+            </Button>
+          )} */}
+        </Box>
+      ),
+    },
+  ];
+
+  return (
+    <LocalizationContext>
+      <AdminHeader />
+      <Box sx={{ p: 3, height: 'calc(100vh - 100px)', width: '100%' }}>
+        <DataGrid
+          rows={consultations}
+          columns={columns}
+          disableSelectionOnClick
+          pageSize={10}
+          rowsPerPageOptions={[10, 25, 50]}
+          autoHeight
+          sx={{
+            '& .MuiDataGrid-cell': {
+              alignItems: 'center',
+              display: 'flex',
+              py: 1,
             },
-            width: 60,
-            disableColumnSort: true
-        },
-        { 
-            field: "patient", 
-            headerName: "Пациент", 
-            renderCell: (cellValues) => {
-                if (!cellValues.row.expanded) {
-                    return (cellValues.row.patient);
-                }
-                else if (cellValues.row.patient) {
-                    return cellValues.row.patient;
-                }
-                return cellValues.value;
+            '& .MuiButton-root': {
+              borderRadius: '10px',
             },
-            disableColumnSort: true
-        },
-        { 
-            field: "slotStartDateTime", 
-            headerName: "Начало конференции", 
-            renderCell: (cellValues) => {
-                if (!cellValues.row.detail) {
-                    return moment(cellValues.row.slotStartDateTime).format('DD.MM.YYYY HH:mm');
-                }
-                return cellValues.value;
-            },
-            maxWidth: 200,
-            disableColumnSort: true
-        },
-        { 
-            field: "slotStartEndTime", 
-            headerName: "Конец конференции", 
-            renderCell: (cellValues) => {
-                if (!cellValues.row.detail) {
-                    return moment(cellValues.row.slotEndDateTime).format('DD.MM.YYYY HH:mm');
-                }
-                return cellValues.value;
-            },
-            maxWidth: 200,
-            disableColumnSort: true
-        },
-        { 
-            field: "protocol", 
-            headerName: "Протокол ТМК", 
-            renderCell: (cellValues) => {
-                /* if (!cellValues.row.detail) {
-                    return (<a target='_blank' href={`http://localhost/short/${cellValues.row.dUrl}`} >Подключиться</a>);
-                } */
-                if (cellValues.row.protocol) {
-                    return cellValues.row.protocol.slice(0, 30);
-                }
-                return cellValues.value;
-            },
-            width: 100,
-            maxWidth: 200,
-            disableColumnSort: true
-        },
-        { 
-            field: "button", 
-            headerName: "Изменить", 
-            renderCell: (cellValues) => {
-                return (
-                    <>
-                        <Button onClick={() => {
-                            setEditProtocolModalOpen(true);
-                            setSelectedConsultation(cellValues.row);
-                        }}>
-                            Изменить
-                        </Button>
-                        {editProtocolModalOpen && selectedConsultation.id === cellValues.row.id && (
-                            <EditProtocolModal
-                                isOpen={editProtocolModalOpen}
-                                onClose={handleChangeProtocolModalClose}
-                                consultation={selectedConsultation}
-                            />
-                        )}
-                    </>
-                    
-                )
-            },
-            width: 100,
-            disableColumnSort: true
-        },
-    ];
+          }}
+        />
 
-    useEffect(() => {
-        if (store?.user?.id) {
-            async function fetchConsultations() {
-                try {
-                    const response = await DoctorService.getEndedConsultationsByDoctorId(store.user.personId);
-                    let array = response.data[0]
-                    array = array.filter(item => item.type !== "protocol");
-                    array.forEach(function(part, index, theArray) {
-                        theArray[index].patient = `Пациент: ${theArray[index].pSecondName} ${theArray[index].pFirstName}`;
-                        /* theArray[index].url = theArray[index].dUrl; */
-                    });
-                    setConsultations(array);
+        {editProtocolModalOpen && selectedConsultation && (
+          <EditProtocolModal
+            isOpen={editProtocolModalOpen}
+            onClose={handleEditClose}
+            consultation={selectedConsultation}
+          />
+        )}
 
-                } catch (e) {
-                    console.log(e);
-                }
-            }
-            fetchConsultations();
-        }
-    }, [store]);
-
-    const [open, setOpen] = useState(false);
-
-    const handleClickCopy = (event, url) => {
-        navigator.clipboard.writeText(url).then(() => {
-            setOpen(true);
-        }, (err) => {
-            console.error('Could not copy text: ', err);
-        });
-    };
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setOpen(false);
-    };
-
-    const rowsWithDetail = consultations.reduce((acc, row) => {
-        acc.push(row);
-        if (expandedRowIds.includes(row.id)) {
-            acc.push({
-                id: `${row.id}-detail`,
-                detail: true,
-                patient: (
-                    <Box>
-                        {row.patient} {row.pPatronomicName}
-                    </Box>
-                        
-                    
-                ),
-                slotStartDateTime: (
-                    <Box>
-                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
-                    </Box>
-                ),
-                slotEndDateTime: (
-                    <Box>
-                        {moment(row.slotEndDateTime).format('DD.MM.YYYY HH:mm')}
-                    </Box>
-                ),
-                protocol: (
-                    <></>
-                )
-            });
-            acc.push({
-                id: `${row.id}-detail2`,
-                detail: true,
-                patient: (
-                    <Box>
-                        {row.dSecondName} {row.dFirstName} {row.dPatronomicName}
-                    </Box>
-                ),
-                slotStartDateTime: (
-                    <Box>
-                        {moment(row.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
-                    </Box>
-                ),
-                slotStartEndTime: (
-                    <Box>
-                        {moment(row.slotEndDateTime).format('DD.MM.YYYY HH:mm')}
-                    </Box>
-                ),
-                protocol: (
-                    <>
-                        
-                    </>
-                )
-            });
-        }
-        return acc;
-    }, []);
-
-    return (
-        <LocalizationContext>
-            <AdminHeader/>
-            <Box sx={{ height: '100%', width: '100%' }}>
-                <DataGrid rowsWithDetail={rowsWithDetail} columns={columns} />
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                    }}
-                    open={open}
-                    autoHideDuration={800}
-                    onClose={handleClose}
-                    message="Скопировано"
-                />
-            </Box>
-        </LocalizationContext>
-    );
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          open={openSnackbar}
+          autoHideDuration={800}
+          onClose={handleSnackbarClose}
+          message="Скопировано"
+        />
+      </Box>
+    </LocalizationContext>
+  );
 }
 
-export default Index;
+export default EndedTMKPage;

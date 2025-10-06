@@ -762,11 +762,9 @@ class ConsultationService {
     async updateSlot(slotId, doctorId, patientId, startDateTime, duration, slotStatusId = null) {
         try {
             const slot = await database["Slots"].findByPk(slotId);
-            const oldDoctor = await this.getDoctorBySlotId(slotId)
             if (!slot) {
                 throw new Error(`Слот с ID ${slotId} не найден`);
             }
-            console.log(slotId, doctorId, patientId, startDateTime, duration, slotStatusId)
             slot.doctorId = doctorId;
             slot.patientId = patientId;
             slot.slotStartDateTime = moment(new Date(startDateTime)).toDate();

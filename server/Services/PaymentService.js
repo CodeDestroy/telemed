@@ -108,6 +108,23 @@ class PaymentService {
         await payment.update(data);
         return payment;
     }
+
+    async getPaymentBySlotId (slotId) {
+        try {
+            const payment = await database.models.Payments.findOne({
+                where: { slotId },
+                include: [
+                    {
+                        model: database.models.Slots,
+                    }
+                ]
+            })
+            return payment
+        }
+        catch (e) {
+            throw e
+        }
+    }
 }
 
 

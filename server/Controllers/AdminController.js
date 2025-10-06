@@ -155,7 +155,7 @@ class AdminController {
             const transporter = await MailManager.getTransporter()
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
-            try {
+            /* try {
                 if (patient.User.email) {
                     const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime);
                     await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
@@ -167,17 +167,8 @@ class AdminController {
             } catch (mailErr) {
                 // не откатываем транзакцию; логируем и сохраняем задачу на повтор
                 console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
-                /* await EmailJobService.create({
-                    toPatient: patient.User.email || null,
-                    toDoctor: doctor.User.email || null,
-                    patientLink,
-                    doctorLink,
-                    startDateTime,
-                    payload: { newSlotId: newSlot.id, newRoomId: newRoom.id, newPaymentId: newPayment.id },
-                    attempts: 0
-                }); */
-                // возможно оповестить админов/логирование
-            }
+
+            } */
             /* if (patient.User.email) {
                 const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
                 transporter.sendMail(mailOptionsPatinet, (error, info) => {
@@ -257,6 +248,10 @@ class AdminController {
             const oldDoctor = await DoctorService.getDoctor(oldSlot.doctorId);
             const oldPatient = await PatientService.getPatient(oldSlot.patientId);
             // Обновляем слот
+
+
+
+            
             const updatedSlot = await ConsultationService.updateSlot(slotId, 
                 doctor.id,
                 patient.id,
@@ -264,6 +259,10 @@ class AdminController {
                 duration,
                 slotStatusId
             );
+
+            
+
+            
 
             // Получаем комнату по слоту
             const room = (await ConsultationService.getSlotById(slotId)).Room;
@@ -287,8 +286,31 @@ class AdminController {
             
             const patientLink = SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink = SERVER_DOMAIN + 'short/' + doctorShortUrl;
+            if (slotStatusId == 3) {
+                const payment = await PaymentService.getPaymentBySlotId(slotId);
+                payment.paymentStatusId = 3
+                payment.save()
+                if (patient.User.email) {
+                    const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
+                        patient.User.email,
+                        patientUrl,
+                        startDateTime
+                    );
+                    transporter.sendMail(mailOptionsPatient);
+                }
 
-            if (patient.User.email) {
+                if (doctor.User.email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(
+                        doctor.User.email,
+                        doctorUrl,
+                        slotId,
+                        startDateTime
+                    );
+                    transporter.sendMail(mailOptionsDoctor);
+                }
+            }
+            //Отключаем отправку тут, отпрапвляем теперь в случае оплаты
+            /* if (patient.User.email) {
                 const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
                     patient.User.email,
                     patientLink,
@@ -304,7 +326,7 @@ class AdminController {
                     startDateTime
                 );
                 transporter.sendMail(mailOptionsDoctor);
-            }
+            } */
 
             res.status(200).json({
                 doctorShortUrl,
@@ -456,7 +478,14 @@ class AdminController {
             if (req.user.accessLevel == 4) {
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
                 const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1, postId)
-
+                if (email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsRegisterDoctor(
+                        email,
+                        phone,
+                        password
+                    );
+                    transporter.sendMail(mailOptionsDoctor);
+                }
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
             }
             else if (req.user.accessLevel == 3) {
@@ -468,7 +497,14 @@ class AdminController {
                 }
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
                 const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, medOrg.id)
-
+                if (email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsRegisterDoctor(
+                        email,
+                        phone,
+                        password
+                    );
+                    transporter.sendMail(mailOptionsDoctor);
+                }
                 return res.status(201).json({ message: 'Врач создан успешно', userId: newUser.id, doctorId: newDoctor.id });
             }
             else {
@@ -512,6 +548,14 @@ class AdminController {
             
             const newUser = await userService.createUser(1, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
             const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
+            if (email) {
+                const mailOptionsPatient = await MailManager.getMailOptionsRegisterPatient(
+                    email,
+                    phone,
+                    password
+                );
+                transporter.sendMail(mailOptionsPatient);
+            }
 
             res.status(201).json({ message: 'Пациент создан успешно', userId: newUser.id, patientId: newPatient.id });
         }
