@@ -474,7 +474,7 @@ class AdminController {
                 errors = errors + 'Неверная дата\n'
             if (errors.length > 0) 
                 throw ApiError.BadRequest(errors)
-
+            const transporter = await MailManager.getTransporter()
             if (req.user.accessLevel == 4) {
                 const newUser = await userService.createUser(2, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
                 const newDoctor = await DoctorService.createDoctor(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils, 1, postId)
@@ -545,7 +545,7 @@ class AdminController {
                 throw ApiError.BadRequest(errors)
             const formattedDate = moment(birthDate).format('YYYY-MM-DD');
             const avatar = req.file;
-            
+            const transporter = await MailManager.getTransporter()
             const newUser = await userService.createUser(1, phone, password, avatar ? SERVER_DOMAIN + 'uploads/' + avatar.filename : null, email, phone)
             const newPatient = await PatientService.createPatient(newUser.id, secondName, name, patrinomicName, formattedDate, info, snils)
             if (email) {
