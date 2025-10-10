@@ -4,7 +4,7 @@ const DoctorController = require('../Controllers/DoctorController');
 const AdminController = require('../Controllers/AdminController');
 const multer = require('multer');
 const path = require('path');
-
+ 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/uploads/'); // Путь, куда будут сохраняться файлы
