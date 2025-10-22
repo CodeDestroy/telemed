@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import {
   createBrowserRouter,
 } from "react-router-dom";
-import AdminServicesList from '../Components/AdminPanel/ServicesList/ActiveList'
+import ActiveList from '../Components/AdminPanel/ServicesList/ActiveList'
 import EndedList from '../Components/AdminPanel/ServicesList/EndedList'
 import doctorLocations from '../Locations/DoctorLocations'
 import VideoComponent from "../Components/VideoComponent";
@@ -27,7 +27,7 @@ const doctorRouter = createBrowserRouter([
     },
     {
       path: doctorLocations.consultations,
-      element: <AdminServicesList/>
+      element: <ActiveList/>
     },
     {
       path: doctorLocations.tmk,

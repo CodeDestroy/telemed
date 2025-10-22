@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     meetingEnd: DataTypes.DATE,
     ended: DataTypes.BOOLEAN,
     slotId: DataTypes.INTEGER,
-    protocol: DataTypes.TEXT
+    protocol: DataTypes.TEXT,
+    sendCount: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Rooms',

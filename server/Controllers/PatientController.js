@@ -134,7 +134,7 @@ class PatientController {
                 }
             }
             else {
-                newPayment.paymentStatusId = 4
+                newPayment.paymentStatusId = 3
             }
             await newPayment.save()
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)

@@ -74,6 +74,7 @@ const DoctorPage = () => {
         let start = dayjs(`${date}T${slot.scheduleStartTime}`);
         const end = dayjs(`${date}T${slot.scheduleEndTime}`);
         const now = dayjs(); // текущее время
+        const plusTwoHours = now.add(2, 'h')
 
         while (start.isBefore(end)) {
           const formatted = start.format("HH:mm");
@@ -83,10 +84,11 @@ const DoctorPage = () => {
             dayjs(c.slotStartDateTime).isSame(start, "minute") && c.slotStatusId !== 5
           );
 
-          if (!isUnavailable && start.isAfter(now)) {
+          if (!isUnavailable && start.isAfter(plusTwoHours)) {
             slots.push(formatted);
           }
 
+          //Тут можно не фиксированоое время, а разбивку из таблицы schedule в БД
           start = start.add(60, "minute"); // шаг 60 минут
         }
       });

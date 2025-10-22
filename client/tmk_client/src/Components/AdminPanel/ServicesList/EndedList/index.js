@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { Box, Button, Snackbar } from '@mui/material';
+import { Box, Button, Snackbar, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import moment from 'moment-timezone';
 import AdminHeader from '../../Header';
@@ -19,6 +19,10 @@ function EndedTMKPage() {
     setSelectedConsultation(consultation);
     setEditProtocolModalOpen(true);
   };
+
+  const handleOpen = (consultation) => {
+    window.location = '/consultation/' + consultation.id
+  }
 
   const handleEditClose = () => {
     setSelectedConsultation(null);
@@ -50,6 +54,7 @@ function EndedTMKPage() {
             doctor: `${item.dSecondName} ${item.dFirstName} ${item.dPatronomicName || ''}`.trim(),
             start: moment(item.slotStartDateTime).format('DD.MM.YYYY HH:mm'),
             end: moment(item.slotEndDateTime).format('DD.MM.YYYY HH:mm'),
+            sendCount: item.sendCount ?? 0, // добавили счётчик отправок
           }));
           setConsultations(array);
         } catch (e) {
@@ -86,15 +91,37 @@ function EndedTMKPage() {
       minWidth: 200,
       renderCell: (params) => (
         <Box sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {params.row.protocol ? params.row.protocol.slice(0, 40) : '-'}
+          {params.row.protocol ? params.row.protocol.slice(0, 40) : ''}
+        </Box>
+      ),
+    },
+    {
+      field: 'sendCount',
+      headerName: 'Отправлено',
+      flex: 0.5,
+      minWidth: 120,
+      renderCell: (params) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title={params.row.sendCount > 0 ? 'Отправлено' : 'Не отправлено'}>
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                backgroundColor: params.row.sendCount > 0 ? 'success.main' : 'error.main',
+                flexShrink: 0,
+              }}
+            />
+          </Tooltip>
+          <span>{params.row.sendCount}</span>
         </Box>
       ),
     },
     {
       field: 'actions',
       headerName: 'Действия',
-      flex: 0.7,
-      minWidth: 200,
+      flex: 0.8,
+      minWidth: 240,
       sortable: false,
       renderCell: (params) => (
         <Box
@@ -111,37 +138,30 @@ function EndedTMKPage() {
             variant="outlined"
             size="small"
             sx={{
-              minWidth: 100,
+              minWidth: 90,
               textTransform: 'none',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
               fontSize: '0.8rem',
-                paddingX: '5px'
+              px: '6px',
             }}
             onClick={() => handleEditOpen(params.row)}
           >
-            Изменить
+            Изменить протокол
           </Button>
 
-          {/* {params.row.dUrl && (
-            <Button
-              variant="outlined"
-              size="small"
-              sx={{
-                minWidth: 120,
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '0.8rem',
-                paddingX: '5px'
-              }}
-              onClick={() => handleCopy(params.row.dUrl)}
-            >
-              Копировать ссылку
-            </Button>
-          )} */}
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            sx={{
+              minWidth: 90,
+              textTransform: 'none',
+              fontSize: '0.8rem',
+              px: '6px',
+            }}
+            onClick={() => handleOpen(params.row)} // ты допишешь сюда свою логику
+          >
+            Открыть
+          </Button>
         </Box>
       ),
     },
@@ -166,6 +186,10 @@ function EndedTMKPage() {
             },
             '& .MuiButton-root': {
               borderRadius: '10px',
+            },
+            '@media (max-width: 900px)': {
+              '& .MuiDataGrid-columnHeaders': { fontSize: '0.8rem' },
+              '& .MuiButton-root': { fontSize: '0.7rem' },
             },
           }}
         />
