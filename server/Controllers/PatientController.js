@@ -320,6 +320,7 @@ class PatientController {
     async addChild(req, res) {
         try {
             const { child } = req.body;
+            console.log(child)
             const newChild = await PatientService.addChild(child);
             res.status(200).json(newChild)
         } catch (e) {
