@@ -22,8 +22,8 @@ export default class MainService {
 
     //static async getDoctorSchedule(id: number): Promise<AxiosResponse<Date[]>> {}
 
-    static async createConsultation(doctorId: number, patientId: number, startDateTime: string | Date, duration: number): Promise<AxiosResponse<createCunsultationResponse>> {
-        return $api.post<createCunsultationResponse>('/api/patient/consultations/create', {doctorId, patientId, startDateTime, duration, slotStatusId: 2})
+    static async createConsultation(doctorId: number, patientId: number, startDateTime: string | Date, duration: number, childId: number | null): Promise<AxiosResponse<createCunsultationResponse>> {
+        return $api.post<createCunsultationResponse>('/api/patient/consultations/create', {doctorId, patientId, startDateTime, duration, slotStatusId: 2, childId})
     }
 
     static async getConsultationPrice(doctorId: number, startDateTime: Date | string): Promise<AxiosResponse<consultaionPrice>> {

@@ -32,5 +32,9 @@ router.post('/consultations/:id/files', uploadMiddleware.single('file'), Patient
 
 router.get('/consultations/:id/files', PatientController.getFiles)
 
+router.get('/:id/children', PatientController.getChildrenByPatientId);
+router.post('/children', PatientController.addChild);
+router.delete('/children/:id', PatientController.removeChild);
+router.get('/consultations/:id/protocol', PatientController.downloadProtocol);
 
 module.exports = router;

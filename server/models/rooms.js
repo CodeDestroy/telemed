@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       Rooms.hasMany(models.Messages, { foreignKey: 'roomId' });
       Rooms.hasMany(models.Url, { foreignKey: 'roomId' });
       Rooms.belongsTo(models.Slots, { foreignKey: 'slotId' });
+      
+      Rooms.belongsTo(models.Child, { foreignKey: 'childId', onDelete: 'CASCADE' });
     }
   }
   Rooms.init({

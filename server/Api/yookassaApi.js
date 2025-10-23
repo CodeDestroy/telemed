@@ -42,7 +42,9 @@ class yookassaApi {
                 description,
                 test: YOOKASSA_TEST,
                 receipt: {
-                    customer: {},
+                    customer: {
+                        email: process.env.CASH_RECEIPT_EMAIL, // обязательное поле
+                    },
                     items: [
                         {
                             description,
@@ -59,7 +61,7 @@ class yookassaApi {
                 }
             };
 
-            if (customerEmail) paymentData.receipt.customer.email = customerEmail;
+            //if (customerEmail) paymentData.receipt.customer.email = customerEmail;
             if (customerPhone) paymentData.receipt.customer.phone = customerPhone;
 
             const response = await $api.post("/payments", paymentData, {

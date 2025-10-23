@@ -12,6 +12,7 @@ import { observer } from 'mobx-react-lite'
 import { AxiosError } from '@/types/errors'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
+import ChildrenSection from '@/components/ChildrenSection'
 const Page = () => {
     const store = useStore()
     const [user, setUser] = useState<User | null>(store.user)
@@ -426,7 +427,22 @@ const Page = () => {
                         </form>
                     </div>
 
-                    {/* ✅ Блок согласий */}
+                    {/* ✅ Блок детей */}
+                    <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
+                        <div className="px-4 sm:px-0">
+                            <h2 className="text-base font-semibold leading-7 text-gray-900">Дети</h2>
+                            <p className="mt-1 text-sm leading-6 text-gray-600">
+                                Добавьте информацию о своих детях
+                            </p>
+                        </div>
+
+                        <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+                            <div className="px-4 py-6 sm:p-8">
+                                <ChildrenSection />
+                            </div>
+                    </div>
+                    </div>
+
                     {/* ✅ Блок согласий */}
                     <div className="grid grid-cols-1 gap-x-8 gap-y-8 pt-10 md:grid-cols-3">
                         <div className="px-4 sm:px-0">

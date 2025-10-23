@@ -36,6 +36,12 @@ export default class ConsultationService {
         return $api.get(`/api/patient/consultations/${slotId}/files`);
     }
 
+    static async downloadProtocol(slotId: number): Promise<AxiosResponse<Blob>> {
+        return $api.get<Blob>(`/api/patient/consultations/${slotId}/protocol`, {
+            responseType: 'blob',
+        });
+    }
+
 
     
 }

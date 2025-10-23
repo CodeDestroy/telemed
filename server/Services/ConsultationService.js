@@ -5,7 +5,11 @@ const moment = require('moment-timezone');
 const { raw } = require('body-parser');
 const UrlManager = require('../Utils/UrlManager');
 const { Op } = require('sequelize');
-
+const fs = require('fs')
+const path = require('path')
+const PizZip = require('pizzip')
+const Docxtemplater = require('docxtemplater')
+const FileManager = require('../Utils/FilesManager')
 const JITSI_APP_ID = process.env.JITSI_APP_ID;
 const JITSI_SERVER_URL = process.env.JITSI_SERVER_URL;
 class ConsultationService {
@@ -661,6 +665,10 @@ class ConsultationService {
                             {
                                 model: database.models.Url,
                                 required: true
+                            },
+                            {
+                                model: database.models.Child,
+                                required: false
                             }
                         ]
 
@@ -877,12 +885,12 @@ class ConsultationService {
 
 
 
-    async createRoom (slotId, roomName) {
+    async createRoom (slotId, roomName, childId = null) {
         try {
             const slot = await database.models.Slots.findByPk(slotId)
             /* const roomName = await UserManager.translit(`${testDoctor.secondName}_${testPatient.secondName}_${testSlot.slotStartDateTime.getTime()}`)
         */
-            const newRoom = await database.models.Rooms.create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id})
+            const newRoom = await database.models.Rooms.create({roomName: roomName, meetingStart: slot.slotStartDateTime, slotId: slot.id, childId: childId})
             return newRoom
         }
         catch(e) {
@@ -970,6 +978,57 @@ class ConsultationService {
             console.log(e)
             throw e
             
+        }
+    }
+    
+
+    async generateProtocolPdf(consultation) {
+        try {
+            // 1. Загружаем шаблон
+            const templatePath = path.resolve(__dirname, '../public/templates/protocol_template.docx');
+            const content = fs.readFileSync(templatePath, 'binary');
+
+            // 2. Готовим шаблон docx
+            const zip = new PizZip(content);
+            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+            // 3. Подготавливаем данные для подстановки
+            const data = {
+                DoctorFIO: consultation.Doctor
+                    ? `${consultation.Doctor.secondName} ${consultation.Doctor.firstName} ${consultation.Doctor.patronomicName || ''}`
+                    : '',
+                DoctorSpetiality: consultation.Doctor?.Posts?.map(p => p.postName).join(', ') || '',
+                DateTime: consultation.slotStartDateTime
+                    ? new Date(consultation.slotStartDateTime).toLocaleString('ru-RU')
+                    : '',
+                PatientFIO: consultation.Room?.Child
+                    ? `${consultation.Room.Child.lastName} ${consultation.Room.Child.firstName} ${consultation.Room.Child.patronymicName || ''} ${new Date(consultation.Room.Child.birthDate).toLocaleDateString('ru-RU')}`
+                    : '',
+                Recommendations: consultation.Room?.protocol || '',
+            };
+
+            // 4. Рендерим шаблон
+            try {
+                doc.render(data);
+            } catch (err) {
+                console.error('Ошибка при рендеринге шаблона:', err);
+                throw err;
+            }
+
+            // 5. Получаем буфер DOCX
+            const docxBuffer = doc.getZip().generate({ type: 'nodebuffer' });
+            if (!docxBuffer || docxBuffer.length === 0) {
+                throw new Error('❌ Получен пустой docxBuffer — проверь шаблон.');
+            }
+
+            // 6. Конвертируем в PDF через FileManager
+            const pdfBuffer = await FileManager.convertDocxToPdf(docxBuffer);
+
+            // 7. Возвращаем PDF
+            return pdfBuffer;
+        } catch (e) {
+            console.error('Ошибка в generateProtocolPdf:', e);
+            throw e;
         }
     }
 

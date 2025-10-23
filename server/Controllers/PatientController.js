@@ -78,7 +78,7 @@ class PatientController {
         let patientShortUrl = null;
         let yookassaPayment = null;
         try {
-            const {doctorId, patientId, startDateTime, duration, slotStatusId } = req.body
+            const {doctorId, patientId, startDateTime, duration, slotStatusId, childId } = req.body
             //console.log(doctorId, patientId, startDateTime, duration, slotStatusId)
             const doctor = await DoctorService.getDoctor(doctorId)
             const patient = await PatientService.getPatient(patientId)
@@ -138,7 +138,7 @@ class PatientController {
             }
             await newPayment.save()
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
-            newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
+            newRoom = await ConsultationService.createRoom(newSlot.id, roomName, childId)
             const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)
             const patientPayload = await ConsultationService.createPayloadPatient(patient.id, newRoom.id)
             const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
@@ -303,6 +303,53 @@ class PatientController {
         } catch (e) {
             console.error(e);
             res.status(500).json({ message: 'Ошибка при получении файлов' });
+        }
+    }
+
+    async getChildrenByPatientId(req, res) {
+        try {
+            const { id } = req.params;
+            const children = await PatientService.getChildrenByPatientId(id);
+            res.status(200).json(children)
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при получении детей' });
+        }
+    }
+
+    async addChild(req, res) {
+        try {
+            const { child } = req.body;
+            const newChild = await PatientService.addChild(child);
+            res.status(200).json(newChild)
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при добавлении ребенка' });
+        }
+    }
+
+    async removeChild(req, res) {
+        try {
+            const { id } = req.params;
+            await PatientService.removeChild(id);
+            res.status(200).json({ message: 'Ребенок успешно удален' });
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при удалении ребенка' });
+        }
+    }
+
+    async downloadProtocol(req, res) {
+        try {
+            const { id } = req.params;
+            const consultation = await ConsultationService.getSlotById(id);
+            const protocolBuffer = await ConsultationService.generateProtocolPdf(consultation);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=Protocol_${id}.pdf`);
+            res.send(protocolBuffer);
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при скачивании протокола' });
         }
     }
     
