@@ -172,6 +172,17 @@ class ConferenceController {
         
     }
 
+    async getSlotByRoomName (req, res) {
+        try {
+            const {roomName} = req.query
+            const tmk = await ConsultationService.getSlotByRoomName(roomName)
+            res.status(200).json(tmk)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
     async setEndConsultation(req, res) {
         try {
 

@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       Rooms.belongsTo(models.Slots, { foreignKey: 'slotId' });
       
       Rooms.belongsTo(models.Child, { foreignKey: 'childId', onDelete: 'CASCADE' });
+      Rooms.hasOne(models.Protocol, {
+        foreignKey: 'room_id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      });
     }
   }
   Rooms.init({
@@ -25,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     ended: DataTypes.BOOLEAN,
     slotId: DataTypes.INTEGER,
     protocol: DataTypes.TEXT,
-    sendCount: DataTypes.INTEGER
+    sendCount: DataTypes.INTEGER,
+    protocol_id: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Rooms',

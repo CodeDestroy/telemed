@@ -68,5 +68,18 @@ export default class DoctorService {
     static async endConsultation(slotId, endTime) {
         return $api.post(`/api/doctor/consultation/${slotId}/setEnd`, {endTime})
     }
+
+    /* static async downloadProtocol(roomId) {
+        return $api.get(`/api/doctor/protocol/${roomId}/pdf`, {
+            responseType: 'blob',
+        });
+        } */
+    
+    static async downloadProtocol(slotId) {
+        return $api.get(`/api/patient/consultations/${slotId}/protocol`, {
+            responseType: 'blob',
+        });
+    }
+
     
 }

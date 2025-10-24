@@ -16,6 +16,7 @@ const storage = multer.diskStorage({
 const uploadMiddleware = multer({ storage });
 
 router.get('/consultations/protocol', ConferenceContorller.getProtocolByRoomName)
+router.get('/consultations/byRoomName', ConferenceContorller.getSlotByRoomName)
 router.get('/doctorList', DoctorController.getDoctorList)
 router.get('/doctor', DoctorController.getDoctor)
 router.get('/postsList', DoctorController.getPostsList)

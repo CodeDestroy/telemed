@@ -27,6 +27,8 @@ import AdminHeader from "../Header";
 import DoctorService from "../../../Services/DoctorService";
 import moment from "moment-timezone";
 import { Context } from "../../../";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+
 
 const statusColor = (status) => {
   const code = (status || "").toLowerCase();
@@ -53,6 +55,8 @@ export default function ConsultationDetailsPage() {
   const [endDialogOpen, setEndDialogOpen] = useState(false);
   const [endTime, setEndTime] = useState(moment().format("YYYY-MM-DDTHH:mm"));
   const [ending, setEnding] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
 
   useEffect(() => {
     if (slotId) {
@@ -133,6 +137,30 @@ export default function ConsultationDetailsPage() {
       setEnding(false);
     }
   };
+  const handleDownloadProtocol = async () => {
+    setDownloading(true);
+    try {
+      const response = await DoctorService.downloadProtocol(details.id);
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        `Протокол_${details.Patient.secondName}_${moment(details.slotStartDateTime).format("DD.MM.YYYY")}.pdf`
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setSnackbar({ open: true, message: "Протокол успешно скачан", severity: "success" });
+    } catch (error) {
+      setSnackbar({ open: true, message: "Ошибка при скачивании PDF", severity: "error" });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -276,6 +304,19 @@ export default function ConsultationDetailsPage() {
               <Button variant="contained" color="primary" onClick={handleSendProtocol} disabled={sending}>
                 {sending ? "Отправка..." : "Отправить"}
               </Button>
+              <Tooltip title="Скачать PDF протокол">
+                <span>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<PictureAsPdfIcon />}
+                    onClick={handleDownloadProtocol}
+                    disabled={downloading}
+                  >
+                    {downloading ? "Загрузка..." : "Скачать PDF"}
+                  </Button>
+                </span>
+              </Tooltip>
               <Typography variant="body2" color="text.secondary" alignSelf="center">
                 Отправлено раз: {details.Room.sendCount ? details.Room.sendCount : 0}
               </Typography>

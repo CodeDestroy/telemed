@@ -34,7 +34,7 @@ function RegistratinStep1() {
         /* console.log(phone) */
         if (!consent) {
             alert('Вы должны согласиться на обработку персональных данных');
-            return;
+            return; 
         }
         try {
             const response = await AuthService.checkPhone(phone.trim())
