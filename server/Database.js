@@ -31,6 +31,9 @@ const SchedulePrices = require('./models/scheduleprices')
 const PromoCodes = require('./models/promocodes')
 const Attachments = require('./models/attachments')
 const DoctorPosts = require('./models/doctorposts')
+const Child = require('./models/child')
+const Protocol = require('./models/protocols');
+const mkbDiagnosis = require('./models/mkbdiagnoses');
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = class Database {
@@ -79,7 +82,10 @@ module.exports = class Database {
       SchedulePrices: SchedulePrices(this.sequelize, DataTypes),
       PromoCodes: PromoCodes(this.sequelize, DataTypes),
       Attachments: Attachments(this.sequelize, DataTypes),
-      DoctorPosts: DoctorPosts(this.sequelize, DataTypes)
+      DoctorPosts: DoctorPosts(this.sequelize, DataTypes),
+      Child: Child(this.sequelize, DataTypes),
+      Protocol: Protocol(this.sequelize, DataTypes),
+      mkbDiagnosis: mkbDiagnosis(this.sequelize, DataTypes),
     };
 
     Object.keys(this.models).forEach(modelName => {

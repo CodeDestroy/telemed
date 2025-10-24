@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/store'
@@ -8,23 +8,55 @@ import Header from '@/components/Header'
 import Link from 'next/link'
 import Footer from '@/components/Footer'
 import Loader from '@/components/Loader'
+import { IMaskInput } from 'react-imask'
+
 const LoginPage = () => {
     
     const [loading, setLoading] = useState(false)
     const store = useStore()
     const router = useRouter()
-    const [phone, setPhone] = useState('')
+    const [phone, setPhone] = useState('')           // чистый номер: 9518531985
+    const [formattedPhone, setFormattedPhone] = useState('') 
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+
+    const phoneRef = useRef<HTMLInputElement>(null)
+    const showPassBtn = useRef<HTMLButtonElement>(null)
+    const dontShowPassBtn = useRef<HTMLButtonElement>(null)
+    const [passwordInpType, setPasswordInputType] = useState('password')
+    const [showPass, setShowPass] = useState(false)
+
+    const [showPassBool, setShowPassBool] = useState<boolean>(false)
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
     useEffect(() => {
         if (store.isAuth)
             router.push('/')
     }, [])
+    const toggleShowPass = () => setShowPass(!showPass)
+    const showPassFunc = () => {
+        if (showPassBtn.current && dontShowPassBtn.current){
+            if (!showPassBool ) {
+                showPassBtn.current.style.display = 'none'
+                //showPassBtn.current.style.display = 'none'
+                dontShowPassBtn.current.style.display = 'block'
+                setShowPassBool(true)
+                setPasswordInputType('text')
+            }
+            else {
+                showPassBtn.current.style.display = 'block'
+                dontShowPassBtn.current.style.display = 'none'
+                setShowPassBool(false)
+                setPasswordInputType('password')
+            }
+        }
+    }
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
+        console.log(phone, password)
+        try {
         
-       try {
             setLoading(true)
             const res = await store.login(phone, password)
 
@@ -50,7 +82,10 @@ const LoginPage = () => {
             }
         }
     }
+
     
+   
+
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col">
@@ -71,11 +106,7 @@ const LoginPage = () => {
                 <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
                     <div className="mx-auto w-full max-w-sm lg:w-96">
                         <div>
-                            {/* <img
-                                alt="Your Company"
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                                className="h-10 w-auto"
-                            /> */}
+                            
                             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">
                                 Войдите в свой аккаунт
                             </h2>
@@ -96,19 +127,42 @@ const LoginPage = () => {
                                         Телефон
                                     </label>
                                     <div className="mt-2">
-                                    <input
+                                    {/* <input
                                         id="phone"
                                         name="phone"
-                                        type="phone"
+                                        type="text"
                                         required
                                         autoComplete="phone"
                                         onChange={(e) => setPhone(e.target.value)}
                                         className="block w-full rounded-md border-0 py-1.5 px-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    />
+                                    /> */}
+                                    {mounted && (
+                                        <IMaskInput
+                                            mask="+7 (000) 000-00-00"
+                                            value={formattedPhone}
+                                            onAccept={(value: string) => {
+                                                const digits = value.replace(/\D/g, '')
+                                                const normalized = digits.startsWith('8') ? digits.slice(1) : digits
+                                                setPhone(normalized)
+                                                setFormattedPhone(value)
+                                            }}
+                                            overwrite
+                                            unmask={false} // сохраняем отображаемое значение
+                                            // Для ref если нужно
+                                            inputRef={phoneRef}
+                                            // обычные пропсы input
+                                            className="block w-full rounded-md border-0 py-1.5 px-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            placeholder="+7 (___) ___-__-__"
+                                        />
+                                    )}
+
                                     </div>
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                                         Пароль
                                     </label>
@@ -122,6 +176,25 @@ const LoginPage = () => {
                                         onChange={(e) => setPassword(e.target.value)}
                                         className="block w-full rounded-md border-0 py-1.5 px-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     />
+                                    </div>
+                                </div> */}
+                                <div>
+                                    <label className="block text-sm font-medium leading-6 text-gray-900">Пароль</label>
+                                    <div className="relative mt-2">
+                                        <input onChange={(e) => setPassword(e.target.value)} id="password" name="password" type={showPass ? 'text' : 'password'} required
+                                            className="block w-full rounded-md border-0 py-1.5 px-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                                        <button ref={showPassBtn} id="showPass" onClick={toggleShowPass} type="button" className="absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500 hover:text-gray-700" style={{right: '5px'}}> 
+                                            {showPass ? 
+                                                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400"  data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"></path>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+                                                </svg>
+                                                :
+                                                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" data-slot="icon" fill="none" strokeWidth="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"></path>
+                                                </svg>
+                                            }
+                                        </button>
                                     </div>
                                 </div>
 
@@ -217,7 +290,7 @@ const LoginPage = () => {
                 <div className="relative hidden w-0 flex-1 lg:block">
                     <img
                         alt=""
-                        src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
+                        src="/img/login_photo.png"
                         className="absolute inset-0 h-full w-full object-cover"
                     />
                 </div>

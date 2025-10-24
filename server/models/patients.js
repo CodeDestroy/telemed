@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Patients.belongsTo(models.Users, { foreignKey: 'userId' });
       Patients.hasMany(models.Slots, { foreignKey: 'patientId' });
+      Patients.hasMany(models.Child, {
+        foreignKey: 'patientId',
+        onDelete: 'CASCADE',
+      });
     }
   }
   Patients.init({

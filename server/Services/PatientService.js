@@ -67,6 +67,57 @@ class PatientService {
             throw e;
         }
     }
+
+    async getChildrenByPatientId(patientId) {
+        try {
+            const children = await database["Child"].findAll({
+                where: { patientId: patientId }
+            })
+            return children;
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
+
+    async addChild(childData) {
+        try {
+            const child = await database["Child"].create({
+                ...childData
+            })
+            return child;
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
+
+    //Пока не используется
+    async updateChild(childId, childData) {
+        try {
+            await database["Child"].update(
+                { ...childData },
+                { where: { id: childId } }
+            )
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
+    async removeChild(childId) {
+        try {
+            await database["Child"].destroy({
+                where: { id: childId }
+            })
+        }
+        catch (e) {
+            console.log(e)
+            throw e;
+        }
+    }
 }
 
 module.exports = new PatientService();

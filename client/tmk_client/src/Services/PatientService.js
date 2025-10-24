@@ -8,5 +8,9 @@ export default class PatientService {
         return $api.get('/api/patient/consultations/protocol', {params: {roomName}});
     }
 
+    static async getSlotByRoomName(roomName){
+        return $api.get('/api/patient/consultations/byRoomName', {params: {roomName}});
+    }
+
         
 }

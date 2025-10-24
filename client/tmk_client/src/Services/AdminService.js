@@ -24,6 +24,15 @@ export default class AdminService {
         return $api.get(`/api/admin/patients/${patientId}`);
     }
 
+    static async getChildrenByPatientId(patientId) {
+        return $api.get(`/api/patient/${patientId}/children`);
+    }
+
+    // Добавить ребёнка
+    static async addChildToPatient(child) {
+        return $api.post(`/api/patient/children`, {child});
+    }
+
     static async editPatient(patientId, patient) {
         return $api.post(`/api/admin/patients/${patientId}`, {user: patient});
     }

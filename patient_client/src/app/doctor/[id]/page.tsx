@@ -16,32 +16,44 @@ import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
 
 import "dayjs/locale/ru";
+import { Child } from "@/types/child";
+import UserService from "@/services/user";
 
 dayjs.locale("ru");
 interface Consultation {
-  id: number;
-  slotStartDateTime: string;
-  slotEndDateTime: string;
-  slotStatusId: number;
+    id: number;
+    slotStartDateTime: string;
+    slotEndDateTime: string;
+    slotStatusId: number;
 }
 
 const DoctorPage = () => {
-  const params = useParams()
-  const rawId = params?.id
-  const id = Array.isArray(rawId) ? rawId[0] : rawId
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [selectedTime, setSelectedTime] = useState<string>("");
-  const [doctor, setDoctor] = useState<DoctorListItemResponse>();
-  const [doctorIsLoading, setDoctorIsLoading] = useState(true);
-  const [availableTimes, setAvailableTimes] = useState<string[]>([]);
-  const [activeConsultations, setActiveConsultations] = useState<Consultation[]>([]);
+    const params = useParams()
+    const rawId = params?.id
+    const id = Array.isArray(rawId) ? rawId[0] : rawId
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+    const [selectedTime, setSelectedTime] = useState<string>("");
+    const [doctor, setDoctor] = useState<DoctorListItemResponse>();
+    const [doctorIsLoading, setDoctorIsLoading] = useState(true);
+    const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+    const [activeConsultations, setActiveConsultations] = useState<Consultation[]>([]);
 
-  const [loading, setLoading] = useState(false)
-  useEffect(() => {
-    if (id) {
-      fetchDoctor();
-    }
-  }, [id]);
+    const [selectedChild, setSelectedChild] = useState<number | "">("");
+    const [children, setChildren] = useState<Child[]>([]);
+    const user = store.user;
+
+
+    const [loading, setLoading] = useState(false)
+    useEffect(() => {
+        if (id) {
+            fetchDoctor();
+        }
+        if (user?.personId) {
+            UserService.getChildren(user.personId)
+            .then(res => setChildren(res.data || []))
+            .catch(err => console.error("Ошибка загрузки детей", err));
+        }
+    }, [id]);
 
   const fetchDoctor = async () => {
     try {
@@ -74,6 +86,7 @@ const DoctorPage = () => {
         let start = dayjs(`${date}T${slot.scheduleStartTime}`);
         const end = dayjs(`${date}T${slot.scheduleEndTime}`);
         const now = dayjs(); // текущее время
+        const plusTwoHours = now.add(2, 'h')
 
         while (start.isBefore(end)) {
           const formatted = start.format("HH:mm");
@@ -83,10 +96,11 @@ const DoctorPage = () => {
             dayjs(c.slotStartDateTime).isSame(start, "minute") && c.slotStatusId !== 5
           );
 
-          if (!isUnavailable && start.isAfter(now)) {
+          if (!isUnavailable && start.isAfter(plusTwoHours)) {
             slots.push(formatted);
           }
 
+          //Тут можно не фиксированоое время, а разбивку из таблицы schedule в БД
           start = start.add(60, "minute"); // шаг 60 минут
         }
       });
@@ -144,8 +158,7 @@ const DoctorPage = () => {
   };
 
   const handleBooking = async () => {
-    if (!doctor || !selectedDate || !selectedTime) return;
-
+    if (!doctor || !selectedDate || !selectedTime || !selectedChild) return;
     try {
       if (store.user?.id) {
         const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime}`).toISOString();
@@ -155,6 +168,7 @@ const DoctorPage = () => {
           store.user?.personId,
           startDateTime,
           60,
+          selectedChild
         );
         if (response.status === 200) {
           //alert("Вы успешно записаны!");
@@ -318,7 +332,47 @@ const DoctorPage = () => {
               )}
             </TextField>
           )}
-          
+         
+
+          {/* ====== ВЫБОР РЕБЁНКА ИЛИ ВХОД ====== */}
+          <div className="mt-4">
+            {!user ? (
+              <div className="text-center">
+                <p className="text-gray-600 mb-2">Чтобы записаться, необходимо авторизоваться</p>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                  Войти
+                </Link>
+              </div>
+            ) : children.length === 0 ? (
+              <div className="text-center">
+                <p className="text-gray-600 mb-2">У вас нет добавленных детей</p>
+                <Link
+                  href="/profile"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                  Добавить детей
+                </Link>
+              </div>
+            ) : (
+              <TextField
+                select
+                label="Выберите ребёнка"
+                value={selectedChild}
+                onChange={(e) => setSelectedChild(Number(e.target.value))}
+                fullWidth
+              >
+                {children.map((child) => (
+                  <MenuItem key={child.id} value={child.id}>
+                    {child.lastName} {child.firstName} {child.patronymicName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          </div>
+           
           {selectedTime && (
             <div className="mt-4">
               {loadingPrice ? (
@@ -339,7 +393,7 @@ const DoctorPage = () => {
               color="primary"
               fullWidth
               onClick={handleBooking}
-              disabled={!selectedDate || !selectedTime}
+              disabled={!selectedDate || !selectedTime || !selectedChild}
           >
             Записаться
           </Button>

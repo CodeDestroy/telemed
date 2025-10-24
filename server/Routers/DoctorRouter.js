@@ -22,4 +22,8 @@ router.post('/scheduler/dates/edit/:id',  SchedulerController.editScheduleDate)
 
 router.post('/conference/protocol/send', ConferenceContorller.sendConferenceProtocol)
 router.post('/conference/protocol/set', ConferenceContorller.setConferenceProtocol)
+
+router.post('/consultation/:id/setEnd', ConferenceContorller.setEndConsultation)
+
+
 module.exports = router;
