@@ -3,7 +3,7 @@
 
 import Header from '@/components/Header'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useStore } from '@/store'
 import { User } from '@/types/user'
 import dayjs from 'dayjs'
@@ -13,14 +13,23 @@ import { AxiosError } from '@/types/errors'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import ChildrenSection from '@/components/ChildrenSection'
+import { IMaskInput } from 'react-imask'
 const Page = () => {
     const store = useStore()
     const [user, setUser] = useState<User | null>(store.user)
+    const [formattedPhone, setFormattedPhone] = useState(store.user?.phone) // для отображения
     const [errors, setErrors] = useState<string[]>([])
+    const phoneRef = useRef<HTMLInputElement>(null)
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setUser(prev => prev ? { ...prev, [name]: value } : prev)
     }
+
+    const setPhone = (phone: string) => {
+        setUser(prev => prev ? { ...prev, phone: phone } : prev)
+    }
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
 
     useEffect(() => {
         if (!store.isLoading && !store.user && !store.isAuth) {
@@ -255,7 +264,30 @@ const Page = () => {
                                 <label htmlFor="phone" className="block text-sm font-medium leading-6 text-gray-900">
                                     Телефон
                                 </label>
-                                <div className="mt-2">
+                                {mounted && (
+                                    <IMaskInput
+                                        mask="+7 (000) 000-00-00"
+                                        value={formattedPhone}
+                                        onAccept={(value: string) => {
+                                            const digits = value.replace(/\D/g, '')
+                                            const normalized = digits.startsWith('8') ? digits.slice(1) : digits
+                                            setPhone(normalized)
+                                            setFormattedPhone(value)
+                                        }}
+                                        overwrite
+                                        unmask={false} // сохраняем отображаемое значение
+                                        // Для ref если нужно
+                                        inputRef={phoneRef}
+                                        /* onChange={handleChange} */
+                                        // обычные пропсы input
+                                        className="block w-full rounded-md border-0 py-1.5 px-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        placeholder="+7 (___) ___-__-__"
+                                    />
+                                )}
+                                {/* <div className="mt-2">
                                     <input
                                     id="phone"
                                     name="phone"
@@ -265,7 +297,7 @@ const Page = () => {
                                     autoComplete="phone"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                     />
-                                </div>
+                                </div> */}
                                 </div>
 
                                 <div>

@@ -14,8 +14,8 @@ class FileManager {
             const pdfBuffer = fs.readFileSync(tempPdfPath);
 
             // Можно удалить временные файлы
-            fs.unlinkSync(tempDocxPath);
-            fs.unlinkSync(tempPdfPath);
+            //fs.unlinkSync(tempDocxPath);
+            //fs.unlinkSync(tempPdfPath);
 
             return pdfBuffer;
         } catch (error) {

@@ -187,7 +187,7 @@ class AuthController {
             const user = await userService.getUser(userDto.id)
             const patient = await PatientService.getPatientByUserId(user.id)
             user.phone = userDto.phone
-            userDto.login = userDto.phone
+            user.login = userDto.phone
             user.email = userDto.email
             patient.secondName = userDto.secondName
             patient.firstName = userDto.firstName
