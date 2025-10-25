@@ -142,6 +142,7 @@ export default function ConsultationDetailsPage() {
     try {
       const response = await DoctorService.downloadProtocol(details.id);
       const blob = new Blob([response.data], { type: "application/pdf" });
+      //const blob = new Blob([response.data], { type: "type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'," });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
