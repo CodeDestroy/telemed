@@ -37,9 +37,10 @@ const ConsultationPage = () => {
       const response = await ConsultationService.downloadProtocol(parseInt(id))
 
       // Получаем blob (Word файл)
-      const blob = new Blob([response.data], {
+      /* const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      })
+      }) */
+     const blob = new Blob([response.data], { type: 'application/pdf', })
 
       // Формируем имя файла
       const patientName: string = consultation?.Patient

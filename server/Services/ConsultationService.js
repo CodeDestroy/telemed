@@ -1032,6 +1032,57 @@ class ConsultationService {
         }
     }
 
+    async generateProtocolPdf(consultation) {
+        try {
+            // 1. Загружаем шаблон
+            const templatePath = path.resolve(__dirname, '../public/templates/protocol_template.docx');
+            const content = fs.readFileSync(templatePath, 'binary');
+
+            // 2. Готовим шаблон docx
+            const zip = new PizZip(content);
+            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+            // 3. Подготавливаем данные для подстановки
+            const data = {
+                DoctorFIO: consultation.Doctor
+                    ? `${consultation.Doctor.secondName} ${consultation.Doctor.firstName} ${consultation.Doctor.patronomicName || ''}`
+                    : '',
+                DoctorSpetiality: consultation.Doctor?.Posts?.map(p => p.postName).join(', ') || '',
+                DateTime: consultation.slotStartDateTime
+                    ? new Date(consultation.slotStartDateTime).toLocaleString('ru-RU')
+                    : '',
+                PatientFIO: consultation.Room?.Child
+                    ? `${consultation.Room.Child.lastName} ${consultation.Room.Child.firstName} ${consultation.Room.Child.patronymicName || ''} ${new Date(consultation.Room.Child.birthDate).toLocaleDateString('ru-RU')}`
+                    : '',
+                MKB: '',
+                Complaints: '',
+                Recommendations: consultation.Room?.protocol || '',
+            };
+
+            // 4. Рендерим шаблон
+            try {
+                doc.render(data);
+            } catch (err) {
+                console.error('Ошибка при рендеринге шаблона:', err);
+                throw err;
+            }
+
+            // 5. Получаем буфер DOCX
+            const docxBuffer = doc.getZip().generate({ type: 'nodebuffer' });
+            if (!docxBuffer || docxBuffer.length === 0) {
+                throw new Error('❌ Получен пустой docxBuffer — проверь шаблон.');
+            }
+
+            // 6. Конвертируем в PDF через FileManager
+            const pdfBuffer = await FileManager.convertDocxToPdf(docxBuffer);
+
+            // 7. Возвращаем PDF
+            return pdfBuffer;
+        } catch (e) {
+            console.error('Ошибка в generateProtocolPdf:', e);
+            throw e;
+        }
+    }
     
 }
 
