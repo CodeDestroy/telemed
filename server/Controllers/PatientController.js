@@ -152,20 +152,21 @@ class PatientController {
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
 
             //Отключили отправку до оплаты
-            /* try {
-                if (patient.User.email) {
-                    const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl, startDateTime);
-                    await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+            if (price.isFree) {
+                try {
+                    if (patient.User.email) {
+                        const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl, startDateTime);
+                        await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                    }
+                    if (doctor.User.email) {
+                        const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorUrl, newSlot.id, startDateTime);
+                        await transporter.sendMail(mailOptionsDoctor);
+                    }
+                } catch (mailErr) {
+                    // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                    console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
                 }
-                if (doctor.User.email) {
-                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorUrl, newSlot.id, startDateTime);
-                    await transporter.sendMail(mailOptionsDoctor);
-                }
-            } catch (mailErr) {
-                // не откатываем транзакцию; логируем и сохраняем задачу на повтор
-                console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
-            } */
-
+            }
 
 
             /* if (patient.User.email) {

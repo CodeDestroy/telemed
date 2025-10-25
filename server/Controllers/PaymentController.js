@@ -29,6 +29,7 @@ class PatientController {
             const patient = await PatientService.getPatient(slot.patientId)
             const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
             const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
+            const transporter = await MailManager.getTransporter()
             switch (notification.event) {
                 case "payment.waiting_for_capture":
                     // 💡 Тут можно решить: сразу списывать или ждать ручного подтверждения
@@ -178,7 +179,7 @@ class PatientController {
             const patient = await PatientService.getPatient(slot.patientId)
             const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
             const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
-
+            const transporter = await MailManager.getTransporter()
             if (!payment) {
                 return res.status(404).json({ message: "Платёж не найден" });
             }
