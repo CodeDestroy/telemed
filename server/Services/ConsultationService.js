@@ -982,7 +982,7 @@ class ConsultationService {
     }
     
 
-    async generateProtocolPdf(consultation) {
+    /* async generateProtocolPdf(consultation) {
         try {
             // 1. Загружаем шаблон
             const templatePath = path.resolve(__dirname, '../public/templates/protocol_template.docx');
@@ -1030,7 +1030,7 @@ class ConsultationService {
             console.error('Ошибка в generateProtocolPdf:', e);
             throw e;
         }
-    }
+    } */
 
     async generateProtocolPdf(consultation) {
         try {
@@ -1053,7 +1053,7 @@ class ConsultationService {
                     : '',
                 PatientFIO: consultation.Room?.Child
                     ? `${consultation.Room.Child.lastName} ${consultation.Room.Child.firstName} ${consultation.Room.Child.patronymicName || ''} ${new Date(consultation.Room.Child.birthDate).toLocaleDateString('ru-RU')}`
-                    : '',
+                    : `${consultation.Patient.secondName} ${consultation.Patient.firstName} ${consultation.Patient.patronomicName || ''} ${new Date(consultation.Patient.birthDate).toLocaleDateString('ru-RU')}`,
                 MKB: '',
                 Complaints: '',
                 Recommendations: consultation.Room?.protocol || '',

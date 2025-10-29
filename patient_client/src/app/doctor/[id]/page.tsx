@@ -41,6 +41,7 @@ const DoctorPage = () => {
     const [selectedChild, setSelectedChild] = useState<number | "">("");
     const [children, setChildren] = useState<Child[]>([]);
     const user = store.user;
+    const [showChildSelect, setShowChildSelect] = useState(false);
 
 
     const [loading, setLoading] = useState(false)
@@ -158,7 +159,7 @@ const DoctorPage = () => {
   };
 
   const handleBooking = async () => {
-    if (!doctor || !selectedDate || !selectedTime || !selectedChild) return;
+    if (!doctor || !selectedDate || !selectedTime) return;
     try {
       if (store.user?.id) {
         const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime}`).toISOString();
@@ -168,7 +169,7 @@ const DoctorPage = () => {
           store.user?.personId,
           startDateTime,
           60,
-          selectedChild
+          selectedChild ? selectedChild : null
         );
         if (response.status === 200) {
           //alert("Вы успешно записаны!");
@@ -357,21 +358,36 @@ const DoctorPage = () => {
                 </Link>
               </div>
             ) : (
-              <TextField
-                select
-                label="Выберите ребёнка"
-                value={selectedChild}
-                onChange={(e) => setSelectedChild(Number(e.target.value))}
-                fullWidth
-              >
-                {children.map((child) => (
-                  <MenuItem key={child.id} value={child.id}>
-                    {child.lastName} {child.firstName} {child.patronymicName}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <>
+                {!showChildSelect ? (
+                  <div className="text-center">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setShowChildSelect(true)}
+                    >
+                      Выбрать ребёнка
+                    </Button>
+                  </div>
+                ) : (
+                  <TextField
+                    select
+                    label="Выберите ребёнка"
+                    value={selectedChild}
+                    onChange={(e) => setSelectedChild(Number(e.target.value))}
+                    fullWidth
+                  >
+                    {children.map((child) => (
+                      <MenuItem key={child.id} value={child.id}>
+                        {child.lastName} {child.firstName} {child.patronymicName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              </>
             )}
           </div>
+
            
           {selectedTime && (
             <div className="mt-4">
@@ -393,7 +409,7 @@ const DoctorPage = () => {
               color="primary"
               fullWidth
               onClick={handleBooking}
-              disabled={!selectedDate || !selectedTime || !selectedChild}
+              disabled={!selectedDate || !selectedTime }
           >
             Записаться
           </Button>
