@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import styles from '../../../../Assets/css/Main.module.css'
 import authLocations from '../../../../Locations/AuthLocations'
 import AuthService from '../../../../Services/AuthService'
 
+import { IMaskInput } from 'react-imask'
 function RestoreFirstStep() {
     useEffect(() => {
         const html = document.querySelector('html')
@@ -10,8 +11,13 @@ function RestoreFirstStep() {
     }, [])
 
     const [phone, setPhone] = useState('')
+    
+    const [formattedPhone, setFormattedPhone] = useState('') 
     const [error, setError] = useState('')
-
+    const phoneRef = useRef(null)
+    
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
     const handlePhone = (event) => {
         setPhone(event.target.value)
     }
@@ -55,7 +61,30 @@ function RestoreFirstStep() {
                                 Укажите Ваш мобильный телефон для отправки кода подтверждения
                             </p>
                             <div className={styles.formGroup}>
-                                <input id="phone" name="phone" value={phone} className={`${styles.formInput} ${styles.phoneMask}`} type="text" placeholder="Введите" onChange={handlePhone}/>
+                                {/* <input id="phone" name="phone" value={phone} className={`${styles.formInput} ${styles.phoneMask}`} type="text" placeholder="Введите" onChange={handlePhone}/> */}
+                                {mounted && (
+                                    <IMaskInput
+                                        mask="+7 (000) 000-00-00"
+                                        value={formattedPhone}
+                                        onAccept={(value) => {
+                                            const digits = value.replace(/\D/g, '')
+                                            const normalized = digits.startsWith('8') ? digits.slice(1) : digits
+                                            setPhone(normalized)
+                                            setFormattedPhone(value)
+                                        }}
+                                        overwrite
+                                        unmask={false} // сохраняем отображаемое значение
+                                        // Для ref если нужно
+                                        inputRef={phoneRef}
+                                        // обычные пропсы input
+                                        className={`${styles.formInput}`}
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        placeholder="+7 (___) ___-__-__"
+                                    />
+                                    
+                                )}
                                 <label htmlFor="phone" className={styles.formLabel}>Мобильный телефон</label>
                                 <span className={styles.formClear} onClick={clearPhone}>
                                     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">

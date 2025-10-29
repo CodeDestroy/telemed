@@ -41,6 +41,7 @@ const DoctorPage = () => {
     const [selectedChild, setSelectedChild] = useState<number | "">("");
     const [children, setChildren] = useState<Child[]>([]);
     const user = store.user;
+    const [showChildSelect, setShowChildSelect] = useState(false);
 
 
     const [loading, setLoading] = useState(false)
@@ -158,7 +159,7 @@ const DoctorPage = () => {
   };
 
   const handleBooking = async () => {
-    if (!doctor || !selectedDate || !selectedTime || !selectedChild) return;
+    if (!doctor || !selectedDate || !selectedTime) return;
     try {
       if (store.user?.id) {
         const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime}`).toISOString();
@@ -168,7 +169,7 @@ const DoctorPage = () => {
           store.user?.personId,
           startDateTime,
           60,
-          selectedChild
+          selectedChild ? selectedChild : null
         );
         if (response.status === 200) {
           //alert("Вы успешно записаны!");
@@ -228,37 +229,35 @@ const DoctorPage = () => {
           <ChevronLeftIcon className="w-4 h-4 mr-1" /> Назад
         </Link>
 
-        <div className="bg-white shadow rounded-lg p-6 flex gap-6 items-center">
+        <div className="bg-white shadow rounded-lg p-6 flex flex-col sm:flex-row sm:items-center gap-6">
           <img
-            //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
             src={doctor?.doctor.User?.avatar}
             alt={`${doctor?.doctor.secondName} ${doctor?.doctor.firstName}`}
-            className="w-24 h-24 rounded-full object-cover"
+            className="w-24 h-24 rounded-full object-cover mx-auto sm:mx-0"
           />
-          <div>
+          <div className="text-center sm:text-left">
             <h1 className="text-2xl font-bold text-gray-900">
               {doctor?.doctor.secondName} {doctor?.doctor.firstName} {doctor?.doctor.patronomicName}
             </h1>
-            {/* {doctor?.doctor.Posts.map((post) => (
-              <span className="text-gray-600">{post.postName}</p>
-            ))} */}
-            {doctor?.doctor?.Posts && doctor.doctor.Posts.length > 0 ? (
-              doctor.doctor.Posts.map((post) => (
-                <a
-                  key={post.id}
-                  href={`/?post=${post.transliterationName}`}
-                  className="hover:underline mt-1 text-xs leading-5 text-gray-500 truncate"
-                >
-                  {post.postName}{', '}
-                </a>
-              ))
-            ) : (
-              <p className="mt-1 text-xs leading-5 text-gray-500">Специальность не указана</p>
-            )}
 
-            
+            {doctor?.doctor?.Posts && doctor.doctor.Posts.length > 0 ? (
+              <div className="mt-2 flex flex-col space-y-1">
+                {doctor.doctor.Posts.map((post, index) => (
+                  <a
+                    key={post.id}
+                    href={`/?post=${post.transliterationName}`}
+                    className="text-xs text-gray-600 hover:underline"
+                  >
+                    {post.postName}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-gray-500">Специальность не указана</p>
+            )}
           </div>
         </div>
+
 
         <div className="bg-white shadow rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Записаться на прием</h2>
@@ -357,21 +356,36 @@ const DoctorPage = () => {
                 </Link>
               </div>
             ) : (
-              <TextField
-                select
-                label="Выберите ребёнка"
-                value={selectedChild}
-                onChange={(e) => setSelectedChild(Number(e.target.value))}
-                fullWidth
-              >
-                {children.map((child) => (
-                  <MenuItem key={child.id} value={child.id}>
-                    {child.lastName} {child.firstName} {child.patronymicName}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <>
+                {!showChildSelect ? (
+                  <div className="text-center">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setShowChildSelect(true)}
+                    >
+                      Выбрать ребёнка
+                    </Button>
+                  </div>
+                ) : (
+                  <TextField
+                    select
+                    label="Выберите ребёнка"
+                    value={selectedChild}
+                    onChange={(e) => setSelectedChild(Number(e.target.value))}
+                    fullWidth
+                  >
+                    {children.map((child) => (
+                      <MenuItem key={child.id} value={child.id}>
+                        {child.lastName} {child.firstName} {child.patronymicName}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              </>
             )}
           </div>
+
            
           {selectedTime && (
             <div className="mt-4">
@@ -393,7 +407,7 @@ const DoctorPage = () => {
               color="primary"
               fullWidth
               onClick={handleBooking}
-              disabled={!selectedDate || !selectedTime || !selectedChild}
+              disabled={!selectedDate || !selectedTime }
           >
             Записаться
           </Button>
