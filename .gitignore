@@ -9,7 +9,7 @@ client/tmk_client/.env
 client/tmk_client/build
 client/tmk_client/public/assets
 server/public/files/
-
+server/temp/
 server/package-lock.json
 client/tmk_client/package-lock.json
 healthyChildService/
