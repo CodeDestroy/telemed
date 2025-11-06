@@ -23,7 +23,9 @@ const Page = () => {
             /* console.log(store.user?.id) */
             if (store.user?.id) {
                 const response = await ConsultationService.getCurrentConsultations(store.user.id)
-                const data: SlotWithRoomPatient[] = response.data
+                const data: SlotWithRoomPatient[] = (response.data).sort((a, b) => {
+                    return a.slotStartDateTime < b.slotStartDateTime ? 1 : -1
+                })
                 setConsultations(data)
             }
             

@@ -17,6 +17,8 @@ var validator = require("email-validator");
 const smsCenterApi = require('../Api/smsCenterApi')
 const PaymentService = require("../Services/PaymentService");
 const yookassaApi = require('../Api/yookassaApi');
+const SchedulerService = require('../Services/SchedulerService')
+const PricesService = require('../Services/PricesService')
 class AdminController {
     async getAllConsultations(req, res) {
         try {
@@ -94,12 +96,14 @@ class AdminController {
         let patientShortUrl = null;
         let yookassaPayment = null;
         try {
-            const {doctor, patient, startDateTime, duration, slotStatusId } = req.body
-
+            const {patient, startDateTime, duration, slotStatusId } = req.body
+            let {doctor} = req.body
+            doctor = await DoctorService.getDoctor(doctor.id)
             // Разбираем дату-время на отдельно дату и время
             const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
             const startTime = startDateTime.split('T')[1]; // HH:mm:ss
             //ищем schedule по startDateTime и doctorId
+            console.log(doctor.id, startDate, startTime)
             const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
             newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
             const price = await PricesService.getPricesByScheduleId(scheduleSlot.id)

@@ -32,6 +32,10 @@ const SelectProfile = () => {
 
     }
 
+    const handleLoginAsPatient = () => {
+        window.location.href = 'https://dr.clinicode.ru'
+    }
+
     return (
         <Box
             sx={{
@@ -127,7 +131,7 @@ const SelectProfile = () => {
                                     variant="contained"
                                     sx={{ mt: 2, borderRadius: 2 }}
                                     fullWidth
-                                    onClick={window.href = 'https://dr.clinicode.ru'}
+                                    onClick={handleLoginAsPatient}
                                 >
                                 Войти
                                 </Button>
