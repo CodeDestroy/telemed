@@ -24,11 +24,9 @@ class AdminController {
         try {
             let allSlots = []
             let personId = req.user.personId
-            console.log(req.query)
             if (!personId) {
                 personId = req.query.personId
             }
-            console.log(personId)
             if (req.user.accessLevel === 4) {
                 allSlots = await ConsultationService.getAllSlots()
             }
@@ -97,17 +95,58 @@ class AdminController {
         let yookassaPayment = null;
         try {
             const {patient, startDateTime, duration, slotStatusId } = req.body
+            const {isCustom, cost} = req.body
             let {doctor} = req.body
             doctor = await DoctorService.getDoctor(doctor.id)
             // Разбираем дату-время на отдельно дату и время
             const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
             const startTime = startDateTime.split('T')[1]; // HH:mm:ss
             //ищем schedule по startDateTime и doctorId
-            console.log(doctor.id, startDate, startTime)
-            const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime)
-            newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
-            const price = await PricesService.getPricesByScheduleId(scheduleSlot.id)
+            /* console.log(patient, startDateTime, duration, slotStatusId, isCustom, cost)
+            return res.status(500).send('Ошибка') */
+            const existingConsultations = (await ConsultationService.getActiveDoctorSlotsByDate(doctor.id, startDate))[0];
+            if (existingConsultations && existingConsultations.length > 0) {
+                const startNew = new Date(startDateTime);
+                const endNew = new Date(startNew.getTime() + duration * 60 * 1000);
 
+                const hasConflict = existingConsultations.some(c => {
+                    // некоторые слоты могут быть отменены — их пропускаем
+                    if (c.slotStatusId === 5) return false;
+
+                    const startExisting = new Date(c.slotStartDateTime);
+                    const endExisting = new Date(c.slotEndDateTime);
+
+                    // Проверка на пересечение интервалов
+                    return startNew < endExisting && endNew > startExisting;
+                });
+
+                if (hasConflict) {
+                    return res.status(400).json({
+                        message: "У врача уже есть запись на выбранное время."
+                    });
+                }
+            }
+            newSlot = await ConsultationService.createSlot(doctor.id, patient.id, startDateTime, duration, slotStatusId)
+            // Приводим стоимость к float
+            let numericCost = 0;
+            if (cost !== undefined && cost !== null && cost !== '') {
+                numericCost = parseFloat(cost);
+                if (isNaN(numericCost)) numericCost = 0; // защита от мусора
+            }
+
+            // --- 💡 Формируем объект цены
+            let price = {
+                price: numericCost,
+                isFree: !numericCost || numericCost === 0
+            };
+
+            // --- Если запись *в расписании*, подменяем цену из БД
+            if (!isCustom) {
+                const scheduleSlot = await SchedulerService.getDoctorScheduleByDateTime(doctor.id, startDate, startTime);
+                price = await PricesService.getPricesByScheduleId(scheduleSlot?.id);
+            }
+            
+        
             //Создаём платёж
 
             const dateObj = new Date(startDateTime);
@@ -142,7 +181,7 @@ class AdminController {
                 }
             }
             else {
-                newPayment.paymentStatusId = 4
+                newPayment.paymentStatusId = 2
             }
             await newPayment.save()
 

@@ -28,6 +28,9 @@ const Page = () => {
     try {
       if (id) {
         const res = await ConsultationService.getConsultationById(parseInt(id))
+        if (res.data.Room.ended)
+          window.location.href = `/consultations/previous/${res.data.id}`
+        console.log(res.data)
         setConsultation(res.data)
 
         if (store.user?.personId) {

@@ -12,5 +12,6 @@ export interface Room {
     token: string | null,
     updatedAt: string,
     childId: number | null
-    Child?: Child
+    Child?: Child, 
+    sendCount: number | null
 }

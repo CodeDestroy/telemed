@@ -16,8 +16,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { LocalizationProvider, DatePicker, TimePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { TextField } from "@mui/material"; // добавь в импорты в начале файла
 
+import {ru} from 'date-fns/locale/ru';
+import { blue, grey } from '@mui/material/colors';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import AdminService from "../../../../Services/AdminService";
@@ -25,7 +29,7 @@ import DoctorService from "../../../../Services/DoctorService";
 import SchedulerService from "../../../../Services/SchedulerService";
 import PatientCreateModal from "../../newSchedule/CreateSlotModal";
 import { Context } from "../../../../";
-
+const white = '#fff'
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -40,6 +44,19 @@ const modalStyle = {
 };
 
 const CreateTmkModal = ({ open, onClose }) => {
+  const defaultTheme = createTheme({
+      palette: {
+        primary: {
+          main: blue[700],
+        },
+        secondary: {
+          main: grey[50],
+        },
+        background: {
+          default: white,
+        },
+      },
+  });
   const { store } = useContext(Context);
 
   const [patients, setPatients] = useState([]);
@@ -47,9 +64,11 @@ const CreateTmkModal = ({ open, onClose }) => {
   const [inputValue, setInputValue] = useState("");
   const [openNewPatient, setOpenNewPatient] = useState(false);
 
-  const [date, setDate] = useState(dayjs());
+  const [date, setDate] = useState(dayjs(new Date()));
   const [timeStart, setTimeStart] = useState(null);
-  const [duration, setDuration] = useState(30);
+  const [duration, setDuration] = useState(60);
+  const [cost, setCost] = useState("");
+
   const [isCustom, setIsCustom] = useState(false);
 
   const [availableTimes, setAvailableTimes] = useState([]);
@@ -72,44 +91,63 @@ const CreateTmkModal = ({ open, onClose }) => {
 
   // Получаем доступные интервалы для расписания врача
   const fetchAvailableTimes = async (selectedDate) => {
-    if (isCustom) return; // вне расписания — не фильтруем
+    if (isCustom) return;
     try {
       setLoadingTimes(true);
       setError("");
       setAvailableTimes([]);
 
+      // ✅ Исправление №1 — нормализуем дату
+      const localDate = dayjs(selectedDate).format("YYYY-MM-DD");
+
+      // Получаем расписание и консультации
       const scheduleRes = await SchedulerService.getDcotorScheduleDates(
         store.selectedProfile.id,
-        selectedDate
+        localDate
       );
       const consultationsRes = await DoctorService.getConsultations(
         store.selectedProfile.id,
-        selectedDate
+        localDate
       );
 
-      const schedule = scheduleRes.data || [];
-      const consultations = consultationsRes.data?.[0] || [];
 
+      const schedule = scheduleRes.data || [];
+      const consultations = consultationsRes.data[0] || [];
+
+      console.log(consultations)
       const freeSlots = [];
 
       schedule.forEach((s) => {
-        const start = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${s.scheduleStartTime}`);
-        const end = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${s.scheduleEndTime}`);
+        const start = dayjs(`${localDate}T${s.scheduleStartTime}`);
+        const end = dayjs(`${localDate}T${s.scheduleEndTime}`);
 
         let cursor = start;
-        while (cursor.add(30, "minute").isBefore(end) || cursor.isSame(end)) {
+
+        while (cursor.isBefore(end)) {
+          // конец текущего потенциального слота
+          const slotEnd = cursor.add(60, "minute");
+
+          // ✅ Исправление №2 — точная проверка пересечения интервалов
           const isBusy = consultations.some((c) => {
-            if (c.slotStatusId === 5) return false;
+            
+            if (c.slotStatusId === 5) return false; // пропускаем отменённые
             const cStart = dayjs(c.slotStartDateTime);
-            const cEnd = dayjs(c.slotEndDateTime);
-            return cursor.isAfter(cStart) && cursor.isBefore(cEnd);
+            const cEnd = dayjs(c.slotEndDateTime).subtract(2, 'minute');
+            /* console.log(c)
+            console.log(cStart)
+            console.log(cEnd) */
+
+            // пересечение, если хотя бы частично пересекаются
+            return (
+              cursor.isBefore(cEnd) && slotEnd.isAfter(cStart)
+            );
           });
 
           if (!isBusy) {
             freeSlots.push(cursor);
           }
 
-          cursor = cursor.add(30, "minute");
+          cursor = slotEnd;
         }
       });
 
@@ -122,10 +160,8 @@ const CreateTmkModal = ({ open, onClose }) => {
     }
   };
 
-  useEffect(() => {
-    if (!isCustom && store.selectedProfile && date) fetchAvailableTimes(date);
-    console.log(store.selectedProfile)
-  }, [date, isCustom]);
+
+  
 
   const handleSubmit = async () => {
     try {
@@ -140,10 +176,9 @@ const CreateTmkModal = ({ open, onClose }) => {
         setError("Выберите время начала");
         return;
       }
-
       const start = dayjs(date)
-        .hour(timeStart.hour())
-        .minute(timeStart.minute());
+        .hour(dayjs(timeStart).hour())
+        .minute(dayjs(timeStart).minute());
       const end = start.add(duration, "minute");
 
       const res = await AdminService.createSlot(
@@ -151,7 +186,9 @@ const CreateTmkModal = ({ open, onClose }) => {
         selectedPatient,
         start,
         duration,
-        2
+        2, 
+        isCustom,
+        cost
       );
 
       if (res.status === 200) {
@@ -162,9 +199,13 @@ const CreateTmkModal = ({ open, onClose }) => {
       }
     } catch (err) {
       console.error(err);
-      setError("Ошибка при создании записи");
+      setError(err.response.data.message);
     }
   };
+
+  useEffect(() => { 
+    if (!isCustom && store.selectedProfile && date) fetchAvailableTimes(date); 
+  }, [date, isCustom]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -190,50 +231,55 @@ const CreateTmkModal = ({ open, onClose }) => {
               }
               label="Вне расписания"
             />
+            <ThemeProvider theme={defaultTheme}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+                {/* ✅ Выбор даты */}
+                <DatePicker
+                  label="Дата"
+                  value={date}
+                  onChange={(newDate) => setDate(newDate)}
+                  slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
+                />
 
-            {/* ✅ Выбор даты */}
-            <DatePicker
-              label="Дата"
-              value={date}
-              onChange={(newDate) => setDate(newDate)}
-              slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
-            />
-
-            {/* ✅ Выбор времени */}
-            {isCustom ? (
-              <TimePicker
-                label="Время начала"
-                value={timeStart}
-                onChange={(newTime) => setTimeStart(newTime)}
-                slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
-              />
-            ) : (
-              <FormControl fullWidth sx={{ mt: 2 }}>
-                <InputLabel>Время начала</InputLabel>
-                <Select
-                  value={timeStart ? timeStart.format("HH:mm") : ""}
-                  label="Время начала"
-                  onChange={(e) =>
-                    setTimeStart(dayjs(`${date.format("YYYY-MM-DD")}T${e.target.value}`))
-                  }
-                  disabled={loadingTimes || availableTimes.length === 0}
-                >
-                  {loadingTimes ? (
-                    <MenuItem disabled>
-                      <CircularProgress size={20} />
-                    </MenuItem>
-                  ) : availableTimes.length > 0 ? (
-                    availableTimes.map((time) => (
-                      <MenuItem key={time} value={time.format("HH:mm")}>
-                        {time.format("HH:mm")}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>Нет свободного времени</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-            )}
+                {/* ✅ Выбор времени */}
+                {isCustom ? (
+                  <TimePicker
+                    label="Выберите время начала"
+                    value={timeStart}
+                    onChange={(newTime) => setTimeStart(newTime)}
+                    slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
+                    minutesStep={30}
+                    skipDisabled={true}
+                  />
+                ) : (
+                  <FormControl fullWidth sx={{ mt: 2 }}>
+                    <InputLabel>Время начала</InputLabel>
+                    <Select
+                      value={timeStart ? timeStart.format("HH:mm") : ""}
+                      label="Время начала"
+                      onChange={(e) =>
+                        setTimeStart(dayjs(`${dayjs(date).format("YYYY-MM-DD")}T${e.target.value}`))
+                      }
+                      disabled={loadingTimes || availableTimes.length === 0}
+                    >
+                      {loadingTimes ? (
+                        <MenuItem disabled>
+                          <CircularProgress size={20} />
+                        </MenuItem>
+                      ) : availableTimes.length > 0 ? (
+                        availableTimes.map((time) => (
+                          <MenuItem key={time} value={time.format("HH:mm")}>
+                            {time.format("HH:mm")}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>Нет доступного времени</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                )}
+              </LocalizationProvider>
+            </ThemeProvider>
 
             {/* ✅ Длительность */}
             <FormControl fullWidth sx={{ mt: 2 }}>
@@ -271,6 +317,16 @@ const CreateTmkModal = ({ open, onClose }) => {
                 Добавить
               </span>
             </Typography>
+            {isCustom && (
+              <TextField
+                fullWidth
+                label="Стоимость"
+                type="number"
+                value={cost}
+                onChange={(e) => setCost(e.target.value)}
+                sx={{ mt: 2 }}
+              />
+            )}
 
             <DialogActions sx={{ mt: 3 }}>
               <Button onClick={onClose}>Отмена</Button>
