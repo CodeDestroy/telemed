@@ -33,6 +33,7 @@ export default class Store {
         this.error = error
     }
     setSelectedProfile (worker) {
+        console.log(worker)
         this.user.medOrgId = worker.medOrgId
         this.user.MedicalOrg = worker.MedicalOrg
         this.user.Post = worker.Post
@@ -49,7 +50,6 @@ export default class Store {
         this.setLoading(true)
         try {
             const response = await AuthService.login(login, password);   
-            console.log(response)
             if (response.status === 200) {
                 let tempUser = response.data.user;
                 if (tempUser.accessLevel === 1) {
@@ -75,6 +75,7 @@ export default class Store {
                     tempUser.postId = tempUser.persons[0].postId
                     tempUser.personId = tempUser.persons[0].id
                     this.setProfiles(tempUser.persons)
+                    this.setSelectedProfile(tempUser.persons[0])
                     this.isSelected = true;
                     this.mustSelect = false;
                     localStorage.setItem('profile', tempUser.persons[0].id);
@@ -220,6 +221,7 @@ export default class Store {
                         tempUser.postId = this.user.persons[0].postId
                         tempUser.personId = this.user.persons[0].id
                         this.setProfiles(tempUser.persons)
+                        this.setSelectedProfile(tempUser.persons[0])
                         this.isSelected = true;
                         this.mustSelect = false
                         

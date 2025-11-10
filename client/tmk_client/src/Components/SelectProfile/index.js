@@ -13,7 +13,6 @@ const SelectProfile = () => {
     useEffect(() => {
         
         if (store && store.profiles && !store.isSelected && store.mustSelect) {
-            console.log(store)
             setProfiles(store.profiles)
         }
             

@@ -66,7 +66,14 @@ class UserService {
                 include: [
                     {
                         model: database["UsersRoles"],
-                        required: true
+                        required: true,
+                        include: [
+                            {
+                                model: database['Permissions'],
+                                as: 'permissions', // совпадает с UsersRoles.belongsToMany(..., as: 'permissions')
+                                required: false
+                            }
+                        ]
                     }
                 ],
             })
@@ -122,6 +129,11 @@ class UserService {
                                 model: database["Posts"],
                                 required: false,
                                 through: { attributes: [] }
+                            },
+                            {
+                            model: database['Permissions'], // подключаем через alias 'permissions'
+                            as: 'permissions',
+                            required: false
                             }
                         ]
                     })
@@ -142,6 +154,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -161,6 +178,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -179,6 +201,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -223,10 +250,19 @@ class UserService {
                 where: {
                     id: userData.id,
                 },
-                include: [{
-                    model: database["UsersRoles"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["UsersRoles"],
+                        required: true,
+                        include: [
+                            {
+                                model: database['Permissions'],
+                                as: 'permissions', // совпадает с UsersRoles.belongsToMany(..., as: 'permissions')
+                                required: false
+                            }
+                        ]
+                    }
+                ]
             })
             switch (user.UsersRole.accessLevel) {
                 case 1: 
@@ -255,6 +291,11 @@ class UserService {
                                 model: database["Posts"],
                                 required: false,
                                 through: { attributes: [] }
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -273,6 +314,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -290,6 +336,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -309,6 +360,11 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })

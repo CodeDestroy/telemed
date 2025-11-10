@@ -11,10 +11,30 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Permissions.belongsToMany(models.UsersRoles, {
+        through: 'RolePermissions',
+        foreignKey: 'permission_id',
+        otherKey: 'role_id',
+        as: 'roles'
+      });
+
+      Permissions.belongsToMany(models.Doctors, {
+        through: 'DoctorPermissions',
+        foreignKey: 'permissionId',
+        otherKey: 'doctorId',
+        as: 'doctorsWithPermission'
+      });
+
+      Permissions.belongsToMany(models.Admins, {
+        through: 'AdminPermissions',
+        foreignKey: 'permissionId',
+        otherKey: 'adminId',
+        as: 'adminsWithPermission'
+      });
     }
   }
   Permissions.init({
-    name: DataTypes.STRING,
+    name: { type: DataTypes.STRING, allowNull: false, unique: true },
     description: DataTypes.STRING
   }, {
     sequelize,

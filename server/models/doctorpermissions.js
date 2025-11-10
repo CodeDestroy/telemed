@@ -11,6 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      DoctorPermissions.belongsTo(models.Doctors, { foreignKey: 'doctorId' });
+      DoctorPermissions.belongsTo(models.Permissions, { foreignKey: 'permissionId' });
+      DoctorPermissions.belongsTo(models.Users, { as: 'grantedByAdmin', foreignKey: 'grantedBy' });
     }
   }
   DoctorPermissions.init({

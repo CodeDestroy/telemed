@@ -19,6 +19,7 @@ const PaymentService = require("../Services/PaymentService");
 const yookassaApi = require('../Api/yookassaApi');
 const SchedulerService = require('../Services/SchedulerService')
 const PricesService = require('../Services/PricesService')
+const PermissionService = require('../Services/PermissionService')
 class AdminController {
     async getAllConsultations(req, res) {
         try {
@@ -672,6 +673,54 @@ class AdminController {
         catch (e) {
             console.log(e)
             res.status(500).json(e.message)
+        }
+    }
+
+    async getPermissionsList(req, res) {
+        try {
+            const permissions = await PermissionService.getPermissionsList()
+            res.status(200).json(permissions)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async getDoctorPermissions(req, res) {
+        try {
+            const {id} = req.params
+            const permissions = await PermissionService.getPermissionsByDoctorId(id)
+            res.status(200).json(permissions)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async setDoctorPermissons(req, res) {
+        try {
+            
+            const user = req.user
+            if (!user) throw ApiError.AuthError('Неизвестный пользователь')
+            const { permissionIds } = req.body;
+            //console.log(permissionIds)
+            const {id} = req.params
+            await database.models.DoctorPermissions.destroy({ where: { doctorId: id } });
+
+            // Добавляем новые
+            const records = permissionIds.map(pid => ({
+                doctorId: id,
+                permissionId: pid,
+                grantedBy: user.id
+            }));
+
+            await database.models.DoctorPermissions.bulkCreate(records);
+
+            res.status(200).json({ message: 'Права успешно обновлены', count: records.length });
+        }
+        catch (e) {
+            console.log(e)
+            res.status(500).json({error: e.message})
         }
     }
 }

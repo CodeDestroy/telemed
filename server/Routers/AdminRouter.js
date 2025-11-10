@@ -36,4 +36,9 @@ router.get('/slotStatuses/all', AdminController.getAllSlotStatuses)
 router.get('/doctors/specialties/all', DoctorController.getPostsList)
 
 
+router.get('/permissions', AdminController.getPermissionsList)
+router.get('/permissions/doctor/:id', AdminController.getDoctorPermissions)
+router.put('/permissions/doctor/:id', AdminController.setDoctorPermissons)
+
+
 module.exports = router;
