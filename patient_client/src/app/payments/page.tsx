@@ -25,7 +25,10 @@ const PaymentsPage = () => {
   const fetchPayments = async () => {
     try {
       const response = await PaymentService.getPaymentsByUserId(store.user?.id)
-      setPayments(response.data);
+      const sortedData = response.data.sort((a, b) => {
+        return a.Slot.slotStartDateTime < b.Slot.slotStartDateTime ? 1 : -1
+      })
+      setPayments(sortedData);
       setIsLoading(false);
     } catch (error) {
       console.error(error);

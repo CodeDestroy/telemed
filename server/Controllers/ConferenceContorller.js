@@ -135,19 +135,16 @@ class ConferenceController {
             
             if (tmk.Patient.User.email) {
                 const mailOptionsPatinet = await MailManager.getMailOptionsProtocolLink(tmk.Patient.User.email, link, tmk.Room.protocol)
-                transporter.sendMail(mailOptionsPatinet, async (error, info) => {
-                    if (error) {
-                        throw new Error(error)
-                        /* return console.log(error); */
-                    }
-                    console.log('Сообщение отправленно: %s', info.messageId)
-                    await database.models.Rooms.increment('sendCount', {
-                        by: 1,
-                        where: { id: tmk.Room.id },
-                    })
-                    await tmk.Room.save()
-                    /* console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info)); */
+                const info = await transporter.sendMail(mailOptionsPatinet);
+
+                console.log('Сообщение отправлено: %s', info.messageId);
+
+                await database.models.Rooms.increment('sendCount', {
+                    by: 1,
+                    where: { id: tmk.Room.id },
                 });
+
+                await tmk.Room.save();
             }
             
             res.status(200).json(tmk)

@@ -56,6 +56,9 @@ function EndedTMKPage() {
             end: moment(item.slotEndDateTime).format('DD.MM.YYYY HH:mm'),
             sendCount: item.sendCount ?? 0, // добавили счётчик отправок
           }));
+          array = array.sort((a, b) => {
+            return a.slotStartDateTime < b.slotStartDateTime ? 1 : -1
+          })
           setConsultations(array);
         } catch (e) {
           console.error(e);
@@ -77,12 +80,14 @@ function EndedTMKPage() {
       headerName: 'Начало конференции',
       flex: 0.8,
       minWidth: 180,
+      sortable: false
     },
     {
       field: 'end',
       headerName: 'Конец конференции',
       flex: 0.8,
       minWidth: 180,
+      sortable: false
     },
     {
       field: 'protocol',

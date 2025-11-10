@@ -136,7 +136,7 @@ const ConsultationPage = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Протокол консультации</h2>
 
-            {consultation.Room?.protocol && (
+            {consultation.Room?.protocol /* && consultation.Room?.sendCount && consultation.Room?.sendCount > 0 */ ? 
               <button
                 onClick={handleDownloadProtocol}
                 disabled={downloading}
@@ -150,10 +150,12 @@ const ConsultationPage = () => {
                 <ArrowDownTrayIcon className="w-5 h-5" />
                 {downloading ? 'Формируется...' : 'Скачать протокол'}
               </button>
-            )}
+              :
+              ''
+            }
           </div>
 
-          {consultation.Room?.protocol ? (
+          {consultation.Room?.protocol /* && consultation.Room?.sendCount && consultation.Room?.sendCount > 0 */ ? (
             <p className="text-gray-700 whitespace-pre-line leading-relaxed">
               {consultation.Room.protocol}
             </p>

@@ -136,16 +136,8 @@ function CustomEditor ({ scheduler, onStateChange }) {
         }
     
         try {
-            /* scheduler.loading(true);
-            console.log(state.doctor)
-            console.log(state.patient)
-            console.log(state.start)
-            console.log(state.duration) */
             
-            /* return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration}) */
             if (state.editing) {
-                /* console.log(state)
-                console.log(scheduler.edited.event_id) */
                 const response = await AdminService.editSlot(state.slot_id ,state.doctor, state.patient, state.start, state.duration, state.slotStatusId)
                 if (response.status == 200) {
                     let color = "red"
@@ -252,7 +244,6 @@ function CustomEditor ({ scheduler, onStateChange }) {
         return response.data
     }
     useEffect(() => {
-        /* console.log(scheduler.state) */
         fetchDoctors()
         .then((data) => {
             setDoctors(data)
