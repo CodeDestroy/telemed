@@ -65,6 +65,10 @@ const DoctorEdit = () => {
         Суббота: [],
         Воскресенье: [],
     });
+    const [permissions, setPermissions] = useState([]); // Все возможные роли
+    const [selectedPermissions, setSelectedPermissions] = useState([]); // Роли врача
+    const [roleError, setRoleError] = useState(null);
+    const [rolesLoading, setRolesLoading] = useState(false);
     const [selectedDay, setSelectedDay] = useState('Понедельник');
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date());
@@ -76,22 +80,7 @@ const DoctorEdit = () => {
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
 
-    /* const handleSave = async () => {
 
-        try {
-            const response = await AdminService.editDoctor(id, doctor)
-
-            if (response.status == 200) {
-                window.location = adminLocations.doctorManagement
-            }
-            else {
-                setError(response.data.message)
-            }
-        }
-        catch (e) {
-            setError(e.response.data.message)
-        }
-    }; */
     const handleSave = async () => {
         try {
             const postIds = doctor.Posts?.map(p => p.id) || [];
@@ -119,19 +108,7 @@ const DoctorEdit = () => {
                     const response = await AdminService.getDoctor(id)
 
                     setDoctor(response.data);
-                    /* const scheduleResponse = await SchedulerService.getDcotorSchedule(id)
-                    const newSchedule = { ...schedule };
-                    scheduleResponse.data.forEach(el => {
-                        const day = el.WeekDay.name;
-                        const start = el.scheduleStartTime.substring(0,5);
-                        const end = el.scheduleEndTime.substring(0,5);
-                        const id = el.id
-                        
-                        if (!newSchedule[day]) newSchedule[day] = [];
-                        newSchedule[day].push({ start, end, id });
-                    });
-        
-                    setSchedule(newSchedule); */
+                   
 
                 } catch (e) {
                     console.log(e);
@@ -186,22 +163,50 @@ const DoctorEdit = () => {
         }})
     }
 
-    const handleDeleteSlot = async (day, index) => {
-        try {
-            const response = await DoctorService.deleteSchedule(schedule[day][index].id)
-            if (response.status == 200) {
-                console.log(day, schedule[day][index])
-                setSchedule({
-                    ...schedule,
-                    [day]: schedule[day].filter((_, i) => i !== index),
-                });
+    
+    useEffect(() => {
+        async function fetchPermissions() {
+            try {
+                setRolesLoading(true);
+                const [allPerms, doctorPerms] = await Promise.all([
+                    AdminService.getPermissions(), // все роли
+                    AdminService.getDoctorPermissions(id), // роли конкретного врача
+                ]);
+
+                setPermissions(allPerms.data);
+                setSelectedPermissions(doctorPerms.data.map(p => p.id));
+            } catch (e) {
+                console.log(e);
+                setRoleError('Не удалось загрузить роли');
+            } finally {
+                setRolesLoading(false);
             }
         }
-        catch (e) {
-            console.log(e.response.data.error)
-        }
-        
+
+        if (store?.user?.id) fetchPermissions();
+    }, [store, id]);
+
+    const handleTogglePermission = (permissionId) => {
+        setSelectedPermissions(prev =>
+            prev.includes(permissionId)
+                ? prev.filter(id => id !== permissionId)
+                : [...prev, permissionId]
+        );
     };
+
+    const handleSaveRoles = async () => {
+        try {
+            const response = await AdminService.updateDoctorPermissions(id, selectedPermissions);
+            if (response.status === 200) {
+                alert('Роли успешно сохранены');
+            } else {
+                setRoleError(response.data.message || 'Ошибка при сохранении ролей');
+            }
+        } catch (e) {
+            setRoleError(e.response?.data?.message || 'Ошибка при сохранении ролей');
+        }
+    };
+
     
     // Добавление временного интервала
     const handleAddSlot = async () => {
@@ -267,27 +272,6 @@ return (
                             } 
                                 label="Подтверждён" />
                         </FormGroup>
-                        {/* <FormControl fullWidth>
-                            <InputLabel id="specialty-select-label">Специальность</InputLabel>
-                            <Select
-                                labelId="specialty-select-label"
-                                value={doctor.Post?.id || ''}
-                                label="Специальность"
-                                onChange={(e) => {
-                                    const selected = specialties.find(s => s.id === e.target.value);
-                                    setDoctor({
-                                        ...doctor,
-                                        Post: selected
-                                    });
-                                }}
-                            >
-                                {specialties.map((spec) => (
-                                    <MenuItem key={spec.id} value={spec.id}>
-                                        {spec.postName}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl> */}
                         <FormControl fullWidth>
                             <InputLabel id="specialty-select-label">Специальности</InputLabel>
                             <Select
@@ -316,7 +300,43 @@ return (
                                 </MenuItem>
                                 ))}
                             </Select>
-                            </FormControl>
+                        </FormControl>
+
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Роли и права доступа
+                            </Typography>
+
+                            {rolesLoading ? (
+                                <Typography>Загрузка...</Typography>
+                            ) : roleError ? (
+                                <Typography color="error">{roleError}</Typography>
+                            ) : (
+                                <FormGroup>
+                                    {permissions.map((perm) => (
+                                        <FormControlLabel
+                                            key={perm.id}
+                                            control={
+                                                <Checkbox
+                                                    checked={selectedPermissions.includes(perm.id)}
+                                                    onChange={() => handleTogglePermission(perm.id)}
+                                                />
+                                            }
+                                            label={perm.description || perm.name}
+                                        />
+                                    ))}
+                                </FormGroup>
+                            )}
+
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                sx={{ mt: 2 }}
+                                onClick={handleSaveRoles}
+                            >
+                                Сохранить роли
+                            </Button>
+                        </Box>
 
 
 
@@ -324,125 +344,7 @@ return (
                             Сохранить
                         </Button>
                 </Box>
-                {/* <ThemeProvider theme={theme}>
-                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-                        <Box sx={{ p: 4 }}>
-                            <Typography variant="h4" align="center" gutterBottom>
-                                Ваше распиание
-                            </Typography>
-                            <Button variant="contained" color="primary" onClick={handleOpenModal} startIcon={<AddIcon />}>
-                                Добавить время работы
-                            </Button>
-
-                            <Grid container spacing={2} sx={{ mt: 4 }}>
-                                {daysOfWeek.map((day) => (
-                                    <Grid item xs={12} sm={6} md={4} lg={3} key={day}>
-                                        <Box
-                                            sx={{
-                                                backgroundColor: theme.palette.secondary.main,
-                                                p: 2,
-                                                borderRadius: '8px',
-                                                height: '200px',
-                                                overflowY: 'auto'
-                                            }}
-                                        >
-                                            <Typography variant="h6" gutterBottom>
-                                                {day}
-                                            </Typography>
-                                            {schedule[day].map((slot, index) => (
-                                                <Box
-                                                    key={index}
-                                                    sx={{
-                                                        display: 'flex',
-                                                        justifyContent: 'space-between',
-                                                        alignItems: 'center',
-                                                        mb: 1,
-                                                        p: 1,
-                                                        backgroundColor: theme.palette.primary.main,
-                                                        borderRadius: '4px',
-                                                }}
-                                                >
-                                                <Typography>
-                                                    {slot.start} - {slot.end}
-                                                </Typography>
-                                                <IconButton onClick={() => handleDeleteSlot(day, index)} color="error">
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                                </Box>
-                                            ))}
-                                        </Box>
-                                    </Grid>
-                                ))}
-                            </Grid>
-
-                       
-                            <Modal open={modalOpen} onClose={handleCloseModal}>
-                                <Box
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: 400,
-                                        bgcolor: 'background.paper',
-                                        boxShadow: 24,
-                                        p: 4,
-                                        borderRadius: 2,
-                                    }}
-                                >
-                                    <Typography variant="h6" gutterBottom>
-                                        Добавить время работы
-                                    </Typography>
-                                    <FormControl fullWidth sx={{ mb: 2 }}>
-                                        <InputLabel id="day-select-label">День недели</InputLabel>
-                                        <Select
-                                            labelId="day-select-label"
-                                            value={selectedDay}
-                                            onChange={(e) => setSelectedDay(e.target.value)}
-                                        >
-                                        {daysOfWeek.map((day) => (
-                                            <MenuItem key={day} value={day}>
-                                                {day}
-                                            </MenuItem>
-                                        ))}
-                                        </Select>
-                                    </FormControl>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="body1" gutterBottom>
-                                            Время начала:
-                                        </Typography>
-                                        <TimePicker
-                                            value={startTime}
-                                            onChange={setStartTime}
-                                            minutesStep={30}
-                                            minTime={minDate}
-                                            maxTime={maxDate}
-                                            sx={{width: '100%'}}
-                                            skipDisabled={true}
-                                        />
-                                    </Box>
-                                    <Box sx={{ mb: 2 }}>
-                                        <Typography variant="body1" gutterBottom>
-                                            Время конца:
-                                        </Typography>
-                                        <TimePicker
-                                            value={endTime}
-                                            onChange={setEndTime}
-                                            minutesStep={30}
-                                            minTime={minDate}
-                                            maxTime={maxDate}
-                                            sx={{width: '100%'}}
-                                            skipDisabled={true}
-                                        />
-                                    </Box>
-                                    <Button variant="contained" color="primary" fullWidth onClick={handleAddSlot}>
-                                        Добавить
-                                    </Button>
-                                </Box>
-                            </Modal>
-                        </Box>
-                    </LocalizationProvider>
-                </ThemeProvider> */}
+                
             </Container>
             
         :

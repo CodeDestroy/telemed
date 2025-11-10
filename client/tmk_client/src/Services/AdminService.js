@@ -74,4 +74,17 @@ export default class AdminService {
     static async getSlotStatuses () {
         return $api.get('/api/admin/slotStatuses/all');
     }
+
+    static async getPermissions() {
+        return $api.get('/api/admin/permissions');
+    }
+
+    static async getDoctorPermissions(doctorId) {
+        return $api.get(`/api/admin/permissions/doctor/${doctorId}`);
+    }
+
+    static async updateDoctorPermissions(doctorId, selectedPermissions) {
+        return $api.put(`/api/admin/permissions/doctor/${doctorId}`, {permissionIds: selectedPermissions});
+
+    }
 }

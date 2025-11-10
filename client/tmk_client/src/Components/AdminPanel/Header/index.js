@@ -29,6 +29,8 @@ import DoctorItems from './MainItems/DoctorItems';
 import generalLocations from '../../../Locations/GeneralLocations';
 import './header.css'
 import OperatorButtons from './MainButtons/OperatorButtons';
+import { hasPermission } from '../../Utils/permissions';
+
 function AdminHeader() {
     
     const {store} = useContext(Context)
@@ -66,6 +68,8 @@ function AdminHeader() {
         window.location.href = generalLocations.profile
 
     }
+
+    
 
     return (
         <AppBar position="static" style={{padding: 0}}>

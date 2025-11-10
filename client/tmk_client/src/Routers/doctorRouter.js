@@ -17,9 +17,10 @@ import Schedule from "../Components/AdminPanel/Schedule";
 import GeneralInfo from "../Components/AdminPanel/Profile/GeneralInfo";
 import generalLocations from '../Locations/GeneralLocations';
 import Settings from "../Components/AdminPanel/Profile/Settings/DoctorSettings";
-import CreateDateSchedule from "../Components/AdminPanel/CreateScheduler/Dates";
+import CreateDateScheduleDoctor from "../Components/AdminPanel/CreateSchedulerDoctor/Dates";
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
 import ConsultationDetailsPage from "../Components/AdminPanel/ConsultationDetailsPage";
+import CreateSchedulerDoctor from '../Components/AdminPanel/CreateSchedulerDoctor'
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -39,11 +40,11 @@ const doctorRouter = createBrowserRouter([
     },
     {
       path: doctorLocations.createSchedule,
-      element: <CreateSchedule/>
+      element: <CreateSchedulerDoctor/>
     },
     {
       path: doctorLocations.createDateSchedule,
-      element: <CreateDateSchedule/>
+      element: <CreateDateScheduleDoctor/>
     },
     {
       path: doctorLocations.schedule,

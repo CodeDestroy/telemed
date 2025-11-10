@@ -1,6 +1,7 @@
 const DoctorService = require('../Services/DoctorService')
 const ConsultationService = require('../Services/ConsultationService')
 const SchedulerService = require('../Services/SchedulerService')
+const PermissionService = require('../Services/PermissionService')
 
 class DoctorController {
     async getConsultations(req, res) {
@@ -129,6 +130,8 @@ class DoctorController {
             res.status(500).json({error: e.message})
         }
     }
+
+    
 
     
 }

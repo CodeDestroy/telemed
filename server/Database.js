@@ -31,6 +31,10 @@ const SchedulePrices = require('./models/scheduleprices')
 const PromoCodes = require('./models/promocodes')
 const Attachments = require('./models/attachments')
 const DoctorPosts = require('./models/doctorposts')
+const RolePermissions = require('./models/rolepermissions')
+const Permissions = require('./models/permissions')
+const AdminPermissions = require('./models/adminpermissions')
+const DoctorPermissions = require('./models/doctorpermissions')
 const Child = require('./models/child')
 const Protocol = require('./models/protocols');
 const mkbDiagnosis = require('./models/mkbdiagnoses');
@@ -86,6 +90,10 @@ module.exports = class Database {
       Child: Child(this.sequelize, DataTypes),
       Protocol: Protocol(this.sequelize, DataTypes),
       mkbDiagnosis: mkbDiagnosis(this.sequelize, DataTypes),
+      Permissions: Permissions(this.sequelize, DataTypes),
+      RolePermissions: RolePermissions(this.sequelize, DataTypes),
+      AdminPermissions: AdminPermissions(this.sequelize, DataTypes),
+      DoctorPermissions: DoctorPermissions(this.sequelize, DataTypes),
     };
 
     Object.keys(this.models).forEach(modelName => {
