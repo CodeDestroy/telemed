@@ -100,8 +100,15 @@ class AdminController {
             let {doctor} = req.body
             doctor = await DoctorService.getDoctor(doctor.id)
             // Разбираем дату-время на отдельно дату и время
-            const startDate = startDateTime.split('T')[0]; // yyyy-MM-dd
-            const startTime = startDateTime.split('T')[1]; // HH:mm:ss
+            const startDateObj = new Date(startDateTime);
+            //startDateObj.setHours(startDateObj.getHours() + 3);
+            
+            /* console.log(moment(startDateObj).format('yyyy-MM-DD'))
+            console.log(moment(startDateObj).format('HH:mm:ss')) */
+            const startDate = moment(startDateObj).format('yyyy-MM-DD') // yyyy-MM-dd
+            const startTime = moment(startDateObj).format('HH:mm:ss') // HH:mm:ss
+            /* console.log(startDate)
+            console.log(startTime) */
             //ищем schedule по startDateTime и doctorId
             /* console.log(patient, startDateTime, duration, slotStatusId, isCustom, cost)
             return res.status(500).send('Ошибка') */
@@ -151,7 +158,7 @@ class AdminController {
             //Создаём платёж
 
             const dateObj = new Date(startDateTime);
-            dateObj.setHours(dateObj.getHours() + 3);
+            //dateObj.setHours(dateObj.getHours() + 3);
 
             const displayHours = String(dateObj.getHours()).padStart(2, '0');
             const displayMinutes = String(dateObj.getMinutes()).padStart(2, '0');
@@ -333,7 +340,7 @@ class AdminController {
             if (slotStatusId == 3) {
                 const payment = await PaymentService.getPaymentBySlotId(slotId);
                 payment.paymentStatusId = 3
-                payment.save()
+                await payment.save()
                 if (patient.User.email) {
                     const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
                         patient.User.email,
@@ -352,6 +359,13 @@ class AdminController {
                     );
                     transporter.sendMail(mailOptionsDoctor);
                 }
+            }
+            else if (slotStatusId == 5) {
+                room.roomName = room.roomName + '_canceled_' + Date.now()
+                const payment = await PaymentService.getPaymentBySlotId(slotId);
+                payment.paymentStatusId = 5
+                await payment.save()
+                await room.save()
             }
             //Отключаем отправку тут, отпрапвляем теперь в случае оплаты
             /* if (patient.User.email) {

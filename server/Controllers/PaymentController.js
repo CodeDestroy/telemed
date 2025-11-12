@@ -75,7 +75,7 @@ class PatientController {
                     //await db.updatePaymentStatus(payment.id, "canceled");
                     payment.paymentStatusId = 5; // Отмена оплаты
                     slot.slotStatusId = 5; // Помечаем слот как "Отменено"
-                    slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id
+                    slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
                     await slot.save()
                     await slot.Room.save()
                     console.log(`Платёж ${yookassaPayment.id} ушёл в ошибку`);
@@ -238,6 +238,9 @@ class PatientController {
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
+                slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
+                await slot.save()
+                await slot.Room.save()
             } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {
                 payment.paymentStatusId = 2; // В обработке
                 slot.slotStatusId = 2; // Помечаем слот как "Ждёт оплаты"
