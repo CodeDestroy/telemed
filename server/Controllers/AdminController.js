@@ -100,15 +100,16 @@ class AdminController {
             let {doctor} = req.body
             doctor = await DoctorService.getDoctor(doctor.id)
             // Разбираем дату-время на отдельно дату и время
-            const startDateObj = new Date(startDateTime);
+            //Тут нужно увеличить на 3 часа, т.к время на сервере настроено некорректно
+            const startDateObj = moment(new Date(startDateTime)).add(3, 'h');
             //startDateObj.setHours(startDateObj.getHours() + 3);
             
-            console.log(moment(startDateObj).format('yyyy-MM-DD'))
-            console.log(moment(startDateObj).format('HH:mm:ss'))
+            /* console.log(moment(startDateObj).format('yyyy-MM-DD'))
+            console.log(moment(startDateObj).format('HH:mm:ss')) */
             const startDate = moment(startDateObj).format('yyyy-MM-DD') // yyyy-MM-dd
             const startTime = moment(startDateObj).format('HH:mm:ss') // HH:mm:ss
-            console.log(startDate)
-            console.log(startTime)
+            /* console.log(startDate)
+            console.log(startTime) */
             //ищем schedule по startDateTime и doctorId
             /* console.log(patient, startDateTime, duration, slotStatusId, isCustom, cost)
             return res.status(500).send('Ошибка') */
