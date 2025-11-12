@@ -103,12 +103,12 @@ class AdminController {
             const startDateObj = new Date(startDateTime);
             //startDateObj.setHours(startDateObj.getHours() + 3);
             
-            /* console.log(moment(startDateObj).format('yyyy-MM-DD'))
-            console.log(moment(startDateObj).format('HH:mm:ss')) */
+            console.log(moment(startDateObj).format('yyyy-MM-DD'))
+            console.log(moment(startDateObj).format('HH:mm:ss'))
             const startDate = moment(startDateObj).format('yyyy-MM-DD') // yyyy-MM-dd
             const startTime = moment(startDateObj).format('HH:mm:ss') // HH:mm:ss
-            /* console.log(startDate)
-            console.log(startTime) */
+            console.log(startDate)
+            console.log(startTime)
             //ищем schedule по startDateTime и doctorId
             /* console.log(patient, startDateTime, duration, slotStatusId, isCustom, cost)
             return res.status(500).send('Ошибка') */
