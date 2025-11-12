@@ -359,8 +359,8 @@ class ConsultationService {
                 raw: true
             }) */
             const slots = await database.models.Slots.findAll({
-                where: {
-                    patientId,
+                where: { patientId, 
+                    slotStatusId: 4
                 },
                 include: [
                     {
@@ -519,7 +519,9 @@ class ConsultationService {
                 raw: true
             }) */
             const slots = await database.models.Slots.findAll({
-                where: { patientId },
+                where: { patientId, 
+                    slotStatusId: {[Op.notIn]:[4, 5]}
+                },
                 include: [
                     {
                         model: database.models.Rooms,
