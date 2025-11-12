@@ -104,7 +104,7 @@ class PatientController {
             //Создаём платёж
 
             const dateObj = new Date(startDateTime);
-            dateObj.setHours(dateObj.getHours() + 3);
+            //dateObj.setHours(dateObj.getHours() + 3);
 
             const displayHours = String(dateObj.getHours()).padStart(2, '0');
             const displayMinutes = String(dateObj.getMinutes()).padStart(2, '0');
@@ -128,7 +128,7 @@ class PatientController {
                 if (yookassaPayment) {
                     newPayment.yookassa_id = yookassaPayment.id
                     newPayment.yookassa_status = yookassaPayment.status
-                    newPayment.yookassa_payment_method_type = yookassaPayment.payment_method.type
+                    //newPayment.yookassa_payment_method_type = yookassaPayment.payment_method.type
                     newPayment.yookassa_confirmation_url = yookassaPayment.confirmation.confirmation_url
                     
                 }

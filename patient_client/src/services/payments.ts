@@ -24,5 +24,9 @@ export default class PaymentService {
         return $api.get<PaymentInformationPageResponse>('/api/payment/checkPaymentStatus', {params: {uuid}})
     }
 
+    static async createYookassaPayment(uuid: string, payment_method_data: string | null): Promise<AxiosResponse<PaymentInformationPageResponse>> {
+        return $api.post<PaymentInformationPageResponse>('/api/payment/yookassa', {uuid, payment_method_data})
+    }
+
     
 }
