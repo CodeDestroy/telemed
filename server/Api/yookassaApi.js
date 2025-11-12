@@ -35,9 +35,9 @@ class yookassaApi {
                     type: "redirect",
                     return_url,
                 },
-                payment_method_data: {
+                /* payment_method_data: {
                     type: payment_method_data,
-                },
+                }, */
                 capture: true,
                 description,
                 test: YOOKASSA_TEST,

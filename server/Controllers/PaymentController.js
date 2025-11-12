@@ -73,7 +73,11 @@ class PatientController {
 
                 case "payment.canceled":
                     //await db.updatePaymentStatus(payment.id, "canceled");
-                    payment.paymentStatusId = 4 // "Ошибка"
+                    payment.paymentStatusId = 5; // Отмена оплаты
+                    slot.slotStatusId = 5; // Помечаем слот как "Отменено"
+                    slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id
+                    await slot.save()
+                    await slot.Room.save()
                     console.log(`Платёж ${yookassaPayment.id} ушёл в ошибку`);
                     break;
 
@@ -97,13 +101,18 @@ class PatientController {
 
     async createPayment(req, res) {
         try {
-            const { amount, currency, description, userId, consultationId } = req.body;
+            const { amount, currency, description, userId, consultationId,  } = req.body;
+            let {payment_method_data} = req.body
+            if (!payment_method_data) {
+                payment_method_data = 'bank_card'
+            }
             const payment = await PaymentService.createPayment(amount, currency, description, userId, consultationId)
             const yookassaPayment = await yookassaApi.createPayment({
                 amount,
                 description,
                 returnUrl: "https://example.com/success",
-                idempotenceKey: payment.uuid4
+                idempotenceKey: payment.uuid4,
+                payment_method_data
             });
             res.status(200).json({
                 ...payment,
