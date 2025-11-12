@@ -340,7 +340,7 @@ class AdminController {
             if (slotStatusId == 3) {
                 const payment = await PaymentService.getPaymentBySlotId(slotId);
                 payment.paymentStatusId = 3
-                payment.save()
+                await payment.save()
                 if (patient.User.email) {
                     const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
                         patient.User.email,
@@ -362,6 +362,9 @@ class AdminController {
             }
             else if (slotStatusId == 5) {
                 room.roomName = room.roomName + '_canceled_' + Date.now()
+                const payment = await PaymentService.getPaymentBySlotId(slotId);
+                payment.paymentStatusId = 5
+                await payment.save()
                 await room.save()
             }
             //Отключаем отправку тут, отпрапвляем теперь в случае оплаты
