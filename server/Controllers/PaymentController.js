@@ -41,8 +41,10 @@ class PatientController {
 
                 case "payment.succeeded":
                     //await db.updatePaymentStatus(payment.id, "succeeded");
-                    slot.slotStatusId = 3;
-                    await slot.save()
+                    if (slot.slotStatusId != 4 || slot.slotStatusId != 5){
+                        slot.slotStatusId = 3;
+                        await slot.save()
+                    }
                     if (payment.paymentStatusId != 3) {
                         payment.paymentStatusId = 3 // "Оплачен"
 
@@ -238,7 +240,8 @@ class PatientController {
 
                 }
                 
-                slot.slotStatusId = 3;
+                if (slot.slotStatusId != 4 || slot.slotStatusId != 5)
+                    slot.slotStatusId = 3;
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
@@ -331,8 +334,8 @@ class PatientController {
                     }
 
                 }
-                
-                slot.slotStatusId = 3;
+                if (slot.slotStatusId != 4 || slot.slotStatusId != 5)
+                    slot.slotStatusId = 3;
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
