@@ -310,6 +310,19 @@ function CustomEditor ({ scheduler, onStateChange }) {
         setSelectedPatient(newValue)
     }
 
+    const handlePaymentCheck = async () => {
+        console.log(event)
+        try {
+            const response = await AdminService.checkPaymentStatusBySlot(event.event_id)
+            if (response.status == 200) {
+                window.location.reload();
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
     const getDoctorSchedule = async (doctor) => {
         if (dayjs(state.start).isBefore(dayjs(new Date()), 'date')) {
             setError('Невозмжно создать консультацию на прошедшую дату')
@@ -574,6 +587,7 @@ function CustomEditor ({ scheduler, onStateChange }) {
             </div>
             <PatientCreateModal show={open} onHide={() => setOpen(false)} />
             <DialogActions>
+                <Button onClick={handlePaymentCheck}>Проверить статус оплаты</Button>
                 <Button onClick={scheduler.close}>Отмена</Button>
                 <Button onClick={handleSubmit}>Сохранить</Button>
             </DialogActions>

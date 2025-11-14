@@ -87,4 +87,8 @@ export default class AdminService {
         return $api.put(`/api/admin/permissions/doctor/${doctorId}`, {permissionIds: selectedPermissions});
 
     }
+
+    static async checkPaymentStatusBySlot(slotId) {
+        return $api.get('/api/payment/checkPaymentStatusBySlot', {params: {slotId}})
+    }
 }

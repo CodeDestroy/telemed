@@ -41,8 +41,11 @@ class PatientController {
 
                 case "payment.succeeded":
                     //await db.updatePaymentStatus(payment.id, "succeeded");
+                    slot.slotStatusId = 3;
+                    await slot.save()
                     if (payment.paymentStatusId != 3) {
                         payment.paymentStatusId = 3 // "Оплачен"
+
                         try {
                             if (patient.User.email) {
                                 const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl.originalUrl, slot.slotStartDateTime);
@@ -206,6 +209,7 @@ class PatientController {
 
             // Меняем paymentStatusId в зависимости от статуса
             if (yookassaPayment.status === "succeeded") {
+                
                 if (payment.paymentStatusId != 3) { // Если платеж ещё не оплачен
                     payment.paymentStatusId = 3; // Оплачено
                     try {
@@ -234,7 +238,101 @@ class PatientController {
 
                 }
                 
-                slot.slotStatusId = 3; // Помечаем слот как "Оплачено"
+                slot.slotStatusId = 3;
+            } else if (yookassaPayment.status === "canceled") {
+                payment.paymentStatusId = 5; // Отмена оплаты
+                slot.slotStatusId = 5; // Помечаем слот как "Отменено"
+                slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
+                await slot.save()
+                await slot.Room.save()
+            } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {
+                payment.paymentStatusId = 2; // В обработке
+                slot.slotStatusId = 2; // Помечаем слот как "Ждёт оплаты"
+            }
+
+            await slot.save()
+            await payment.save();
+
+            // 4. Возвращаем обновлённые данные
+            return res.status(200).json({
+                uuid4: payment.uuid4,
+                yookassa_status: payment.yookassa_status,
+                paymentStatusId: payment.paymentStatusId,
+                confirmation_url: payment.yookassa_confirmation_url
+            });
+
+        } catch (e) {
+            console.error("Ошибка при проверке платежа:", e);
+            return res.status(500).json({
+                message: e.message
+            });
+        }
+    }
+
+    
+
+    async checkPaymentStatusBySlot(req, res) {
+        try {
+            const { slotId } = req.query;
+            if (!slotId) {
+                return res.status(400).json({ message: "slotId is required" });
+            }
+
+            // 1. Ищем платеж в БД
+            const payment = await PaymentService.getPaymentBySlotId(slotId)
+            const slot = await ConsultationService.getSlotById(payment.slotId)
+            const doctor = await DoctorService.getDoctor(slot.doctorId)
+            const patient = await PatientService.getPatient(slot.patientId)
+            const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
+            const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
+            const transporter = await MailManager.getTransporter()
+            if (!payment) {
+                return res.status(404).json({ message: "Платёж не найден" });
+            }
+
+            if (!payment.yookassa_id) {
+                return res.status(400).json({ message: "Для этого платежа нет yookassa_id" });
+            }
+
+            // 2. Запрос к Юкассе
+            const yookassaPayment = await yookassaApi.getPayment(payment.yookassa_id);
+            
+            // 3. Обновляем данные в БД
+            payment.yookassa_status = yookassaPayment.status;
+            payment.yookassa_payment_method_type = yookassaPayment.payment_method?.type || null;
+
+            // Меняем paymentStatusId в зависимости от статуса
+            if (yookassaPayment.status === "succeeded") {
+                
+                if (payment.paymentStatusId != 3) { // Если платеж ещё не оплачен
+                    payment.paymentStatusId = 3; // Оплачено
+                    try {
+                        if (patient.User.email) {
+                            const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientUrl.originalUrl, slot.slotStartDateTime);
+                            await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                        }
+                        if (doctor.User.email) {
+                            const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorUrl.originalUrl, slot.id, slot.slotStartDateTime);
+                            await transporter.sendMail(mailOptionsDoctor);
+                        }
+                    } catch (mailErr) {
+                        // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                        console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+                        /* await EmailJobService.create({
+                            toPatient: patient.User.email || null,
+                            toDoctor: doctor.User.email || null,
+                            patientLink,
+                            doctorLink,
+                            startDateTime,
+                            payload: { newSlotId: newSlot.id, newRoomId: newRoom.id, newPaymentId: newPayment.id },
+                            attempts: 0
+                        }); */
+                        // возможно оповестить админов/логирование
+                    }
+
+                }
+                
+                slot.slotStatusId = 3;
             } else if (yookassaPayment.status === "canceled") {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
