@@ -15,5 +15,6 @@ router.get('/statuses', PaymentController.getPaymentsStatuses)
 router.post('/yokassa/webhook', PaymentController.yookassaWebhook)
 
 router.get('/checkPaymentStatus', checkPaymentLimiter, PaymentController.checkPaymentStatus)
+router.get('/checkPaymentStatusBySlot', PaymentController.checkPaymentStatusBySlot)
 
 module.exports = router;
