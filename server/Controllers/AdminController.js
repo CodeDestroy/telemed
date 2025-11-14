@@ -190,9 +190,11 @@ class AdminController {
                 }
             }
             else {
-                newPayment.paymentStatusId = 2
+                newPayment.paymentStatusId = 3
+                newSlot.slotStatusId = 3
             }
             await newPayment.save()
+            await newSlot.save()
 
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             newRoom = await ConsultationService.createRoom(newSlot.id, roomName)

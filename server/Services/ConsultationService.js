@@ -17,7 +17,6 @@ class ConsultationService {
 
     async getAllSlotsByDate (date) {
         try {
-            console.log(date)
             const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
@@ -127,7 +126,6 @@ class ConsultationService {
         catch (e) {
             console.log(e)
             throw e
-            throw e
         }   
     }
 
@@ -169,7 +167,6 @@ class ConsultationService {
         }
         catch (e) {
             console.log(e)
-            throw e
             throw e
         }   
     }

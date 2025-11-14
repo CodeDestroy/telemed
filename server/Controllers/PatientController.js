@@ -135,8 +135,10 @@ class PatientController {
             }
             else {
                 newPayment.paymentStatusId = 3
+                newSlot.slotStatusId = 3
             }
             await newPayment.save()
+            await newSlot.save()
             const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
             newRoom = await ConsultationService.createRoom(newSlot.id, roomName, childId)
             const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)

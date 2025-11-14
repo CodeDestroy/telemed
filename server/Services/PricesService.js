@@ -16,7 +16,6 @@ class PricesService {
 
     async editPrice({scheduleId, price, isFree = false, startDate = null, endDate = null}) {
         try {
-            console.log(scheduleId, price, isFree , startDate , endDate )
             const newPrice = await database.models.SchedulePrices.update(
                 { 
                     price, isFree, startDate, endDate
