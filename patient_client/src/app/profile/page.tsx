@@ -61,10 +61,10 @@ const Page = () => {
             currError.push('Email должен быть длиннее 2 символов')
             currErrorIndicator = true
         }
-        if (!user?.snils || user?.snils.length != 11) {
+        /* if (!user?.snils || user?.snils.length != 11) {
             currError.push('Введите корректный СНИЛС')
             currErrorIndicator = true
-        }
+        } */
         
         if (currErrorIndicator){
             /* setError(error ? error : '' + (`\n\n${currError}`)) */

@@ -53,7 +53,7 @@ const Registration = () => {
     if (password.length < 3) currError.push('Пароль должен быть длиннее 3 символов')
     if (!confirmPassword) currError.push('Введите Подтверждение пароля')
     if (password !== confirmPassword) currError.push('Пароли не совпадают')
-    if (!snils || snils.length !== 11) currError.push('Введите корректный СНИЛС')
+    /* if (!snils || snils.length !== 11) currError.push('Введите корректный СНИЛС') */
     if (!birthDate) currError.push('Введите Дату рождения')
 
     if (!agreePD) currError.push('Необходимо согласие на обработку персональных данных')
@@ -278,7 +278,6 @@ const Registration = () => {
                         maxLength={11}
                         value={snils}
                         onChange={(e) => setSnils(e.target.value.replace(/\D/g, ''))}
-                        required
                         placeholder="11223344595"
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       />
