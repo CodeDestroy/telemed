@@ -34,6 +34,20 @@ function Jitsi(props) {
     const handleProtocolModalClose = () => setProtocolModalShow(false);
     const handleProtocolModalShow = () => setProtocolModalShow(true);
 
+    const isModerator = store.selectedProfile?.isWorker;
+
+    const TOOLBAR_BUTTONS = [
+        'microphone', 'camera', 'desktop', 'fullscreen',
+        'fodeviceselection', 'hangup', 'chat',
+        'videoquality', 'filmstrip',
+        'tileview', 'videobackgroundblur', 'download',
+        'participants-pane', 'pip', 'speakerstats',
+        'mute-everyone'
+    ];
+
+    if (isModerator) {
+        TOOLBAR_BUTTONS.push('recording');
+    }
 
     const onConferenceCreatedTimestamp = (nativeEvent) => {
         /* Conference terminated event */
@@ -41,9 +55,7 @@ function Jitsi(props) {
       
     }
 
-    useEffect(() => {
-        console.log(store)
-    }, [store.user])
+
 
 
     //Срабатывает у входящего
@@ -55,7 +67,6 @@ function Jitsi(props) {
             /* socket.emit('timer:start', {...nativeEvent, time}) */
             if (result.data.timer == 'start') {
                 var date = new Date(result.data.time);
-                console.log(date)
                 props.onJoin(result.data?.time);
             }
 
@@ -73,6 +84,7 @@ function Jitsi(props) {
     //Срабатывает у всех
     const onParticipantLeft = async (nativeEvent) => {
         try {
+            console.log('onParticipantLeft')
             /* console.log(nativeEvent, localId) */
             /* const currTime = Date.now(); */
             const result = await ConferenceService.leaveConference({...nativeEvent, roomName});
@@ -107,6 +119,7 @@ function Jitsi(props) {
     const handleEndCall = async (event) => {
         try {
             /* const currTime = Date.now(); */
+            console.log('handleEndCall')
             const nativeEvent = { id: localId, roomName: roomName}
             const result = await ConferenceService.leaveConference(nativeEvent);
             /* JitsiRef.current.style.display = 'none' */
@@ -174,12 +187,7 @@ function Jitsi(props) {
                     SHOW_WATERMARK_FOR_GUESTS: false,
                     SHOW_CHROME_EXTENSION_BANNER: false,
 
-                    TOOLBAR_BUTTONS: ['microphone', 'camera', 'desktop', 'fullscreen',
-                    'fodeviceselection', 'recording', 'hangup', 'chat',
-                     
-                    'videoquality', 'filmstrip', 
-                    'tileview', 'videobackgroundblur', 'download', 'participants-pane', 'pip', 'speakerstats',
-                    'mute-everyone'],
+                    TOOLBAR_BUTTONS: TOOLBAR_BUTTONS,
                     HIDE_KICK_BUTTON_FOR_GUESTS: true,
                     JITSI_WATERMARK_LINK: "null",
                     MOBILE_APP_PROMO: false,

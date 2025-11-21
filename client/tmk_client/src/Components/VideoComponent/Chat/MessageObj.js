@@ -19,10 +19,6 @@ const ChildComponent = ({message, files, user}) => {
     const {store} = useContext(Context);
 
 
-    useEffect(()=>{
-        console.log(user)
-    }, [])
-
     if (store.user)
     return (
 

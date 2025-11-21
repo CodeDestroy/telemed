@@ -98,7 +98,8 @@ class UserService {
                     })
                     
                     const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
-                    const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    //const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    const tokensPatient = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     /* console.log(tokensPatient) */
                     await tokenService.saveToken(user.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
@@ -131,9 +132,9 @@ class UserService {
                                 through: { attributes: [] }
                             },
                             {
-                            model: database['Permissions'], // подключаем через alias 'permissions'
-                            as: 'permissions',
-                            required: false
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
@@ -141,7 +142,8 @@ class UserService {
                     //const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
-                    const tokens = await tokenService.generateTokens({...newUserDto});
+                    //const tokens = await tokenService.generateTokens({...newUserDto});
+                    const tokens = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
@@ -165,7 +167,8 @@ class UserService {
                     
                     const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    //const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    const tokensAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin } 
@@ -188,7 +191,8 @@ class UserService {
                     })
                     const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    //const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    const tokensSuperAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }
@@ -211,7 +215,8 @@ class UserService {
                     })
                     const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    //const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    const tokensOperator = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensOperator, user: userDtoOperator }  
@@ -272,7 +277,8 @@ class UserService {
                         }
                     })
                     const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
-                    const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    //const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    const tokensPatient = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(userDtoPatient.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
@@ -301,7 +307,8 @@ class UserService {
                     })
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
-                    const tokens = await tokenService.generateTokens({...newUserDto});
+                    //const tokens = await tokenService.generateTokens({...newUserDto});
+                    const tokens = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
@@ -323,7 +330,8 @@ class UserService {
                         ]
                     })
                     const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
-                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    //const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    const tokensAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin }
@@ -347,7 +355,8 @@ class UserService {
                     
                     const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    //const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    const tokensSuperAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }  
@@ -371,7 +380,8 @@ class UserService {
                     
                     const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    //const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    const tokensOperator = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensOperator, user: userDtoOperator }  

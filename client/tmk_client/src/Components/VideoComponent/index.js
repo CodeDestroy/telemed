@@ -8,7 +8,7 @@ import Header from '../Header';
 import { observer } from 'mobx-react-lite';
 import Timer from '../Timer';
 import ModalChat from './Chat/ModalChat'
-
+import SelectProfileJitsi from './SelectProfileJitsi'
 function Index() {
     const {roomId} = useParams();
     const {store} = useContext(Context);
@@ -62,6 +62,30 @@ function Index() {
           /* window.location.href='/';  */
           /* return */
         }
+        if (user.UsersRole.accessLevel == 1) {
+            store.setSelectedProfile(user.Patient)
+            store.setProfiles([user.Patient])
+            store.isSelected = true
+            store.mustSelect = false
+            store.selectedProfile.isWorker = false
+        }
+        else if (user.UsersRole.accessLevel == 2) {
+            store.setProfiles(user.Doctors)
+            store.selectedProfile.isWorker = true
+            if (user.Doctors.length > 1) {
+                store.isSelected = false
+                store.mustSelect = true
+                
+            }
+        }
+        else if (user.UsersRole.accessLevel == 3 || user.UsersRole.accessLevel == 4 || user.UsersRole.accessLevel == 5) {
+            store.setProfiles(user.Admins)
+            store.selectedProfile.isWorker = true
+            if (user.Admins.length > 1) {
+                store.isSelected = false
+                store.mustSelect = true
+            }
+        }
         store.setAuth(true)
         store.setUser(user) 
         joinRoom(roomId)
@@ -71,8 +95,6 @@ function Index() {
     const [isTimerRunning, setIsTimerRunning] = useState(false);
 
     const handleConferenceJoin = (time = 0) => {
-        console.log(time)
-        console.log(new Date(time))
         if (time != 0) {
             
             const startedTime  = new Date(time);
@@ -144,6 +166,7 @@ function Index() {
             <Jitsi openModalChat={hadleOpenModalChat} room={roomId} token={jwt} onFullScreen={handleFullScreen} onJoin={handleConferenceJoin} onLeave={handleConferenceLeave} timerSeconds={totalSeconds}/>
             <Timer time={totalSeconds} offsetTimestamp={totalSeconds} run={isTimerRunning}/*  onUpdateTotalSeconds={handleUpdateTotalSeconds} *//>
             <Chat roomId={roomId} token={jwt}  show={modalChatShow} onHide={() => setModalChatShow(false)}/>
+            {/* <SelectProfileJitsi/> */}
           {/* <ModalChat show={modalChatShow} onHide={() => setModalChatShow(false)} roomId={roomId} token={jwt}/> */}
         </div>
         

@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextareaAutosize
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -290,11 +291,14 @@ export default function ConsultationDetailsPage() {
             <Typography variant="h6" gutterBottom>
               Протокол консультации
             </Typography>
-            <TextField
+            <TextareaAutosize
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              className='w-100'
               value={protocol}
               onChange={(e) => setProtocol(e.target.value)}
               multiline
-              rows={6}
+              minRows={6}
+              maxRows={25}
               fullWidth
               placeholder="Введите протокол консультации..."
             />
