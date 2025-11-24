@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       Slots.hasOne(models.Rooms, { foreignKey: 'slotId' });
       Slots.hasOne(models.Payments, { foreignKey: 'slotId' });
       Slots.hasMany(models.Attachments, { foreignKey: 'slotId' });
+      Slots.hasOne(models.PatientConsultationInfo, {
+        foreignKey: 'slotId',
+      });
     }
   }
   Slots.init({

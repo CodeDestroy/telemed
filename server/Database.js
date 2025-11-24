@@ -38,6 +38,7 @@ const DoctorPermissions = require('./models/doctorpermissions')
 const Child = require('./models/child')
 const Protocol = require('./models/protocols');
 const mkbDiagnosis = require('./models/mkbdiagnoses');
+const PatientConsultationInfo = require('./models/patientconsultationinfo');
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = class Database {
@@ -94,6 +95,7 @@ module.exports = class Database {
       RolePermissions: RolePermissions(this.sequelize, DataTypes),
       AdminPermissions: AdminPermissions(this.sequelize, DataTypes),
       DoctorPermissions: DoctorPermissions(this.sequelize, DataTypes),
+      PatientConsultationInfo: PatientConsultationInfo(this.sequelize, DataTypes),
     };
 
     Object.keys(this.models).forEach(modelName => {

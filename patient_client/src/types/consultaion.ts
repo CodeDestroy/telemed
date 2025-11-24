@@ -46,6 +46,17 @@ export interface ConsultationFull {
     avatar: string | undefined
 }
 
+export interface PatientConsultationInfo {
+    id: number,
+    complaints: string,
+    diagnosis: string,
+    anamnesis: string,
+    comments: string,
+    slotId: number,
+    createdAt: string,
+    updatedAt: string
+}
+
 export interface SlotWithRoomPatient {
 
     createdAt: string,
@@ -61,7 +72,8 @@ export interface SlotWithRoomPatient {
     Room: Room
     Patient: Patient
     Doctor: Doctor,
-    Payment: Payment
+    Payment: Payment,
+    PatientConsultationInfo?: PatientConsultationInfo
 }
 
 export interface Url {

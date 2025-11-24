@@ -10,7 +10,8 @@ const superAdminLocations = {
     slotsManagement: '/slots',
     createPatient: '/patients/create',
     editPatient: '/patients/edit/:id',
-    calendar: '/calendar'
+    calendar: '/calendar',
+    consultationPage: '/consultation/:id',
 };
   
 export default superAdminLocations;

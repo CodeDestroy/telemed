@@ -337,6 +337,54 @@ export default function ConsultationDetailsPage() {
             </Box>
           )}
 
+          {/* --- Данные, заполненные пациентом --- */}
+          {details.PatientConsultationInfo && (
+            <Box mt={4}>
+              <Typography variant="h6" gutterBottom>
+                Данные от пациента
+              </Typography>
+
+              <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Жалобы
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.complaints || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Ранее установленный диагноз
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.diagnosis || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Анамнез
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.anamnesis || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Комментарии пациента
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.comments || "Не заполнено"}
+                  </Typography>
+                </Box>
+              </Paper>
+            </Box>
+          )}
+
+
           {/* --- Файлы --- */}
           <Box mt={4}>
             <Typography variant="subtitle1" fontWeight={500}>

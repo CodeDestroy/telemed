@@ -78,14 +78,14 @@ const Registration = () => {
         const response1 = await AuthService.checkPhone(phone)
         if (!response1.data) {
           const response2 = await AuthService.confirmRegistration(
-            secondName,
-            firstName,
-            patronomicName,
+            secondName.trim(),
+            firstName.trim(),
+            patronomicName.trim(),
             birthDate,
-            email,
+            email.trim(),
             phone,
-            password,
-            snils
+            password.trim(),
+            snils.trim()
           )
           setLoading(false)
           router.push(`/registration/registration-step3?phone=${response2.data[0]?.phone}`)

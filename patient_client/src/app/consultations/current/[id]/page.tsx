@@ -24,14 +24,25 @@ const Page = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const store = useStore()
 
+  const [complaints, setComplaints] = useState('')
+  const [diagnosis, setDiagnosis] = useState('')
+  const [anamnesis, setAnamnesis] = useState('')
+  const [comments, setComments] = useState('')
+  
+  const [saving, setSaving] = useState(false)
+
+
   const fetchConsultation = async () => {
     try {
       if (id) {
         const res = await ConsultationService.getConsultationById(parseInt(id))
         if (res.data.Room.ended)
           window.location.href = `/consultations/previous/${res.data.id}`
-        console.log(res.data)
         setConsultation(res.data)
+        setComplaints(res.data.PatientConsultationInfo?.complaints || '')
+        setDiagnosis(res.data.PatientConsultationInfo?.diagnosis || '')
+        setAnamnesis(res.data.PatientConsultationInfo?.anamnesis || '')
+        setComments(res.data.PatientConsultationInfo?.comments || '')
 
         if (store.user?.personId) {
           const url = await ConsultationService.getConsultationUrl(res.data.id, store.user?.id)
@@ -45,6 +56,30 @@ const Page = () => {
       console.log(err)
     }
   }
+
+  const handleSaveInfo = async () => {
+    if (!id) return
+
+    try {
+      setSaving(true)
+
+      await ConsultationService.savePatientSlotInfo(parseInt(id), 
+        complaints,
+        diagnosis,
+        anamnesis,
+        comments
+      )
+
+      // Можно вывести уведомление или toast
+      alert('Данные успешно сохранены!')
+    } catch (err) {
+      console.error(err)
+      alert('Ошибка при сохранении')
+    } finally {
+      setSaving(false)
+    }
+  }
+
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -140,6 +175,78 @@ const Page = () => {
             </p>
           </div>
         )}
+
+        {/* ====== ПОЛЯ ДЛЯ ЗАПОЛНЕНИЯ ====== */}
+        {paymentStatus === 3 && (
+          <div className="mt-8 bg-white shadow rounded-lg p-6 space-y-5">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Дополнительная информация для врача
+            </h2>
+
+            <p className="text-gray-500">
+              Пожалуйста, заполните основные сведения, чтобы врач мог лучше подготовиться.
+            </p>
+
+            {/* Жалобы */}
+            <div className="flex flex-col gap-2">
+              <label className="font-medium text-gray-700">Жалобы</label>
+              <textarea
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none min-h-[110px]"
+                placeholder="Опишите симптомы и что вас беспокоит..."
+                value={complaints}
+                onChange={(e) => setComplaints(e.target.value)}
+              />
+            </div>
+
+            {/* Ранее установленный диагноз */}
+            <div className="flex flex-col gap-2">
+              <label className="font-medium text-gray-700">Ранее установленный диагноз</label>
+              <textarea
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none min-h-[110px]"
+                placeholder="Укажите диагнозы, поставленные ранее..."
+                value={diagnosis}
+                onChange={(e) => setDiagnosis(e.target.value)}
+              />
+            </div>
+
+            {/* Анамнез */}
+            <div className="flex flex-col gap-2">
+              <label className="font-medium text-gray-700">Анамнез</label>
+              <textarea
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none min-h-[150px]"
+                placeholder="Опишите историю заболевания..."
+                value={anamnesis}
+                onChange={(e) => setAnamnesis(e.target.value)}
+              />
+            </div>
+
+            {/* Комментарии */}
+            <div className="flex flex-col gap-2">
+              <label className="font-medium text-gray-700">Комментарии</label>
+              <textarea
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none min-h-[150px]"
+                placeholder="Опишите то, что вы считаете нужным для проведения консультации..."
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+              />
+            </div>
+
+            {/* Кнопка сохранить */}
+            <div className="pt-3">
+              <button
+                onClick={handleSaveInfo}
+                disabled={saving}
+                className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors
+                  ${saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}
+                `}
+              >
+                {saving ? 'Сохранение...' : 'Сохранить'}
+              </button>
+            </div>
+          </div>
+        )}
+
+
 
         {/* ====== ФАЙЛЫ ====== */}
         {paymentStatus === 3 && (

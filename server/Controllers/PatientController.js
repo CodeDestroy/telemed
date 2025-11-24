@@ -356,6 +356,24 @@ class PatientController {
         }
     }
     
+    async savePatientSlotInfo(req, res) {
+        try {
+            const { id } = req.params;
+            const { complaints, diagnosis, anamnesis, comments } = req.body;
+            const consultation = await ConsultationService.getSlotById(id);
+            console.log(consultation.PatientConsultationInfo.complaints)
+            consultation.PatientConsultationInfo.complaints = complaints;
+            consultation.PatientConsultationInfo.diagnosis = diagnosis;
+            consultation.PatientConsultationInfo.anamnesis = anamnesis;
+            consultation.PatientConsultationInfo.comments = comments;
+            await consultation.PatientConsultationInfo.save()
+            await consultation.save();
+            res.status(200).json({ message: 'Информация успешно сохранена' });
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: 'Ошибка при сохранении информации' });
+        }
+    }
 
 }
 
