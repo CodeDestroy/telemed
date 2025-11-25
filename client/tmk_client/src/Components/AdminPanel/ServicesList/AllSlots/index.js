@@ -32,15 +32,17 @@ function AllSlots() {
     if (store?.user?.id) {
       async function fetchConsultations() {
         try {
-          const response = await AdminService.getConsultations();
-          let array = response.data[0];
+          /* const response = await AdminService.getConsultations(); */
+          const response2 = await AdminService.getConsultationsV2();
+          let array = response2.data;
 
           array.forEach((el) => {
-            el.id = el.slot_id || el.id;
-            el.patient = `${el.pSecondName} ${el.pFirstName}`;
+            el.id = el.id;
+            el.patient = `${el.Patient.secondName} ${el.Patient.firstName}`;
             el.slotStartDateTimeFormatted = moment(el.slotStartDateTime).format(
               "DD.MM.YYYY HH:mm"
             );
+            el.PaymentStatus = el.Payment?.PaymentStatus ? el.Payment?.PaymentStatus : '-'
           });
 
           setConsultations(array);
@@ -67,6 +69,7 @@ function AllSlots() {
   };
 
   const columns = [
+    { field: 'id', headerName: '#' },
     { field: "patient", headerName: "Пациент", width: 220 },
 
     {
@@ -84,15 +87,15 @@ function AllSlots() {
     },
 
     {
-      field: "paymentStatusDescription",
+      field: "PaymentStatus",
       headerName: "Статус оплаты",
       width: 250,
       renderCell: (params) => (
-        <Chip
-          label={params.row.paymentStatusDescription || "—"}
-          color={statusColor(params.row.paymentStatusDescription)}
-          size="small"
-        />
+          <Chip
+            label={params.row.Payment?.PaymentStatus?.code || "—"}
+            color={statusColor(params.row.Payment?.PaymentStatus?.description)}
+            size="small"
+          />
       ),
     },
 

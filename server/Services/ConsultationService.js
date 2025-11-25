@@ -50,6 +50,45 @@ class ConsultationService {
         }
     }
 
+    async getAllSlotsV2() {
+        try {
+            const result = await database.models.Slots.findAll({
+                include: [
+                    {
+                        model: database.models.Rooms,
+                        required: false
+                    },
+                    {
+                        model: database.models.Patients,
+                        required: false,
+                    },
+                    {
+                        model: database.models.Doctors,
+                        required: true,
+                    },
+                    {
+                        model: database.models.Payments,
+                        required: false,
+                        include: [
+                            {
+                                model: database.models.PaymentStatus,
+                                required: false
+                            }
+                        ]
+                    }
+                ],
+                order: [
+                    ['id', 'DESC']
+                ]
+            });
+            return result
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     //Все слоты (лучше не использовать)
     async getAllSlots () {
         try {
@@ -83,6 +122,8 @@ class ConsultationService {
             {
                 raw: true
             })
+
+            
             /* const slots = await database.sequelize.query(`
                 select s.id as "id" , 
                     p."firstName" as "pFirstName", 
@@ -867,7 +908,7 @@ class ConsultationService {
                     }
                 ]
             })
-            return slot.Doctor
+            return slot.Patient || null;
         }
         catch (e)
         {

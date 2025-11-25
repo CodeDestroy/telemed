@@ -50,6 +50,35 @@ class AdminController {
         
     }
 
+    async getAllConsultationsV2(req, res) {
+        try {
+            let allSlots = []
+            let personId = req.user.personId
+            if (!personId) {
+                personId = req.query.personId
+            }
+            if (req.user.accessLevel === 4) {
+                allSlots = await ConsultationService.getAllSlotsV2()
+            }
+            else if (req.user.accessLevel === 3 || req.user.accessLevel === 5) {
+                allSlots = await ConsultationService.getAllSlotsInMOByAdminId(personId)
+            }
+            else if (req.user.accessLevel === 2) {
+                if (!personId) {throw new ApiError('personId is required', 400)}
+                allSlots = await ConsultationService.getAllDoctorSlotsRaw(personId)
+            }
+            else if (req.user.accessLevel === 1) {
+                //Все слоты пациента
+            }
+            
+            res.status(200).json(allSlots)
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+        
+    }
+
     async getAllConsultationsDate (req, res) {
         try {
             const {date} = req.query
