@@ -37,7 +37,6 @@ function AllSlots() {
           let array = response2.data;
 
           array.forEach((el) => {
-            el.id = el.id;
             el.patient = `${el.Patient.secondName} ${el.Patient.firstName}`;
             el.slotStartDateTimeFormatted = moment(el.slotStartDateTime).format(
               "DD.MM.YYYY HH:mm"
