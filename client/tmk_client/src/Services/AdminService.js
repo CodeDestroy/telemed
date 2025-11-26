@@ -8,6 +8,11 @@ export default class AdminService {
         return $api.get('/api/admin/consultations/all', {params: {personId}});
     }
 
+    
+    static async getConsultationsV2 (personId) {
+        return $api.get('/api/admin/v2/consultations/all', {params: {personId}});
+    }
+
     static async getConsultationsByDate (date) {
         return $api.get('/api/admin/consultations/date', {params: {date}});
     }

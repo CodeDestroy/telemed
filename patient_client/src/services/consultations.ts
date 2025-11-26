@@ -42,6 +42,15 @@ export default class ConsultationService {
         });
     }
 
+    static async savePatientSlotInfo(slotId: number, complaints: string, diagnosis: string, anamnesis: string, comments: string) {
+        return $api.post(`/api/patient/consultations/${slotId}/info`, {
+            complaints,
+            diagnosis,
+            anamnesis,
+            comments
+        });
+    }
+
 
     
 }

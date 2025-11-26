@@ -20,7 +20,6 @@ class AuthController {
             const password = req.body.password
             
             const userData = await userService.login(login, password);
-
             if (userData.message != undefined)
                 throw ApiError.BadRequest(userData.message)
             else {
@@ -37,6 +36,7 @@ class AuthController {
     async refresh (req, res) {
         try {
             const {refreshToken} = req.cookies;
+            //console.log(refreshToken)
             const userData = await userService.refresh(refreshToken);
 
             await res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'none', secure: true, httpOnly: true})

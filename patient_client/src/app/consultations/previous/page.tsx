@@ -23,7 +23,10 @@ const Page = () => {
             /* console.log(store.user?.id) */
             if (store.user?.id) {
                 const response = await ConsultationService.getPreviousConsultations(store.user.id)
-                const data: SlotWithRoomPatient[] = response.data
+                //const data: SlotWithRoomPatient[] = response.data
+                const data: SlotWithRoomPatient[] = (response.data).sort((a, b) => {
+                    return a.id < b.id ? 1 : -1
+                })
                 setConsultations(data)
             }
             

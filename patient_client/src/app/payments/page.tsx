@@ -92,7 +92,7 @@ const PaymentsPage = () => {
               doctor?.Posts.map((post) => (
                 <p
                     key={post.id}
-                    className="mt-1 text-xs leading-5 text-gray-500 truncate text-gray-600"
+                    className="mt-1 text-xs leading-5 text-gray-500 text-gray-600"
                 >
                     {post.postName}{' '}
                 </p>

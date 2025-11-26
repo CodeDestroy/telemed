@@ -44,12 +44,12 @@ class ConferenceController {
             //Оставить на потом
             /* if (roomInfo.started === 0)
                 return res.status(406).json({message: 'Консультация не была инициирована'}) */
-            tmk.Room.ended = true;
-            tmk.Room.meetingEnd = new Date();
+            //tmk.Room.ended = true;
+            //tmk.Room.meetingEnd = new Date();
             /* tmk.Room.protocol = protocol */
-            tmk.slotStatusId = 4
-            tmk.Room.save()
-            tmk.save()
+            //tmk.slotStatusId = 4
+            //tmk.Room.save()
+            //tmk.save()
             rooms.removeRoom(conferenceEvent.roomName.toLowerCase())
         }
         res.json({data: conferenceEvent});

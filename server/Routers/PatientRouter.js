@@ -37,5 +37,6 @@ router.get('/:id/children', PatientController.getChildrenByPatientId);
 router.post('/children', PatientController.addChild);
 router.delete('/children/:id', PatientController.removeChild);
 router.get('/consultations/:id/protocol', PatientController.downloadProtocol);
+router.post('/consultations/:id/info', PatientController.savePatientSlotInfo)
 
 module.exports = router;

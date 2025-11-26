@@ -17,6 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/consultations/all', AdminController.getAllConsultations)
+router.get('/v2/consultations/all', AdminController.getAllConsultationsV2)
 router.get('/consultations/date', AdminController.getAllConsultationsDate)
 router.get('/consultations/ended', AdminController.getEndedConsultations)
 router.post('/consultations/create', AdminController.createConsultation)

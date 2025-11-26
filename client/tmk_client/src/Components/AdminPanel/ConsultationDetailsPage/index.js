@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextareaAutosize
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -290,11 +291,14 @@ export default function ConsultationDetailsPage() {
             <Typography variant="h6" gutterBottom>
               Протокол консультации
             </Typography>
-            <TextField
+            <TextareaAutosize
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              className='w-100'
               value={protocol}
               onChange={(e) => setProtocol(e.target.value)}
               multiline
-              rows={6}
+              minRows={6}
+              maxRows={25}
               fullWidth
               placeholder="Введите протокол консультации..."
             />
@@ -332,6 +336,54 @@ export default function ConsultationDetailsPage() {
               </Button>
             </Box>
           )}
+
+          {/* --- Данные, заполненные пациентом --- */}
+          {details.PatientConsultationInfo && (
+            <Box mt={4}>
+              <Typography variant="h6" gutterBottom>
+                Данные от пациента
+              </Typography>
+
+              <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Жалобы
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.complaints || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Ранее установленный диагноз
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.diagnosis || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Анамнез
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.anamnesis || "Не заполнено"}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Комментарии пациента
+                  </Typography>
+                  <Typography variant="body1">
+                    {details.PatientConsultationInfo.comments || "Не заполнено"}
+                  </Typography>
+                </Box>
+              </Paper>
+            </Box>
+          )}
+
 
           {/* --- Файлы --- */}
           <Box mt={4}>
