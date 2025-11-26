@@ -135,6 +135,7 @@ class SchedulerController {
             const {id} = req.params
             const {date} = req.query
             const {dayid} = req.query
+            console.log(date, dayid)
             let schedule
             if (!dayid && !date) {
 

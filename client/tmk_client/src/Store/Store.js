@@ -58,7 +58,7 @@ export default class Store {
                         redirect: process.env.REACT_APP_PATIENT_CLIENT_URL,
                     }
                     
-                    window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
+                    //window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
                     this.setError('Запрещён вход для пациентов')
                     return res
                 }
@@ -211,7 +211,7 @@ export default class Store {
                             data: 'Запрещён вход для пациентов',
                             redirect: process.env.REACT_APP_PATIENT_CLIENT_URL
                         }
-                        window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
+                        //window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL
                         this.setError('Запрещён вход для пациентов')
                         return res
                     }

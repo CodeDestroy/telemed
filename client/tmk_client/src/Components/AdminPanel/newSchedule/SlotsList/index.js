@@ -1,5 +1,7 @@
 import React, {useEffect, useState, useContext} from 'react'
 import AdminService from '../../../../Services/AdminService';
+import SchedulerService from '../../../../Services/SchedulerService';
+
 import DoctorService from '../../../../Services/DoctorService';
 import Header from '../../Header';
 import CreateSlotModal from '../CreateSlotModal';
@@ -42,22 +44,7 @@ function Index() {
         setSelectedItem(null)
     }
 
-    useEffect(() => {
-        handleFetchDoctors()
-        handleFetchReservedSlots()
-    }, []) 
-
-    useEffect(() => {
-        if (doctors.length > 0) {
-            doctors.forEach(async (doctor, index) => {
-                await handleFetchSchedule(doctor);
-                if (index === doctors.length - 1) {
-                    setScheduleLoaded(true)
-                }
-            });
-            
-        }
-    }, [doctors])
+    
 
     useEffect(() => {
         if (scheduleLoaded)
@@ -65,13 +52,14 @@ function Index() {
             const newScheduleMap = new Map();
 
             Array.from(schedule.entries()).forEach(([doctor, schedule]) => {
+                //const slot = schedule
                 //const slots = splitScheduleBy30Min(schedule);
-                const slots = splitScheduleBy60Min(schedule);
-                newScheduleMap.set(doctor, slots);
+                //const slots = splitScheduleBy60Min(schedule);
+                newScheduleMap.set(doctor, schedule);
             });
             setSplitedSchedule(newScheduleMap)
         }
-    }, [scheduleLoaded])
+    }, [schedule, scheduleLoaded])
 
     const handleFetchDoctors = async () => {
         try {
@@ -82,16 +70,37 @@ function Index() {
         }
     }
 
-    const handleFetchReservedSlots = async () => {
+    /* const handleFetchReservedSlots = async () => {
         try {
             const response = await AdminService.getConsultationsByDate(new Date());
             setReservedSlots(response.data[0])
         } catch (e) {
             alert('Ошибка загрузки занятых слотов');
         }
+    } */
+
+    const handleFetchSchedule = async () => {
+        try {
+            doctors.forEach(async (doctor) => {
+                try {
+                    const response = await SchedulerService.getDcotorSchedule(doctor.id, new Date());
+                    console.log(response)
+                    schedule.set(doctor, response.data);
+                    setScheduleLoaded(true)
+                } catch (e) {
+                    console.log(e)
+                    //alert('Ошибка загрузки расписания');
+                }
+            })
+            /* const schedule = await SchedulerService.getDcotorScheduleDates() */
+        }
+        catch (e) {
+            //alert('Ошибка загрузки расписания').
+            console.log(e)
+        }
     }
 
-    const handleFetchSchedule = async (doctor) => {
+    /* const handleFetchSchedule = async (doctor) => {
         if (!doctor) {
             alert('Выберите врача');
             return;
@@ -102,7 +111,7 @@ function Index() {
         } catch (e) {
             alert('Ошибка загрузки расписания');
         }
-    };
+    }; */
 
     function splitScheduleBy30Min(schedule) {
         const slots = [];
@@ -204,6 +213,28 @@ function Index() {
         console.log('Удалить:', selectedItem);
         handleMenuClose();
     };
+
+    useEffect(() => {
+        handleFetchDoctors()
+        //handleFetchReservedSlots()
+    }, []) 
+
+    useEffect(() => {
+        if (doctors.length > 0)
+            handleFetchSchedule()
+    }, [doctors])
+
+    /* useEffect(() => {
+        if (doctors.length > 0) {
+            doctors.forEach(async (doctor, index) => {
+                await handleFetchSchedule(doctor);
+                if (index === doctors.length - 1) {
+                    setScheduleLoaded(true)
+                }
+            });
+            
+        }
+    }, [doctors, handleFetchSchedule]) */
 
     const DoctorScheduleList = ({ scheduleMap }) => {
         const entries = Array.from(scheduleMap.entries());
