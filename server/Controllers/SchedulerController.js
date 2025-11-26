@@ -2,33 +2,39 @@
 const SchedulerService = require('../Services/SchedulerService')
 const { Op } = require('sequelize');
 const database = require('../models/index');
+const PricesService = require('../Services/PricesService');
+const moment = require('moment-timezone')
 class SchedulerController {
     // Создание нового временного промежутка для расписания врача
     async createOrUpdateSchedule(req, res) {
-        const { doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, scheduleStatus = 1 } = req.body;
-        const startTime = ((new Date(scheduleStartTime)).getHours() + 3) + ':' + (new Date(scheduleStartTime)).getMinutes();
-        const endTime = ((new Date(scheduleEndTime)).getHours() + 3) + ':' + (new Date(scheduleEndTime)).getMinutes();
+        const { doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, scheduleStatus = 1, slotDuration, slotsCount } = req.body;
 
-        console.log(startTime, endTime)
         try {
             const weekDay = await database["WeekDays"].findOne({
                 where: {
                     name: scheduleDay
                 }
             })
-            // Проверяем пересечения по времени для выбранного дня недели
-            const overlappingSchedules = await SchedulerService.findOverlappingSchedules(doctorId, weekDay.id, startTime, endTime)
+            for (let i = 0; i < slotsCount; i++) {
+                const startTime = moment(scheduleStartTime).add(slotDuration*i);
+                const endTime = moment(scheduleStartTime).add(slotDuration*(i+1));
+                // Проверяем пересечения по времени для выбранного дня недели
+                const overlappingSchedules = await SchedulerService.findOverlappingSchedules(doctorId, weekDay.id, startTime, endTime)
 
-            if (overlappingSchedules) {
-                return res.status(400).json({
-                    error: 'Временной промежуток пересекается с существующим расписанием.',
-                });
+                if (overlappingSchedules) {
+                    return res.status(400).json({
+                        error: 'Временной промежуток пересекается с существующим расписанием.',
+                    });
+                }
+
+                // Создаем новый временной промежуток для врача
+                const newSchedule = await SchedulerService.createSchedule(doctorId, weekDay.id, startTime, endTime, scheduleStatus);
+                console.log(newSchedule)
+                console.log('createOrUpdateSchedule')
             }
+            
 
-            // Создаем новый временной промежуток для врача
-            const newSchedule = await SchedulerService.createSchedule(doctorId, weekDay.id, startTime, endTime, scheduleStatus);
-
-            res.status(201).json(newSchedule);
+            res.status(201).send('Успешно');
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Ошибка сервера.' });
@@ -157,7 +163,6 @@ class SchedulerController {
             const {id} = req.params
             const {startDate} = req.query
             const {endDate} = req.query
-            console.log(req.query)
             const schedule = await SchedulerService.getDoctorScheduleBetweenDays(id, startDate, endDate)
             return res.status(200).json(schedule)
             /* if (startDate && endDate) {
@@ -228,29 +233,55 @@ class SchedulerController {
 /* 
 http://localhost:8080/api/doctor/scheduler/14?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT
 http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT */
-    async addScheduleDate (req, res) {
+    async addScheduleDate(req, res) {
         try {
-            const slotData = req.body;
-            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
-            const newDate = new Date(date)
-            const day = newDate.getDay()
-           /*  const startTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
-            const endTimeNew = ((new Date(startTime)).getHours() + 3) + ':' + (new Date(endTime)).getMinutes();
-             */
-            console.log({ doctorId, date, startTime, endTime, scheduleStatus })
-            const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(doctorId, date, startTime, endTime)
-            if (overlappingSchedules) {
-                return res.status(400).json({
-                    error: 'Временной промежуток пересекается с существующим расписанием.',
-                });
+            const { doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount } = req.body;
+            // Приведение исходных данных к нормальному виду
+            const inputDate = new Date(date); // Получаем чистый объект даты
+            const inputStartTime = moment(`${inputDate.toISOString().split('T')[0]}T${startTime}`, 'YYYY-MM-DDTHH:mm').toDate();
+            const inputSlotDuration = parseInt(slotDuration, 10); // Парсим duration в число минут
+            const totalSlots = parseInt(slotsCount, 10);          // Общее количество слотов
+
+            // Основной цикл создания расписания
+            for (let i = 0; i < totalSlots; i++) {
+                const currentStart = moment(inputStartTime).add(i * inputSlotDuration, 'minutes');
+                const currentEnd = moment(currentStart).add(inputSlotDuration, 'minutes');
+
+                // Проверка на пересечения
+                const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(
+                    doctorId,
+                    date,
+                    currentStart.toDate(),
+                    currentEnd.toDate()
+                );
+
+                if (overlappingSchedules && overlappingSchedules.length > 0) {
+                    return res.status(400).json({
+                        error: 'Временной промежуток пересекается с существующим расписанием.'
+                    });
+                }
+
+                // Создание расписания
+                const newSchedule = await SchedulerService.createScheduleDate(
+                    doctorId,
+                    date,
+                    currentStart.format('YYYY-MM-DD HH:mm'),
+                    currentEnd.format('YYYY-MM-DD HH:mm'),
+                    inputDate.getDay(),
+                    1 // Status by default
+                );
+
+                const aYearFromNow = new Date();
+                aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+                const newPrice = await PricesService.createPrice({scheduleId: newSchedule.id, price, isFree, startDate: new Date(), endDate: aYearFromNow})
+
+                /* console.log("Создано новое расписание:", newSchedule); */
             }
 
-            const newSchedule = await SchedulerService.createScheduleDate(doctorId, date, startTime, endTime, day, scheduleStatus);
-            console.log(newSchedule)
-            return res.status(200).json(newSchedule)
-        }
-        catch (e) {
-            res.status(404).json({error: e.message})
+            return res.status(200).send('Расписание успешно создано.');
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
         }
     }
 
@@ -258,7 +289,7 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
         try {
             const slotData = req.body;
             const { id } = req.params
-            const { doctorId, date, startTime, endTime, scheduleStatus = 1 } = req.body;
+            const { doctorId, date, startTime, endTime, scheduleStatus = 1, price, isFree } = req.body;
             const newDate = new Date(date)
             const day = newDate.getDay()
             
@@ -269,6 +300,9 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
                 });
             }
             const newSchedule = await SchedulerService.editScheduleDate(id, date, startTime, endTime, day, scheduleStatus);
+            const aYearFromNow = new Date();
+            aYearFromNow.setFullYear(aYearFromNow.getFullYear() + 1);
+            const newPrice = await PricesService.editPrice({scheduleId: newSchedule.id, price, isFree, startDate: new Date(), endDate: aYearFromNow})
             return res.status(200).json(newSchedule)
         }
         catch (e) {

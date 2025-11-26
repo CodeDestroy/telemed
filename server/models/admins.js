@@ -12,6 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Admins.belongsTo(models.Users, { foreignKey: 'userId' });
       Admins.belongsTo(models.MedicalOrgs, { foreignKey: 'medOrgId' });
+      Admins.belongsToMany(models.Permissions, {
+        through: 'AdminPermissions',
+        foreignKey: 'adminId',
+        otherKey: 'permissionId',
+        as: 'permissions'
+      });
     }
   }
   Admins.init({

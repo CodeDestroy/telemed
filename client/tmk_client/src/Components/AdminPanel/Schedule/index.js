@@ -40,7 +40,7 @@ function Schedule() {
                     let color = "red"
                     switch (slot.slotStatusId) {
                         case 1:
-                            color = "#2196F3"
+                            color = "#FFC107"
                             break;
                         case 2:
                             color = "#FFC107"
@@ -151,27 +151,27 @@ function Schedule() {
                 /* agenda={false} */
                 month={
                     {
-                        weekDays: [0, 1, 2, 3, 4, 5], 
+                        weekDays: [0, 1, 2, 3, 4, 5, 6], 
                         weekStartOn: 1, 
-                        startHour: 8, 
-                        endHour: 22,
+                        startHour: 6, 
+                        endHour: 24,
                         navigation: true,
                         disableGoToDay: false,
                         
                     }
                 }
                 week={{
-                    weekDays: [0, 1, 2, 3, 4, 5], 
+                    weekDays: [0, 1, 2, 3, 4, 5, 6], 
                     weekStartOn: 1, 
-                    startHour: 8, 
-                    endHour: 22,
+                    startHour: 6, 
+                    endHour: 24,
                     step: 30,
                     navigation: true,
                     disableGoToDay: false
                 }}      
                 day={{
-                    startHour: 8, 
-                    endHour: 22, 
+                    startHour: 6, 
+                    endHour: 24, 
                     step: 30,
                     navigation: true
                 }}

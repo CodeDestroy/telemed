@@ -13,13 +13,6 @@ exports.HTTPS_PORT = HTTPS_PORT;
 const cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-/* const Database = require('./Database')
-const database = new Database(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, process.env.DB_HOST) */
-/* DB_USER = "postgres"
-DB_PASSWORD = "admin"
-DB_HOST = "localhost"
-DB_NAME = "tmk" */
-
 const mainRouter = require('./Routers/MainRouter')
 const authRouter = require('./Routers/AuthRouter');
 const conferenceRouter = require('./Routers/ConferenceRouter')
@@ -28,6 +21,7 @@ const integrationRouter = require('./Routers/IntegrationRouter')
 const doctorRouter = require('./Routers/DoctorRouter')
 const outerServicesRouter = require('./Routers/OuterServicesRouter')
 const patientRouter = require('./Routers/PatientRouter')
+const paymentRouter = require('./Routers/PaymentRouter')
 const { start } = require('./start');
 const adminRouter = require('./Routers/AdminRouter')
 const AuthMiddleware = require('./middleware/AuthMiddleware')
@@ -52,6 +46,10 @@ app.use('/api/doctor', AuthMiddleware, doctorRouter)
 app.use('/api/admin', AuthMiddleware, adminRouter)
 app.use('/api/patient', patientRouter);
 app.use('/api/service', outerServicesRouter)
+app.use('/api/payment', paymentRouter)
 ioConnections = [];
+const checkExpiredPayments = require("./cron/checkExpiredPayments");
 
+// Запускаем cron-задачу
+checkExpiredPayments();
 start();

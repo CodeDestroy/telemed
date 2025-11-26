@@ -1,6 +1,7 @@
 const DoctorService = require('../Services/DoctorService')
 const ConsultationService = require('../Services/ConsultationService')
 const SchedulerService = require('../Services/SchedulerService')
+const PermissionService = require('../Services/PermissionService')
 
 class DoctorController {
     async getConsultations(req, res) {
@@ -48,7 +49,7 @@ class DoctorController {
     }
 
     async getEndedConsultations (req, res) {
-        try {
+        try { 
             const {userId} = req.query
             const doctor = await DoctorService.getDoctorByUserId(userId)
             const activeSlots = await ConsultationService.getEndedDoctorSlots(doctor.id)
@@ -65,6 +66,18 @@ class DoctorController {
             const doctor = await DoctorService.getDoctor(doctorId)
             const activeSlots = await ConsultationService.getEndedDoctorSlots(doctor.id)
             res.status(200).json(activeSlots)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+
+    async getConsultationBySlotId (req, res) {
+        try {
+            const {id} = req.params
+            const consultation = await ConsultationService.getSlotById(id)
+            res.status(200).json(consultation)
         }
         catch (e) {
             res.status(500).json({error: e.message})
@@ -117,6 +130,8 @@ class DoctorController {
             res.status(500).json({error: e.message})
         }
     }
+
+    
 
     
 }

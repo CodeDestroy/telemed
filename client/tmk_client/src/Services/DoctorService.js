@@ -20,8 +20,8 @@ export default class DoctorService {
         return $api.get('/api/doctor/v2/consultations/ended', {params: {doctorId}})
     }
 
-    static async createScheduler (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
-        return $api.post('/api/doctor/scheduler', {doctorId, scheduleDay, scheduleStartTime, scheduleEndTime})
+    static async createScheduler (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, slotDuration, slotsCount) {
+        return $api.post('/api/doctor/scheduler', {doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, slotDuration, slotsCount})
     }
 
     static async getSchedule (doctorId) {
@@ -42,11 +42,11 @@ export default class DoctorService {
         return $api.post('/api/doctor/scheduler/delete', {id})
     }
     
-    static async addSchedule (doctorId, date, startTime, endTime) {
-        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime })
+    static async addSchedule (doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount = 1) {
+        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount })
     }
-    static async updateSchedule (doctorId, slotId, date, startTime, endTime) {
-        return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime })
+    static async updateSchedule (doctorId, slotId, date, startTime, endTime, price, isFree) {
+        return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime, price, isFree })
     }
 
     static async setProtocol (roomId, protocol) {
@@ -56,5 +56,30 @@ export default class DoctorService {
     static async sendProtocol (roomId) {
         return $api.post('/api/doctor/conference/protocol/send', {roomId})
     }
+
+    static async getConsultationBySlotId(slotId) {
+        return $api.get(`/api/doctor/v2/consultation/${slotId}`)
+    }
+
+    static async getFilesBySlotId(slotId) {
+        return $api.get(`/api/patient/consultations/${slotId}/files`)
+    }
+
+    static async endConsultation(slotId, endTime) {
+        return $api.post(`/api/doctor/consultation/${slotId}/setEnd`, {endTime})
+    }
+
+    /* static async downloadProtocol(roomId) {
+        return $api.get(`/api/doctor/protocol/${roomId}/pdf`, {
+            responseType: 'blob',
+        });
+        } */
+    
+    static async downloadProtocol(slotId) {
+        return $api.get(`/api/patient/consultations/${slotId}/protocol`, {
+            responseType: 'blob',
+        });
+    }
+
     
 }

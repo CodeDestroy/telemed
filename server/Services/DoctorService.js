@@ -6,7 +6,8 @@ class DoctorService {
             const doctor = await database["Doctors"].findOne({
                 where: {
                     userId: userId
-                }
+                },
+                
             })
             return doctor;
         }
@@ -19,10 +20,17 @@ class DoctorService {
     async getAllDoctors() {
         try {
             const doctors = await database["Doctors"].findAll({
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true,
+                        through: { attributes: [] }
+                    }
+                ]
             })
             return doctors;
         }
@@ -38,10 +46,17 @@ class DoctorService {
                 where: {
                     medOrgId: medorgId
                 },
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true,
+                        through: { attributes: [] }
+                    }
+                ]
             })
             return doctors
         }
@@ -51,28 +66,58 @@ class DoctorService {
         }
     }
 
-    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null) {
+    async createDoctor(userId, secondName, firstName, patronomicName, birthDate, info, snils = null, medOrgId = null, postIds = 2) {
         try {
+            // Создаем доктора без привязки к постам
             const doctor = await database["Doctors"].create({
-                
-                userId, secondName, firstName, patronomicName, birthDate, info, snils, medOrgId
-            })
-            return doctor
-      
-        }
-        catch (e) {
-            console.log(e)
-            throw e
+                userId,
+                secondName,
+                firstName,
+                patronomicName,
+                birthDate,
+                info,
+                snils,
+                medOrgId
+            });
+
+            // Универсальная обработка postIds
+            let postIdsArray = [];
+            if (Array.isArray(postIds)) {
+                postIdsArray = postIds.map(id => parseInt(id, 10));
+            } else if (postIds) {
+                postIdsArray = [parseInt(postIds, 10)];
+            }
+
+            // Если есть postIds, создаем связи в DoctorPosts
+            if (postIdsArray.length > 0) {
+                const postLinks = postIdsArray.map(postId => ({
+                    doctorId: doctor.id,
+                    postId
+                }));
+                await database["DoctorPosts"].bulkCreate(postLinks);
+            }
+
+            return doctor;
+        } catch (e) {
+            console.log(e);
+            throw e;
         }
     }
+
 
     async getDoctor(id) {
         try {
             const doctor = await database["Doctors"].findByPk(id, {
-                include: [{
-                    model: database["Users"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["Users"],
+                        required: true
+                    },
+                    {
+                        model: database["Posts"],
+                        required: true,
+                    }
+                ]
             })
             return doctor;
         }
@@ -146,7 +191,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -168,7 +214,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -197,7 +244,8 @@ class DoctorService {
                 include: [
                     {
                         model: database["Posts"],
-                        required: true
+                        required: true,
+                        through: { attributes: [] }
                     },
                     {
                         model: database["MedicalOrgs"],
@@ -226,6 +274,33 @@ class DoctorService {
         catch {
             console.log(e)
             throw e
+        }
+    }
+    async updateDoctorPosts(doctorId, postIds) {
+        // Преобразуем id в числа
+        const ids = postIds.map(id => parseInt(id, 10));
+
+        // Удаляем связи, которых нет в новом списке
+        await database['DoctorPosts'].destroy({
+            where: {
+                doctorId,
+                postId: { [Sequelize.Op.notIn]: ids }
+            }
+        });
+
+        // Находим текущие связи
+        const existingLinks = await database['DoctorPosts'].findAll({
+            where: { doctorId }
+        });
+        const existingPostIds = existingLinks.map(link => link.postId);
+
+        // Создаём только новые связи
+        const newLinks = ids
+            .filter(id => !existingPostIds.includes(id))
+            .map(postId => ({ doctorId, postId }));
+
+        if (newLinks.length > 0) {
+            await database['DoctorPosts'].bulkCreate(newLinks);
         }
     }
 }

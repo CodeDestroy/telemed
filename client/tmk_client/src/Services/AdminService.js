@@ -8,6 +8,11 @@ export default class AdminService {
         return $api.get('/api/admin/consultations/all', {params: {personId}});
     }
 
+    
+    static async getConsultationsV2 (personId) {
+        return $api.get('/api/admin/v2/consultations/all', {params: {personId}});
+    }
+
     static async getConsultationsByDate (date) {
         return $api.get('/api/admin/consultations/date', {params: {date}});
     }
@@ -22,6 +27,15 @@ export default class AdminService {
 
     static async getPatient(patientId) {
         return $api.get(`/api/admin/patients/${patientId}`);
+    }
+
+    static async getChildrenByPatientId(patientId) {
+        return $api.get(`/api/patient/${patientId}/children`);
+    }
+
+    // Добавить ребёнка
+    static async addChildToPatient(child) {
+        return $api.post(`/api/patient/children`, {child});
     }
 
     static async editPatient(patientId, patient) {
@@ -41,6 +55,10 @@ export default class AdminService {
         return $api.post(`/api/admin/doctors/${doctorId}`, {user: doctor});
     }
 
+    static async getSpecialties() {
+        return $api.get('/api/admin/doctors/specialties/all');
+    }
+
 
     static async createDoctor(formData, profileId = null) {
         return $apiMultipartData.post('/api/admin/doctors/create', formData, {params: {profileId}});
@@ -50,8 +68,8 @@ export default class AdminService {
         return $apiMultipartData.post('/api/admin/patients/create', formData);
     }
 
-    static async createSlot (doctor, patient, startDateTime, duration, slotStatusId) {
-        return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration, slotStatusId});
+    static async createSlot (doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost) {
+        return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost});
     }
     //slotId, doctor, patient, startDateTime, duration, slotStatusId
     static async editSlot (slotId, doctor, patient, startDateTime, duration, slotStatusId) {
@@ -60,5 +78,22 @@ export default class AdminService {
 
     static async getSlotStatuses () {
         return $api.get('/api/admin/slotStatuses/all');
+    }
+
+    static async getPermissions() {
+        return $api.get('/api/admin/permissions');
+    }
+
+    static async getDoctorPermissions(doctorId) {
+        return $api.get(`/api/admin/permissions/doctor/${doctorId}`);
+    }
+
+    static async updateDoctorPermissions(doctorId, selectedPermissions) {
+        return $api.put(`/api/admin/permissions/doctor/${doctorId}`, {permissionIds: selectedPermissions});
+
+    }
+
+    static async checkPaymentStatusBySlot(slotId) {
+        return $api.get('/api/payment/checkPaymentStatusBySlot', {params: {slotId}})
     }
 }

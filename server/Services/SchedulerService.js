@@ -120,7 +120,16 @@ class SchedulerService {
 
     async editScheduleDate (slotId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus) {
         try {
-            const newslot = await database["Schedule"].update(
+            const newSlot = await database["Schedule"].findOne({
+                where: { id: slotId } 
+            })
+            newSlot.date = date
+            newSlot.scheduleStartTime = scheduleStartTime
+            newSlot.scheduleEndTime = scheduleEndTime
+            newSlot.scheduleDayId = scheduleDay
+            newSlot.scheduleStatus = scheduleStatus
+            await newSlot.save()
+            /* const newslot = await database["Schedule"].update(
                 { 
                     date,
                     scheduleStartTime,
@@ -131,9 +140,9 @@ class SchedulerService {
                 { 
                     where: { id: slotId } 
                 }
-            )
+            ) */
                 
-            return newslot
+            return newSlot
         }
         catch (e) {
             console.log(e)
@@ -150,6 +159,34 @@ class SchedulerService {
                         [Op.eq]: date
                     },
                     /* date: {[Op.ne]: null}, */
+                    scheduleStatus: 1,
+
+                },
+                include: [
+                    { 
+                        model: database["WeekDays"],
+                        required: true ,
+                    }
+                ],
+            })
+            return doctorSchedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleByDateTime (doctorId, date, time) {
+        try {
+            const doctorSchedule = await database["Schedule"].findOne({
+                where: {
+                    doctorId,
+                    date: {
+                        [Op.eq]: date
+                    },
+                    scheduleStartTime: { [Op.lte]: time },
+                    scheduleEndTime: { [Op.gte]: time },
                     scheduleStatus: 1,
 
                 },
@@ -196,7 +233,13 @@ class SchedulerService {
                         date: {
                             [Op.between]: [startDate, endDate]
                         }
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 }) 
                 return doctorSchedule;
             }
@@ -208,7 +251,13 @@ class SchedulerService {
                             [Op.gte]: startDate
                         }
 
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 })
                 return doctorSchedule
             }
@@ -220,7 +269,13 @@ class SchedulerService {
                             [Op.lte]: endDate
                         }
 
-                    }
+                    },
+                    include: [
+                        {
+                            model: database["SchedulePrices"],
+                            required: true
+                        }
+                    ]
                 })
                 return doctorSchedule
             }
@@ -403,8 +458,9 @@ class SchedulerService {
             } else if (endDate) {
                 scheduleWhere.date = { [Op.lte]: endDate };
             }
-            const weekDays = await database["Schedule"].findAll({
-                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name']],
+            scheduleWhere.scheduleStatus = 1
+            /* const weekDays = await database["Schedule"].findAll({
+                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
                 include: [
                     {
                         model: database["WeekDays"],
@@ -413,11 +469,28 @@ class SchedulerService {
                 ],
                 where: scheduleWhere,
                 raw: true
+            }); */
+            const weekDays = await database["Schedule"].findAll({
+                attributes: [
+                    [fn('DISTINCT', col('date')), 'date'], // Уникальные даты
+                    [col('WeekDay.name'), 'name'],
+                ],
+                include: [
+                    {
+                        model: database["WeekDays"],
+                        attributes: []
+                    }
+                ],
+                where: scheduleWhere,
+                group: ['WeekDay.name', 'Schedule.date'],
+                /* order: [[database["WeekDays"], 'id', 'ASC']], */
+                order: [['date', 'ASC']],
+                raw: true
             });
 
             // Преобразуем в массив строк
-            const result = weekDays.map(wd => wd.name);
-            return result;
+            /* const result = weekDays.map(wd => wd.name); */
+            return weekDays;
         }
         catch (e) {
             console.log(e)

@@ -9,7 +9,6 @@ module.exports = async function (req, res, next) {
 
         const parsedUrl = url.parse(req.originalUrl);
         const authHeader = req.headers.authorization;
-        
         if (allowedPath.includes(parsedUrl.pathname)) {
             // Для маршрута /auth/login разрешаем доступ без токена
             console.table(`Путь запроса ${parsedUrl.pathname}`)

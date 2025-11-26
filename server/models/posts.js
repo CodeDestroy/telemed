@@ -10,14 +10,29 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Posts.hasMany(models.Doctors, { foreignKey: 'postId' });
+      /* Posts.hasMany(models.Doctors, { foreignKey: 'postId' }); */
+      Posts.belongsToMany(models.Doctors, {
+        through: 'DoctorPosts',
+        foreignKey: 'postId',
+        otherKey: 'doctorId'
+      });
     }
   }
-  Posts.init({
-    postName: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Posts',
-  });
+  Posts.init(
+    {
+      postName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      transliterationName: {
+        type: DataTypes.STRING,
+      },
+    },
+    {
+      sequelize,
+      modelName: 'Posts',
+    }
+  );
+
   return Posts;
 };

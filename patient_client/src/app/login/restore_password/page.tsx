@@ -6,6 +6,7 @@ import { useStore } from '@/store'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import { AxiosError, AxiosErrorExtended } from '@/types/errors'
+import Footer from '@/components/Footer'
 
 const ForgotPassword = () => {
     const store = useStore()
@@ -135,6 +136,7 @@ const ForgotPassword = () => {
                 )}
             </div>
         </div>
+        <Footer/>
     </div>
   )
 }

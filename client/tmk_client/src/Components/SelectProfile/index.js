@@ -31,6 +31,10 @@ const SelectProfile = () => {
 
     }
 
+    const handleLoginAsPatient = () => {
+        window.location.href = 'https://dr.clinicode.ru'
+    }
+
     return (
         <Box
             sx={{
@@ -75,7 +79,15 @@ const SelectProfile = () => {
                                     {profile.MedicalOrg.medOrgName}
                                 </Typography>
                                 <Typography variant="body1" color="text.secondary">
-                                    {profile.Post.postName}
+                                    {profile.Posts.map(post => (
+                                        <>
+                                            <br></br>
+                                            <span key={`${profile.id}_${post.postName}`}>{post.postName}</span>
+                                        </>
+                                            
+                                        )
+                                    )}
+                                    
                                 </Typography>
                                 </CardContent>
                                 <Button
@@ -89,6 +101,42 @@ const SelectProfile = () => {
                             </Card>
                         </Grid>
                     ))}
+                    { store.user && !store.user.isWorker &&
+                    <Grid item xs={12} sm={6} md={4}>
+                            <Card
+                                sx={{
+                                    minHeight: 160,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                    textAlign: "center",
+                                    p: 2,
+                                    borderRadius: 3,
+                                    boxShadow: 3,
+                                    transition: "0.3s",
+                                    "&:hover": { boxShadow: 6, transform: "translateY(-4px)" },
+                                }}
+                            >
+                                <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    Войти как пациент
+                                </Typography>
+                                <Typography variant="body1" color="text.secondary">
+                                    Войдите в свой личный кабинет как пациент
+                                    
+                                </Typography>
+                                </CardContent>
+                                <Button
+                                    variant="contained"
+                                    sx={{ mt: 2, borderRadius: 2 }}
+                                    fullWidth
+                                    onClick={handleLoginAsPatient}
+                                >
+                                Войти
+                                </Button>
+                            </Card>
+                        </Grid>
+                    }
                 </Grid>
 
                 {/* Кнопка Выйти */}

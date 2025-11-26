@@ -17,6 +17,7 @@ const Services = require('./models/services')
 const Slots = require('./models/slots')
 const Payments = require('./models/payments')
 const PayTypes = require('./models/paytypes')
+const PaymentStatus = require('./models/paymentstatus')
 const SlotStatus = require('./models/slotstatus')
 const ConfirmCodes = require('./models/confirmcodes')
 const MedicalOrgs = require('./models/medicalorgs')
@@ -26,6 +27,18 @@ const Schedule = require('./models/schedule')
 const WeekDays = require('./models/weekdays')
 const UsersRooms = require('./models/usersrooms')
 const UsersSettings = require('./models/userssettings')
+const SchedulePrices = require('./models/scheduleprices')
+const PromoCodes = require('./models/promocodes')
+const Attachments = require('./models/attachments')
+const DoctorPosts = require('./models/doctorposts')
+const RolePermissions = require('./models/rolepermissions')
+const Permissions = require('./models/permissions')
+const AdminPermissions = require('./models/adminpermissions')
+const DoctorPermissions = require('./models/doctorpermissions')
+const Child = require('./models/child')
+const Protocol = require('./models/protocols');
+const mkbDiagnosis = require('./models/mkbdiagnoses');
+const PatientConsultationInfo = require('./models/patientconsultationinfo');
 const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = class Database {
@@ -63,6 +76,7 @@ module.exports = class Database {
       Slots: Slots(this.sequelize, DataTypes),
       Payments: Payments(this.sequelize, DataTypes),
       PayTypes: PayTypes(this.sequelize, DataTypes),
+      PaymentStatus: PaymentStatus(this.sequelize, DataTypes),
       SlotStatus: SlotStatus(this.sequelize, DataTypes),
       ConfirmCodes: ConfirmCodes(this.sequelize, DataTypes),
       MedicalOrgs: MedicalOrgs(this.sequelize, DataTypes),
@@ -70,6 +84,18 @@ module.exports = class Database {
       API: API(this.sequelize, DataTypes),
       Schedule: Schedule(this.sequelize, DataTypes),
       WeekDays: WeekDays(this.sequelize, DataTypes),
+      SchedulePrices: SchedulePrices(this.sequelize, DataTypes),
+      PromoCodes: PromoCodes(this.sequelize, DataTypes),
+      Attachments: Attachments(this.sequelize, DataTypes),
+      DoctorPosts: DoctorPosts(this.sequelize, DataTypes),
+      Child: Child(this.sequelize, DataTypes),
+      Protocol: Protocol(this.sequelize, DataTypes),
+      mkbDiagnosis: mkbDiagnosis(this.sequelize, DataTypes),
+      Permissions: Permissions(this.sequelize, DataTypes),
+      RolePermissions: RolePermissions(this.sequelize, DataTypes),
+      AdminPermissions: AdminPermissions(this.sequelize, DataTypes),
+      DoctorPermissions: DoctorPermissions(this.sequelize, DataTypes),
+      PatientConsultationInfo: PatientConsultationInfo(this.sequelize, DataTypes),
     };
 
     Object.keys(this.models).forEach(modelName => {

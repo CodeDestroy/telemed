@@ -20,7 +20,6 @@ class AuthController {
             const password = req.body.password
             
             const userData = await userService.login(login, password);
-
             if (userData.message != undefined)
                 throw ApiError.BadRequest(userData.message)
             else {
@@ -37,6 +36,7 @@ class AuthController {
     async refresh (req, res) {
         try {
             const {refreshToken} = req.cookies;
+            //console.log(refreshToken)
             const userData = await userService.refresh(refreshToken);
 
             await res.cookie('refreshToken', userData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, sameSite: 'none', secure: true, httpOnly: true})
@@ -187,7 +187,7 @@ class AuthController {
             const user = await userService.getUser(userDto.id)
             const patient = await PatientService.getPatientByUserId(user.id)
             user.phone = userDto.phone
-            userDto.login = userDto.phone
+            user.login = userDto.phone
             user.email = userDto.email
             patient.secondName = userDto.secondName
             patient.firstName = userDto.firstName
@@ -214,17 +214,24 @@ class AuthController {
             if (!user) throw ApiError.BadRequest('Пользователь с таким номером телефона не зарегистрирован')
             const newCode = await CodeService.createNewCode(user.id, 180)
            
-            const transporter = await MailManager.getTransporter()
-            const mailOptions = await MailManager.getMailOptionsRestorePasswordCode(user.email, newCode.code)
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    res.status(200).send(false)
-                    return console.log(error);
-                }
-                console.log('Сообщение отправленно: %s', info.messageId);
-                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-            });
-            res.status(200).send(true)
+            
+            if (user.email) {
+                const transporter = await MailManager.getTransporter()
+                const mailOptions = await MailManager.getMailOptionsRestorePasswordCode(user.email, newCode.code)
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return res.status(200).send(false)
+                        //return console.log(error);
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+                res.status(200).send(true)
+            }
+            else {
+               throw ApiError.BadRequest('Email не указан. Свяжитесь с администратором для восстановления доступа.') 
+            }
+            
         }
         catch (e) {
             res.status(500).json({

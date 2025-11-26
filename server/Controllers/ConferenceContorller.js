@@ -3,6 +3,7 @@ const rooms = require('../Utils/RoomManager')
 const UrlManager = require('../Utils/UrlManager')
 const MailManager = require('../Utils/MailManager')
 
+const database = require('../Database/setDatabase')
 const SERVER_DOMAIN = process.env.SERVER_DOMAIN;
 const CLIENT_URL = process.env.CLIENT_URL;
 class ConferenceController {
@@ -43,12 +44,12 @@ class ConferenceController {
             //Оставить на потом
             /* if (roomInfo.started === 0)
                 return res.status(406).json({message: 'Консультация не была инициирована'}) */
-            tmk.Room.ended = true;
-            tmk.Room.meetingEnd = new Date();
+            //tmk.Room.ended = true;
+            //tmk.Room.meetingEnd = new Date();
             /* tmk.Room.protocol = protocol */
-            tmk.slotStatusId = 4
-            tmk.Room.save()
-            tmk.save()
+            //tmk.slotStatusId = 4
+            //tmk.Room.save()
+            //tmk.save()
             rooms.removeRoom(conferenceEvent.roomName.toLowerCase())
         }
         res.json({data: conferenceEvent});
@@ -134,14 +135,16 @@ class ConferenceController {
             
             if (tmk.Patient.User.email) {
                 const mailOptionsPatinet = await MailManager.getMailOptionsProtocolLink(tmk.Patient.User.email, link, tmk.Room.protocol)
-                transporter.sendMail(mailOptionsPatinet, (error, info) => {
-                    if (error) {
-                        throw new Error(error)
-                        /* return console.log(error); */
-                    }
-                    console.log('Сообщение отправленно: %s', info.messageId);
-                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                const info = await transporter.sendMail(mailOptionsPatinet);
+
+                console.log('Сообщение отправлено: %s', info.messageId);
+
+                await database.models.Rooms.increment('sendCount', {
+                    by: 1,
+                    where: { id: tmk.Room.id },
                 });
+
+                await tmk.Room.save();
             }
             
             res.status(200).json(tmk)
@@ -154,17 +157,48 @@ class ConferenceController {
     }
 
      async getProtocolByRoomName(req, res) {
-            try {
-                const {roomName} = req.query
-                const tmk = await ConsultationService.getSlotByRoomName(roomName)
-                res.status(200).json(tmk.Room.protocol)
-                
-            }
-            catch (e) {
-                res.status(500).json({error: e.message})
-            }
+        try {
+            const {roomName} = req.query
+            const tmk = await ConsultationService.getSlotByRoomName(roomName)
+            res.status(200).json(tmk.Room.protocol)
             
         }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+        
+    }
+
+    async getSlotByRoomName (req, res) {
+        try {
+            const {roomName} = req.query
+            const tmk = await ConsultationService.getSlotByRoomName(roomName)
+            res.status(200).json(tmk)
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    async setEndConsultation(req, res) {
+        try {
+
+            const { id } = req.params
+            const {endTime} = req.body
+            const tmk = await ConsultationService.getSlotById(id)
+            tmk.Room.ended = true
+            tmk.Room.meetingEnd = endTime
+            await tmk.Room.save()
+            await tmk.save()
+            res.status(200).json(tmk.Room)
+
+        }
+        catch (e) {
+            res.status(500).json({error: e.message})
+        }
+    }
+
+    
 
     
 }

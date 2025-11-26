@@ -1,6 +1,7 @@
 import AdminMain from '../Components/AdminPanel/Main/AdminDashboard'
 import CreateSlot from '../Components/AdminPanel/ServicesList/CreateSlot'
 import adminLocations from '../Locations/AdminLocations';
+import superAdminLocations from '../Locations/SuperAdminLocations'
 import AllSlots from '../Components/AdminPanel/ServicesList/AllSlots'
 import {
   createBrowserRouter,
@@ -17,6 +18,7 @@ import Settings from '../Components/AdminPanel/Profile/Settings/AdminSettings';
 import GeneralInfo from '../Components/AdminPanel/Profile/GeneralInfo';
 import generalLocations from '../Locations/GeneralLocations';
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
+import ConsultationDetailsPage from "../Components/AdminPanel/ConsultationDetailsPage";
 const superAdminRouter = createBrowserRouter([
     {
         path: "*",
@@ -73,6 +75,10 @@ const superAdminRouter = createBrowserRouter([
     {
       path: '/protocol/:protocolId',
       element: <ProtocolPage/>
+    },
+    {
+      path: superAdminLocations.consultationPage,
+      element: <ConsultationDetailsPage/>
     }
     /* {
         path: '/test',

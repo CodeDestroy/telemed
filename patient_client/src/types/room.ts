@@ -1,3 +1,5 @@
+import { Child } from "./child"
+
 export interface Room {
     createdAt: string,
     ended: string | null,
@@ -9,4 +11,7 @@ export interface Room {
     slotId: number,
     token: string | null,
     updatedAt: string,
+    childId: number | null
+    Child?: Child, 
+    sendCount: number | null
 }

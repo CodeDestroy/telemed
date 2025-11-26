@@ -66,7 +66,14 @@ class UserService {
                 include: [
                     {
                         model: database["UsersRoles"],
-                        required: true
+                        required: true,
+                        include: [
+                            {
+                                model: database['Permissions'],
+                                as: 'permissions', // совпадает с UsersRoles.belongsToMany(..., as: 'permissions')
+                                required: false
+                            }
+                        ]
                     }
                 ],
             })
@@ -91,7 +98,8 @@ class UserService {
                     })
                     
                     const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
-                    const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    //const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    const tokensPatient = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     /* console.log(tokensPatient) */
                     await tokenService.saveToken(user.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
@@ -120,6 +128,12 @@ class UserService {
                             },
                             {
                                 model: database["Posts"],
+                                required: false,
+                                through: { attributes: [] }
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
                                 required: false
                             }
                         ]
@@ -128,7 +142,8 @@ class UserService {
                     //const userDto = await UserDto.deserialize(user, user.UsersRole, doctor)
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
-                    const tokens = await tokenService.generateTokens({...newUserDto});
+                    //const tokens = await tokenService.generateTokens({...newUserDto});
+                    const tokens = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
@@ -141,13 +156,19 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     
                     const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    //const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    const tokensAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin } 
@@ -160,12 +181,18 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    //const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    const tokensSuperAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }
@@ -178,12 +205,18 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    //const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    const tokensOperator = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensOperator, user: userDtoOperator }  
@@ -222,10 +255,19 @@ class UserService {
                 where: {
                     id: userData.id,
                 },
-                include: [{
-                    model: database["UsersRoles"],
-                    required: true
-                }]
+                include: [
+                    {
+                        model: database["UsersRoles"],
+                        required: true,
+                        include: [
+                            {
+                                model: database['Permissions'],
+                                as: 'permissions', // совпадает с UsersRoles.belongsToMany(..., as: 'permissions')
+                                required: false
+                            }
+                        ]
+                    }
+                ]
             })
             switch (user.UsersRole.accessLevel) {
                 case 1: 
@@ -235,7 +277,8 @@ class UserService {
                         }
                     })
                     const userDtoPatient = await UserDto.deserialize(user, user.UsersRole, patient)
-                    const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    //const tokensPatient = await tokenService.generateTokens({...userDtoPatient});
+                    const tokensPatient = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(userDtoPatient.id, tokensPatient.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensPatient, user: userDtoPatient } 
@@ -252,13 +295,20 @@ class UserService {
                             },
                             {
                                 model: database["Posts"],
+                                required: false,
+                                through: { attributes: [] }
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
                                 required: false
                             }
                         ]
                     })
                     const newUserDto = await UserDto.serializeWorker(user, user.UsersRole, doctors)
                     /* console.log({...userDto}) */
-                    const tokens = await tokenService.generateTokens({...newUserDto});
+                    //const tokens = await tokenService.generateTokens({...newUserDto});
+                    const tokens = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokens.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokens, user: newUserDto } 
@@ -271,11 +321,17 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     const userDtoAdmin = await UserDto.serializeWorker(user, user.UsersRole, admins)
-                    const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    //const tokensAdmin = await tokenService.generateTokens({...userDtoAdmin});
+                    const tokensAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(userDtoAdmin.id, tokensAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensAdmin, user: userDtoAdmin }
@@ -288,13 +344,19 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     
                     const userDtoSuperAdmin = await UserDto.serializeWorker(user, user.UsersRole, superAdmins)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    //const tokensSuperAdmin = await tokenService.generateTokens({...userDtoSuperAdmin});
+                    const tokensSuperAdmin = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensSuperAdmin.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensSuperAdmin, user: userDtoSuperAdmin }  
@@ -307,13 +369,19 @@ class UserService {
                             {
                                 model: database["MedicalOrgs"],
                                 required: true
+                            },
+                            {
+                                model: database['Permissions'], // подключаем через alias 'permissions'
+                                as: 'permissions',
+                                required: false
                             }
                         ]
                     })
                     
                     const userDtoOperator = await UserDto.serializeWorker(user, user.UsersRole, operators)
                     /* console.log({...userDtoAdmin}) */
-                    const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    //const tokensOperator = await tokenService.generateTokens({...userDtoOperator});
+                    const tokensOperator = await tokenService.generateTokens({ id: user.id, accessLevel: user.UsersRole.accessLevel });
                     await tokenService.saveToken(user.id, tokensOperator.refreshToken);
                     //send answer (user and tokens)
                     return { ...tokensOperator, user: userDtoOperator }  

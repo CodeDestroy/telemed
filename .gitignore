@@ -9,7 +9,7 @@ client/tmk_client/.env
 client/tmk_client/build
 client/tmk_client/public/assets
 server/public/files/
-
+server/temp/
 server/package-lock.json
 client/tmk_client/package-lock.json
 healthyChildService/
@@ -17,6 +17,11 @@ serverCopy/
 server/config/config.json
 patient_client/.next
 patient_client/node_modules
+patient_client/tmk_client
 patient_client/.env
+
 secret_key.txt
 ./secret_key.txt
+.gigaide
+.idea
+

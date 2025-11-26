@@ -1,6 +1,6 @@
 import WeekDay from "./weekDay";
 
-export default interface ScheduleMainPage {
+export interface ScheduleMainPage {
     WeekDay: WeekDay,
     date: string | null,
     doctorId: number,
@@ -13,3 +13,11 @@ export default interface ScheduleMainPage {
     scheduleStatus: number,
     updatedAt: string,
 }
+
+
+export interface ScheduleShort {
+    date: string,
+    name: string,
+    scheduleEndTime: string,
+    scheduleStartTime: string,
+} 

@@ -76,17 +76,23 @@ export default class Store {
                     tempUser.postId = tempUser.persons[0].postId
                     tempUser.personId = tempUser.persons[0].id
                     this.setProfiles(tempUser.persons)
+                    this.setSelectedProfile(tempUser.persons[0])
                     this.isSelected = true;
                     this.mustSelect = false;
                     localStorage.setItem('profile', tempUser.persons[0].id);
+                    localStorage.setItem('token', response.data.accessToken);
                 }
                 else {
                     this.setProfiles(tempUser.persons)
                     this.mustSelect = true
+                    localStorage.setItem('token', response.data.accessToken);
                 }
 
                 this.setUser(tempUser);
-                localStorage.setItem('token', response.data.accessToken);
+
+                //console.log(response.data.accessToken)
+                
+                //console.log(localStorage.getItem('token'))
                 this.setAuth(true);
                 this.setLoading(false)
                 return response
@@ -137,7 +143,7 @@ export default class Store {
 
     async logout (){
         try {
-            await AuthService.logout();
+            
             localStorage.removeItem('token');
             localStorage.removeItem('profile');
             this.setAuth(false);
@@ -150,6 +156,7 @@ export default class Store {
 
             this.setError('')
             this.setUser({});
+            await AuthService.logout();
         }
         catch (e) {
             console.log(e)
@@ -222,6 +229,7 @@ export default class Store {
                         tempUser.postId = this.user.persons[0].postId
                         tempUser.personId = this.user.persons[0].id
                         this.setProfiles(tempUser.persons)
+                        this.setSelectedProfile(tempUser.persons[0])
                         this.isSelected = true;
                         this.mustSelect = false
                         
@@ -250,7 +258,7 @@ export default class Store {
             this.setUser({});
             this.setAuth(false);
             this.setError(e.response.data)
-            localStorage.removeItem('token');
+            //localStorage.removeItem('token');
             console.log(e)
             return false
         }

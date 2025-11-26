@@ -1,5 +1,6 @@
 import { Doctor } from "./doctor"
 import { Patient } from "./patient"
+import { Payment } from "./payment"
 import { Room } from "./room"
 
 export interface ConsultationFull {
@@ -45,6 +46,17 @@ export interface ConsultationFull {
     avatar: string | undefined
 }
 
+export interface PatientConsultationInfo {
+    id: number,
+    complaints: string,
+    diagnosis: string,
+    anamnesis: string,
+    comments: string,
+    slotId: number,
+    createdAt: string,
+    updatedAt: string
+}
+
 export interface SlotWithRoomPatient {
 
     createdAt: string,
@@ -59,7 +71,9 @@ export interface SlotWithRoomPatient {
     updatedAt: string,
     Room: Room
     Patient: Patient
-    Doctor: Doctor
+    Doctor: Doctor,
+    Payment: Payment,
+    PatientConsultationInfo?: PatientConsultationInfo
 }
 
 export interface Url {
@@ -73,11 +87,63 @@ export interface Url {
 }
 
 export interface Slot {
-    scheduleStartTime: string
-    scheduleEndTime: string
+    slotStartDateTime: string
+    slotEndDateTime: string
     serviceId: number
     isBusy: boolean
     patientId: number
     slotStatusId: number
     doctorId: number
+}
+
+export interface ScheduleSlot {
+    /* scheduleStartTime: string
+    scheduleEndTime: string
+    serviceId: number
+    isBusy: boolean
+    patientId: number
+    slotStatusId: number
+    doctorId: number */
+
+
+    doctorId: number
+    id: number
+    scheduleDayId: number
+    scheduleEndTime: string
+    scheduleServiceTypeId: number | null
+    scheduleStartTime: string
+    scheduleStatus: number | null
+    updatedAt: string
+
+    
+}
+
+export interface SlotExtended {
+    id: number,
+    slotStartDateTime: string
+    slotEndDateTime: string
+    serviceId: number
+    isBusy: boolean
+    Patient: Patient
+    slotStatusId: number
+    Doctor: Doctor
+}
+
+export interface createCunsultationResponse {
+    doctorShortUrl: string,
+    patientShortUrl: string,
+    newSlot: Slot,
+    newPayment: Payment,
+    newRoom: Room
+}
+
+export interface consultaionPrice {
+    price: string | number | null
+    createdAt: string
+    endDate: string
+    id: number
+    isFree: boolean | null
+    scheduleId: number
+    startDate: string
+    updatedAt: string
 }

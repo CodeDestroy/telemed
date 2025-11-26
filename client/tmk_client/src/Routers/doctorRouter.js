@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 import {
   createBrowserRouter,
 } from "react-router-dom";
-import AdminServicesList from '../Components/AdminPanel/ServicesList/ActiveList'
+import ActiveList from '../Components/AdminPanel/ServicesList/ActiveList'
 import EndedList from '../Components/AdminPanel/ServicesList/EndedList'
 import doctorLocations from '../Locations/DoctorLocations'
 import VideoComponent from "../Components/VideoComponent";
@@ -17,8 +17,10 @@ import Schedule from "../Components/AdminPanel/Schedule";
 import GeneralInfo from "../Components/AdminPanel/Profile/GeneralInfo";
 import generalLocations from '../Locations/GeneralLocations';
 import Settings from "../Components/AdminPanel/Profile/Settings/DoctorSettings";
-import CreateDateSchedule from "../Components/AdminPanel/CreateScheduler/Dates";
+import CreateDateScheduleDoctor from "../Components/AdminPanel/CreateSchedulerDoctor/Dates";
 import ProtocolPage from '../Components/Protocol/ProtocolPage';
+import ConsultationDetailsPage from "../Components/AdminPanel/ConsultationDetailsPage";
+import CreateSchedulerDoctor from '../Components/AdminPanel/CreateSchedulerDoctor'
 const doctorRouter = createBrowserRouter([
     {
         path: "*",
@@ -26,7 +28,7 @@ const doctorRouter = createBrowserRouter([
     },
     {
       path: doctorLocations.consultations,
-      element: <AdminServicesList/>
+      element: <ActiveList/>
     },
     {
       path: doctorLocations.tmk,
@@ -38,11 +40,11 @@ const doctorRouter = createBrowserRouter([
     },
     {
       path: doctorLocations.createSchedule,
-      element: <CreateSchedule/>
+      element: <CreateSchedulerDoctor/>
     },
     {
       path: doctorLocations.createDateSchedule,
-      element: <CreateDateSchedule/>
+      element: <CreateDateScheduleDoctor/>
     },
     {
       path: doctorLocations.schedule,
@@ -60,6 +62,10 @@ const doctorRouter = createBrowserRouter([
     {
       path: '/protocol/:protocolId',
       element: <ProtocolPage/>
+    },
+    {
+      path: doctorLocations.consultationPage,
+      element: <ConsultationDetailsPage/>
     }
 
 

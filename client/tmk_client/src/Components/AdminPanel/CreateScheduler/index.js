@@ -63,6 +63,10 @@ const CreateSchedule = () => {
     const [endTime, setEndTime] = useState(new Date());
     const [theme, setTheme] = useState(defaultTheme);
 
+    const [price, setPrice] = useState()
+    const [slotDuration, setSlotDuration] = useState(30)
+    const [slotsCount, setSlotsCount] = useState(1)
+
     // Открытие модального окна
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
@@ -85,7 +89,7 @@ const CreateSchedule = () => {
     const handleAddSlot = async () => {
         /* console.log(startTime, endTime, selectedDay, store.user.personId) */
         try {
-            const response = await DoctorService.createScheduler(store.user.personId, selectedDay, startTime, endTime)
+            const response = await DoctorService.createScheduler(store.user.personId, selectedDay, startTime, endTime, slotDuration, slotsCount)
             /* const response = {status: 201} */
             if (response.status == 201) {
                 if (startTime && endTime && selectedDay) {
@@ -114,7 +118,6 @@ const CreateSchedule = () => {
         try {
             const response = await DoctorService.deleteSchedule(schedule[day][index].id)
             if (response.status == 200) {
-                console.log(day, schedule[day][index])
                 setSchedule({
                     ...schedule,
                     [day]: schedule[day].filter((_, i) => i !== index),
@@ -297,6 +300,16 @@ const CreateSchedule = () => {
                                         sx={{width: '100%'}}
                                         skipDisabled={true}
                                         /* renderInput={(params) => <TextField {...params} />} */
+                                    />
+                                </Box>
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="body1" gutterBottom>
+                                        Цена:
+                                    </Typography>
+                                    <TextField 
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}  
+                                        sx={{width: '100%'}}
                                     />
                                 </Box>
                                 <Button variant="contained" color="primary" fullWidth onClick={handleAddSlot}>

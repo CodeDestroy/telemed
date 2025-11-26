@@ -94,7 +94,7 @@ const Index = (props) => {
                 {/* <Modal.Title>Modal title</Modal.Title> */}
             </Modal.Header>
             <Modal.Body style={{textAlign: 'center', fontSize: '2rem'}}>
-                <p style={{fontSize: '2rem', fontWeight: 'bold'}}>Спасибо за участие в тестировании телемедицинских консультаций!</p>
+                <p style={{fontSize: '2rem', fontWeight: 'bold'}}>Спасибо за участие в телемедицинской консультации!</p>
                 <p style={{fontSize: '1.5rem'}}>Составьте протокол в свободной форме (используя клавиатуру или голосовой ввод)</p>
                 <div style={{ marginTop: '20px', position: 'relative' }}>
                     <TextField

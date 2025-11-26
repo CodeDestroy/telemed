@@ -64,7 +64,6 @@ class CodeService {
             if (!user) {
                 return ApiError.AuthError(`Пользователь ${login} не найден`)
             }
-            console.log(user)
             switch (user.UsersRole.accessLevel) {
                 case 1: 
                     let patient = await database["Patients"].findOne({
