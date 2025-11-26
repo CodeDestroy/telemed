@@ -458,6 +458,7 @@ class SchedulerService {
             } else if (endDate) {
                 scheduleWhere.date = { [Op.lte]: endDate };
             }
+            scheduleWhere.scheduleStatus = 1
             /* const weekDays = await database["Schedule"].findAll({
                 attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
                 include: [
@@ -471,19 +472,17 @@ class SchedulerService {
             }); */
             const weekDays = await database["Schedule"].findAll({
                 attributes: [
+                    [fn('DISTINCT', col('date')), 'date'], // Уникальные даты
                     [col('WeekDay.name'), 'name'],
-                    'date',
-                    'scheduleStartTime',
-                    'scheduleEndTime',
                 ],
                 include: [
                     {
-                    model: database["WeekDays"],
-                    attributes: []
+                        model: database["WeekDays"],
+                        attributes: []
                     }
                 ],
                 where: scheduleWhere,
-                group: ['WeekDay.name', 'Schedule.date', 'Schedule.scheduleStartTime', 'Schedule.scheduleEndTime'],
+                group: ['WeekDay.name', 'Schedule.date'],
                 /* order: [[database["WeekDays"], 'id', 'ASC']], */
                 order: [['date', 'ASC']],
                 raw: true

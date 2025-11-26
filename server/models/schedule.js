@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     scheduleEndTime: DataTypes.TIME,
     scheduleStatus: DataTypes.INTEGER,
     scheduleServiceTypeId: DataTypes.INTEGER,
-    date: DataTypes.DATEONLY
+    date: DataTypes.DATEONLY,
   }, {
     sequelize,
     modelName: 'Schedule',
