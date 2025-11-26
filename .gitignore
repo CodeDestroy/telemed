@@ -22,3 +22,6 @@ patient_client/.env
 
 
 secret_key.txt
+
+.gigaide
+.idea
