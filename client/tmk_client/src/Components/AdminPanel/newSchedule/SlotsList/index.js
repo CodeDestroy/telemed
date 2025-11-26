@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useContext} from 'react'
 import AdminService from '../../../../Services/AdminService';
 import DoctorService from '../../../../Services/DoctorService';
 import Header from '../../Header';
@@ -8,9 +8,12 @@ import { Button, IconButton, Stack } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Context } from '../../../../';
+import EditSlotModal from '../EditSlot';
 
 function Index() {
 
+    const { store } = useContext(Context);
     const [schedule, setSchedule] = useState(new Map())
     const [doctors, setDoctors] = useState([])
     const [scheduleLoaded, setScheduleLoaded] = useState(false)
@@ -26,6 +29,16 @@ function Index() {
 
     const handleCloseModal = () => {
         setModalShow(false)
+        setSelectedItem(null)
+    }
+    const [showEditModal, setEditModalShow] = useState(false)
+    const handleEditShowModal = (item) => {
+        setEditModalShow(true)
+        setSelectedItem(item)
+    }
+
+    const handleEditCloseModal = () => {
+        setEditModalShow(false)
         setSelectedItem(null)
     }
 
@@ -52,7 +65,8 @@ function Index() {
             const newScheduleMap = new Map();
 
             Array.from(schedule.entries()).forEach(([doctor, schedule]) => {
-                const slots = splitScheduleBy30Min(schedule);
+                //const slots = splitScheduleBy30Min(schedule);
+                const slots = splitScheduleBy60Min(schedule);
                 newScheduleMap.set(doctor, slots);
             });
             setSplitedSchedule(newScheduleMap)
@@ -61,7 +75,7 @@ function Index() {
 
     const handleFetchDoctors = async () => {
         try {
-            const response = await AdminService.getDoctors();
+            const response = await AdminService.getDoctors(store.selectedProfile.id);
             setDoctors(response.data);
         } catch (e) {
             alert('Ошибка загрузки врачей');
@@ -120,6 +134,36 @@ function Index() {
         return slots;
     }
 
+    function splitScheduleBy60Min(schedule) {
+        const slots = [];
+
+        schedule.forEach(item => {
+            const date = item.date; // "2025-05-13", используется чтобы собрать полный Date-объект
+
+            const startTime = new Date(`${date}T${item.scheduleStartTime}`);
+            const endTime = new Date(`${date}T${item.scheduleEndTime}`);
+
+            let currentStart = new Date(startTime);
+
+            while (currentStart < endTime) {
+            const currentEnd = new Date(currentStart.getTime() + 60 * 60 * 1000); // +30 минут
+
+            // Если слот выходит за пределы расписания — обрезаем
+            if (currentEnd > endTime) break;
+
+            slots.push({
+                ...item,
+                scheduleStartTime: currentStart.toTimeString().slice(0, 8),
+                scheduleEndTime: currentEnd.toTimeString().slice(0, 8),
+            });
+
+            currentStart = currentEnd;
+            }
+        });
+
+        return slots;
+    }
+
     const [selectedItem, setSelectedItem] = useState(null)
     const [selectedDoctor, setSelectedDoctor] = useState(null)
 
@@ -146,13 +190,13 @@ function Index() {
 
     const handleMenuClose = () => {
         setCustomMenu({ open: false, top: 0, left: 0, item: null });
-        setSelectedItem(null);
+        /* setSelectedItem(null); */
     };
 
     const handleEdit = () => {
         // Реализуй логику редактирования
-        console.log('Редактировать:', selectedItem);
-        handleMenuClose();
+        handleEditShowModal(selectedItem)
+        /* handleMenuClose(); */
     };
 
     const handleDelete = () => {
@@ -247,16 +291,16 @@ function Index() {
                                                     onClick={() => handleEdit(customMenu.item)}
                                                     style={{ cursor: 'pointer', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}
                                                 >
-                                                    <EditIcon fontSize="small" />
+                                                    <EditIcon fontSize="small"/>
                                                     Редактировать
                                                 </div>
-                                                <div
+                                                {/* <div
                                                     onClick={() => handleDelete(customMenu.item)}
                                                     style={{ cursor: 'pointer', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}
                                                 >
                                                     <DeleteIcon fontSize="small" />
                                                     Удалить
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )}
 
@@ -314,6 +358,7 @@ function Index() {
             </div>
             <div>
                 <CreateSlotModal show={showModal} onHide={handleCloseModal} onClose={handleCloseModal} item={selectedItem} doctor={selectedDoctor} open={showModal}/>
+                <EditSlotModal show={showEditModal} onHide={handleEditCloseModal} onClose={handleEditCloseModal} item={selectedItem} open={showEditModal}/>
             </div>
         </>
     )
