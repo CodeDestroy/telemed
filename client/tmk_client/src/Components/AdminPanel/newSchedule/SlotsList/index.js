@@ -13,6 +13,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Context } from '../../../../';
 import EditSlotModal from '../EditSlot';
 
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
+
 function Index() {
 
     const { store } = useContext(Context);
@@ -21,6 +25,9 @@ function Index() {
     const [scheduleLoaded, setScheduleLoaded] = useState(false)
     const [reservedSlots, setReservedSlots] = useState([])
     const [splitedSchedule, setSplitedSchedule] = useState(null)
+
+    const [startDate, setStartDate] = useState(new Date())
+    /* const [endDate, setEndDate] = useState(new Date()) */
 
     const [showModal, setModalShow] = useState(false)
     const handleShowModal = (item, doctor) => {
@@ -79,39 +86,50 @@ function Index() {
         }
     } */
 
-    const handleFetchSchedule = async () => {
+    /* const handleFetchSchedule = async () => {
         try {
             doctors.forEach(async (doctor) => {
                 try {
-                    const response = await SchedulerService.getDcotorSchedule(doctor.id, new Date());
-                    console.log(response)
+                    const response = await SchedulerService.getDcotorSchedule(doctor.id, startDate, endDate);
                     schedule.set(doctor, response.data);
                     setScheduleLoaded(true)
                 } catch (e) {
                     console.log(e)
-                    //alert('Ошибка загрузки расписания');
                 }
             })
-            /* const schedule = await SchedulerService.getDcotorScheduleDates() */
+            
         }
         catch (e) {
-            //alert('Ошибка загрузки расписания').
             console.log(e)
         }
-    }
+    } */
 
-    /* const handleFetchSchedule = async (doctor) => {
-        if (!doctor) {
-            alert('Выберите врача');
-            return;
-        }
+    const handleFetchSchedule = async () => {
         try {
-            const response = await DoctorService.getScheduleByDateV2(doctor.id, new Date());
-            schedule.set(doctor, response.data);
+            const newMap = new Map();
+
+            for (const doctor of doctors) {
+                try {
+                    const response = await SchedulerService.getDcotorSchedule(
+                        doctor.id,
+                        startDate,
+                        startDate
+                    );
+
+                    newMap.set(doctor, response.data);
+                } catch (e) {
+                    console.log("Ошибка загрузки конкретного врача:", e);
+                }
+            }
+
+            setSchedule(newMap);
+            setScheduleLoaded(true);
         } catch (e) {
-            alert('Ошибка загрузки расписания');
+            console.log("Ошибка загрузки расписания:", e);
         }
-    }; */
+    };
+
+
 
     function splitScheduleBy30Min(schedule) {
         const slots = [];
@@ -225,6 +243,18 @@ function Index() {
     }, [doctors])
 
     /* useEffect(() => {
+        setEndDate(startDate);
+    }, [startDate]); */
+
+    useEffect(() => {
+        if (doctors.length > 0) {
+            handleFetchSchedule();
+        }
+    }, [startDate]);
+
+
+
+    /* useEffect(() => {
         if (doctors.length > 0) {
             doctors.forEach(async (doctor, index) => {
                 await handleFetchSchedule(doctor);
@@ -248,28 +278,13 @@ function Index() {
                     const free = [];
 
                     for (const slot of schedule) {
-                        let isBusy = false
-                        let busySlot = null
-                        reservedSlots.forEach((reserved) => {
-                            const reservedTime = new Date(reserved.slotStartDateTime).toTimeString().slice(0, 8);
-                            if (reserved.doctorId === slot.doctorId && reservedTime === slot.scheduleStartTime)
-                            {
-                                isBusy = true
-                                busySlot = reserved
-                                return
-                            }
-                            else {
-                                isBusy = false
-                                busySlot = null
-                            }
-                        })               
-                        if (isBusy) {
-                            busy.push(busySlot);
+                        if (slot.scheduleStatus != 1 || slot.slotId ) {
+                            busy.push(slot);
+                            console.log(slot)
                         } else {
                             free.push(slot);
                         }
                     }
-                    const ref = React.createRef();
                     return (
                         <div
                             className="doctor-card"
@@ -296,7 +311,7 @@ function Index() {
                                         sx={{ mb: 1 }}
                                     >
                                         <Button variant="contained" className="fs-3">
-                                            {dayjs(item.slotStartDateTime).format('HH:mm')} - {dayjs(item.slotEndDateTime).format('HH:mm')}
+                                            {dayjs(item.scheduleStartTime).format('HH:mm')} - {dayjs(item.scheduleEndTime).format('HH:mm')}
                                         </Button>
                                         <IconButton 
                                             onClick={(event) => handleMenuOpen(event, item)}
@@ -369,6 +384,29 @@ function Index() {
             <Header/>
             <div className="container">
                 <h1>Расписание</h1>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "1rem",
+                        marginBottom: "1rem",
+                        fontSize: "1.5rem",
+                    }}
+                >
+                    <IconButton onClick={() => setStartDate(dayjs(startDate).subtract(1, "day").toDate())}>
+                        <ArrowBackIosNewIcon />
+                    </IconButton>
+
+                    <div style={{ minWidth: "150px", textAlign: "center" }}>
+                        {dayjs(startDate).format("DD.MM.YYYY")}
+                    </div>
+
+                    <IconButton onClick={() => setStartDate(dayjs(startDate).add(1, "day").toDate())}>
+                        <ArrowForwardIosIcon />
+                    </IconButton>
+                </div>
+
                 <div
                     className="doctors-wrapper"
                     style={{

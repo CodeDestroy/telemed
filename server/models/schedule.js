@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       Schedule.belongsTo(models.WeekDays, { foreignKey: 'scheduleDayId' });
       Schedule.belongsTo(models.Services, { foreignKey: 'scheduleServiceTypeId' });
       Schedule.hasMany(models.SchedulePrices, { foreignKey: 'scheduleId' });
+      Schedule.belongsTo(models.Slots, {foreignKey: 'slotId'})
     }
   }
   Schedule.init({
@@ -20,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     scheduleStatus: DataTypes.INTEGER,
     scheduleServiceTypeId: DataTypes.INTEGER,
     date: DataTypes.DATEONLY,
+    slotId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Schedule',

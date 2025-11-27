@@ -100,7 +100,7 @@ class SchedulerService {
         }
     }
 
-    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1) {
+    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1, scheduleServiceTypeId = 1) {
         try {
             const newSchedule = await database["Schedule"].create({
                 doctorId,
@@ -109,6 +109,7 @@ class SchedulerService {
                 scheduleEndTime,
                 scheduleStatus,
                 scheduleDayId: scheduleDay,
+                scheduleServiceTypeId
             });
             return newSchedule
         }
@@ -448,7 +449,7 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null) {
+    async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null, serviceId) {
         try {
             let scheduleWhere = { doctorId };
             if (startDate && endDate) {
@@ -459,6 +460,8 @@ class SchedulerService {
                 scheduleWhere.date = { [Op.lte]: endDate };
             }
             scheduleWhere.scheduleStatus = 1
+            if (serviceId)
+                scheduleWhere.scheduleServiceTypeId = serviceId
             /* const weekDays = await database["Schedule"].findAll({
                 attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
                 include: [
@@ -491,6 +494,22 @@ class SchedulerService {
             // Преобразуем в массив строк
             /* const result = weekDays.map(wd => wd.name); */
             return weekDays;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getSchedulerById(scheduleId) {
+        try {
+            const schedule = await database["Schedule"].findByPk(scheduleId, {
+                include: [
+                    { model: database["WeekDays"], required: false },
+                    { model: database['SchedulePrices'], required: true }
+                ],
+            });
+            return schedule
         }
         catch (e) {
             console.log(e)

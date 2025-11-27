@@ -2,14 +2,10 @@
 
 import { observer } from 'mobx-react-lite'
 import Header from '@/components/Header'
-import { useStore } from '@/store'
 import { useEffect, useState } from 'react'
 import main from '@/services/main'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import DoctorListItemResponse from '@/types/main'
-import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { ruRU } from '@mui/x-date-pickers/locales';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ru';
 import Post from '@/types/posts'
@@ -17,15 +13,12 @@ import Post from '@/types/posts'
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Doctor } from '@/types/doctor'
-import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import Box from '@mui/material/Box';
 import Loader from '@/components/Loader'
-import { ScheduleShort } from '@/types/schedule'
 import Footer from '@/components/Footer'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 
 function Home () {
-    const [date, setDate] = useState<Dayjs | null>(null);
     const [doctorsListIsLoading, setDoctorsListIsLoading] = useState(true)
     
     const [postsList, setPostsList] = useState<Post[]>([])
@@ -43,7 +36,7 @@ function Home () {
 
 
     const searchParams = useSearchParams()
-    const router = useRouter()
+    
     
     const initialPostId = searchParams?.get('postId') || null
     const initialPostName = searchParams?.get('post') || null
@@ -70,7 +63,7 @@ function Home () {
 
     const fetchDoctorsList = async () => {
         try {
-            const response = await main.getDoctorList(new Date(), medOrgId)
+            const response = await main.getDoctorList(new Date(), medOrgId, 1)
             setDoctorListWithSchedule(response.data)
             const data: DoctorListItemResponse[] = response.data
             const list: Doctor[] = []
@@ -129,7 +122,7 @@ function Home () {
         })
 
         setSortedList(filtered)
-    }, [selectedPost, selectedDoctor, date, doctorListWithSchedule])
+    }, [selectedPost, selectedDoctor, doctorListWithSchedule])
 
 
     /* const handleSelectDoctor = (doctor: Event) => {
@@ -251,9 +244,11 @@ function Home () {
                                                 >
                                                 {/* Левая часть: фото + ФИО */}
                                                 <div className="flex min-w-0 gap-x-4 sm:col-span-7">
-                                                    <img
+                                                    <Image
+                                                    width={100}
+                                                    height={100}
                                                     alt=""
-                                                    src={item.doctor.User?.avatar}
+                                                    src={item.doctor.User?.avatar || ''}
                                                     className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                                     />
                                                     <div className="min-w-0 flex-auto">
@@ -274,11 +269,11 @@ function Home () {
                                                             </p>
                                                         )
                                                     })} */}
-                                                    {item.doctor.Posts.map((post, idx) => (
+                                                    {item.doctor.Posts.map((post) => (
                                                         <a
                                                             key={post.id}
                                                             href={`/?post=${post.transliterationName}`}
-                                                            className="hover:underline mt-1 text-xs leading-5 text-gray-500 truncate"
+                                                            className="hover:underline mt-1 text-xs leading-5 text-gray-500"
                                                         >
                                                             {post.postName}{' '}
                                                         </a>

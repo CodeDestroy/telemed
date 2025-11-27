@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Slots.hasOne(models.PatientConsultationInfo, {
         foreignKey: 'slotId',
       });
+      Slots.hasOne(models.Schedule, {foreignKey: 'slotId'})
     }
   }
   Slots.init({

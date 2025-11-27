@@ -71,6 +71,9 @@ export default class AdminService {
     static async createSlot (doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost) {
         return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost});
     }
+    static async createSlotV2 (doctor, patient, scheduleId, slotStatusId) {
+        return $api.post('/api/admin/v2/consultations/create', {doctor, patient, scheduleId, slotStatusId});
+    }
     //slotId, doctor, patient, startDateTime, duration, slotStatusId
     static async editSlot (slotId, doctor, patient, startDateTime, duration, slotStatusId) {
         return $api.post('/api/admin/consultations/edit', {slotId, doctor, patient, startDateTime, duration, slotStatusId});

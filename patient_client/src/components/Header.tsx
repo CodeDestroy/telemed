@@ -67,7 +67,10 @@ const Header = () => {
                 <PopoverGroup className="hidden lg:flex lg:gap-x-12">
 
                     <Link href="/" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
-                        Главная
+                        Телемедицинские консультации
+                    </Link>
+                    <Link href="/secondOpinion" onClick={() => setLoading(true)} className="text-sm font-semibold leading-6 text-gray-900">
+                        Второе мнение
                     </Link>
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
@@ -203,7 +206,16 @@ const Header = () => {
                                         onClick={() => setLoading(true)}
                                         className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                                     >
-                                        Главная
+                                        Телемедицинские консультации
+                                    </Link>
+                                </div>
+                                <div className="space-y-2 py-6">
+                                    <Link
+                                        href="/secondOpinion"
+                                        onClick={() => setLoading(true)}
+                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                                    >
+                                        Второе мнение
                                     </Link>
                                 </div>
                                 <div className="space-y-2 py-6">

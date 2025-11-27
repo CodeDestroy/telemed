@@ -509,7 +509,7 @@ class ConsultationService {
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
                     and s."doctorId" = :doctorId 
-                    and (r."ended" != true or r."ended" is null) `, 
+                    and (r."ended" != true or r."ended" is null) and s."slotStatusId" not in (4, 5)`, 
             {
                 replacements: { doctorId: doctorId}, 
                 raw: true
@@ -924,6 +924,25 @@ class ConsultationService {
                 slotEndDateTime: moment(new Date(startDateTime)).add(duration, 'm').toDate(), 
                 slotStatusId: slotStatusId == 1 ? 2 : slotStatusId,
                 serviceId: 1, 
+                isBusy: true, 
+                patientId: patientId
+            })
+            return newSlot
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async createSlotV2 (doctorId, patientId, schedule, slotStatusId = null) {
+        try {
+            const newSlot = await database.models.Slots.create({
+                doctorId: doctorId, 
+                slotStartDateTime: moment(schedule.date + 'T' + schedule.scheduleStartTime).toDate(), 
+                slotEndDateTime: moment(schedule.date + 'T' + schedule.scheduleEndTime).toDate(), 
+                slotStatusId: slotStatusId == 1 ? 2 : slotStatusId,
+                serviceId: schedule.scheduleServiceTypeId ? schedule.scheduleServiceTypeId : 1, 
                 isBusy: true, 
                 patientId: patientId
             })

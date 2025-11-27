@@ -6,6 +6,7 @@ import ConsultationService from '@/services/consultations'
 import { useStore } from '@/store'
 import { ConsultationFull, SlotWithRoomPatient } from '@/types/consultaion'
 import dayjs from 'dayjs'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 import React, { useEffect, useState } from 'react'
@@ -78,15 +79,17 @@ const Page = () => {
                                 >
                                 {/* Левая часть — инфа о консультации */}
                                 <div className="flex-1">
-                                    <img
+                                    <Image
                                         //src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                        src={consultation?.Doctor.User?.avatar}
+                                        src={consultation?.Doctor.User?.avatar || ''}
+                                        width={100}
+                                        height={100}
                                         alt={`Фото`}
                                         className="w-24 h-24 rounded-full object-cover"
                                     />
                                     <div className="flex items-center gap-x-4 text-xs">
                                         <time dateTime={consultation.slotStartDateTime} className="text-gray-500">
-                                            {dayjs(consultation.slotStartDateTime).format('DD.MM.YYYY HH:mm')}
+                                            {dayjs(consultation.slotStartDateTime).format('DD.MM.YYYY HH:mm')} - {dayjs(consultation.slotEndDateTime).format('HH:mm')}
                                         </time>
                                         <span className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600">
                                             {consultation.Room.ended ? 'Завершена' : ''}

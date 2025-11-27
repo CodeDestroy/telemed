@@ -236,7 +236,7 @@ http://localhost:8080/api/doctor/scheduler/14?startDate=Fri,+28+Feb+2025+21:00:0
 http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00+GMT&endDate=Sun,+30+Mar+2025+21:00:00+GMT */
     async addScheduleDate(req, res) {
         try {
-            const { doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount } = req.body;
+            const { doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount, serviceId } = req.body;
             // Приведение исходных данных к нормальному виду
             const inputDate = new Date(date); // Получаем чистый объект даты
             const inputStartTime = moment(`${inputDate.toISOString().split('T')[0]}T${startTime}`, 'YYYY-MM-DDTHH:mm').toDate();
@@ -269,7 +269,8 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
                     currentStart.format('YYYY-MM-DD HH:mm'),
                     currentEnd.format('YYYY-MM-DD HH:mm'),
                     inputDate.getDay(),
-                    1 // Status by default
+                    1, // Status by default
+                    serviceId
                 );
 
                 const aYearFromNow = new Date();

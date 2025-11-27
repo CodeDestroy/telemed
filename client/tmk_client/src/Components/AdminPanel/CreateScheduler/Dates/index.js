@@ -22,8 +22,8 @@ import InputLabel from '@mui/material/InputLabel';
 
 // Определяем типы консультаций и соответствующие длительности
 const consultationTypes = [
-    { label: 'Второе мнение', durationOptions: ['10', '15'] },
-    { label: 'Длительная консультация', durationOptions: ['30', '60'] },
+    { label: 'ТМК', durationOptions: ['30', '60'], serviceId: 1 },
+    { label: 'Второе мнение', durationOptions: ['10', '15'], serviceId: 2 },
 ];
 
 function CreateDateSchedule() {
@@ -103,6 +103,7 @@ function CreateDateSchedule() {
                 price: modalData.price,
                 isFree: modalData.isFree,
                 slotDuration: modalData.slotDuration,
+                serviceId: consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId
             });
         }
 
@@ -113,7 +114,7 @@ function CreateDateSchedule() {
                     modalData.startTime.format('HH:mm'), 
                     modalData.endTime.format('HH:mm'), 
                     modalData.price, 
-                    modalData.isFree
+                    modalData.isFree,
                 );
                 alert('Расписание обновлено');
             } else {
@@ -126,6 +127,8 @@ function CreateDateSchedule() {
                         slot.price,
                         slot.isFree,
                         slot.slotDuration,
+                        1,
+                        consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId
                         
                     );
                 }));

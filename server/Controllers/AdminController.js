@@ -324,6 +324,209 @@ class AdminController {
         }
     }
 
+    async createConsultationV2(req, res) {
+        let newSlot = null;
+        let newPayment = null;
+        let newRoom = null;
+        let doctorShortUrl = null;
+        let patientShortUrl = null;
+        let yookassaPayment = null;
+        try {
+            const {patient, scheduleId, slotStatusId } = req.body
+            let {doctor} = req.body
+            doctor = await DoctorService.getDoctor(doctor.id)
+            // Разбираем дату-время на отдельно дату и время
+            //Тут нужно увеличить на 3 часа, т.к время на сервере настроено некорректно
+
+            const schedule = await SchedulerService.getSchedulerById(scheduleId)
+            if (schedule.scheduleStatus !== 1 || schedule.slotId) {
+                return res.status(400).json({
+                    message: "У врача уже есть запись на выбранное время."
+                });
+            }
+            
+            
+            //const startDateObj = moment(new Date(startDateTime)).add(3, 'h');
+            //startDateObj.setHours(startDateObj.getHours() + 3);
+            
+            /* console.log(moment(startDateObj).format('yyyy-MM-DD'))
+            console.log(moment(startDateObj).format('HH:mm:ss')) */
+            const startDate = moment(schedule.date).format('yyyy-MM-DD') // yyyy-MM-dd
+            //return res.status(400).json(schedule)
+            /* console.log(startDate)
+            console.log(startTime) */
+            //ищем schedule по startDateTime и doctorId
+            /* console.log(patient, startDateTime, duration, slotStatusId, isCustom, cost)
+            return res.status(500).send('Ошибка') */
+            /* const existingConsultations = (await ConsultationService.getActiveDoctorSlotsByDate(doctor.id, startDate))[0];
+            if (existingConsultations && existingConsultations.length > 0) {
+                const startNew = new Date(startDateTime);
+                const endNew = new Date(startNew.getTime() + duration * 60 * 1000);
+
+                const hasConflict = existingConsultations.some(c => {
+                    // некоторые слоты могут быть отменены — их пропускаем
+                    if (c.slotStatusId === 5) return false;
+
+                    const startExisting = new Date(c.slotStartDateTime);
+                    const endExisting = new Date(c.slotEndDateTime);
+
+                    // Проверка на пересечение интервалов
+                    return startNew < endExisting && endNew > startExisting;
+                });
+
+                if (hasConflict) {
+                    return res.status(400).json({
+                        message: "У врача уже есть запись на выбранное время."
+                    });
+                }
+            } */
+            newSlot = await ConsultationService.createSlotV2(doctor.id, patient.id, schedule, slotStatusId)
+            // Приводим стоимость к float
+            const price = await PricesService.getPricesByScheduleId(schedule?.id);
+            
+        
+            //Создаём платёж
+
+            //const dateObj = new Date(startDateTime);
+            //dateObj.setHours(dateObj.getHours() + 3);
+
+            /* const displayHours = String(dateObj.getHours()).padStart(2, '0');
+            const displayMinutes = String(dateObj.getMinutes()).padStart(2, '0');
+            const displaySeconds = String(dateObj.getSeconds()).padStart(2, '0');
+            const displayTime = `${displayHours}:${displayMinutes}:${displaySeconds}`; */
+
+            const description = `Оплата ТМК на ${moment(startDate).format('DD.MM.YYYY')} ${schedule.scheduleStartTime}`
+            newPayment = await PaymentService.createPayment(patient.userId, 3, price.price, newSlot.id, description)
+
+            //Отправляем в юкассу
+            if (!price.isFree) {
+                yookassaPayment = await yookassaApi.createPayment({
+                    amount: price.price,
+                    description,
+                    return_url: `https://dr.clinicode.ru/payments/${newPayment.uuid4}`,
+                    payment_uuid: newPayment.uuid4,
+                    
+                    customerEmail: patient.User.email,
+                    customerPhone: patient.User.phone
+                });
+
+                if (yookassaPayment) {
+                    newPayment.yookassa_id = yookassaPayment.id
+                    newPayment.yookassa_status = yookassaPayment.status
+                    //newPayment.yookassa_payment_method_type = yookassaPayment.payment_method.type
+                    newPayment.yookassa_confirmation_url = yookassaPayment.confirmation.confirmation_url
+                    
+                }
+            }
+            else {
+                newPayment.paymentStatusId = 3
+                newSlot.slotStatusId = 3
+            }
+            await newPayment.save()
+            await newSlot.save()
+            schedule.slotId = newSlot.id;
+            schedule.scheduleStatus = 2;
+            await schedule.save()
+
+            const roomName = await UserManager.translit(`${doctor.secondName}_${patient.secondName}_${newSlot.slotStartDateTime.getTime()}`)
+            newRoom = await ConsultationService.createRoom(newSlot.id, roomName)
+            const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, newRoom.id)
+            const patientPayload = await ConsultationService.createPayloadPatient(patient.id, newRoom.id)
+            const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
+            const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
+            const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`
+            const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`
+            doctorShortUrl = await UrlManager.createShort(doctorUrl, doctor.User.id, newRoom.id)
+            patientShortUrl = await UrlManager.createShort(patientUrl, patient.User.id, newRoom.id)
+            const transporter = await MailManager.getTransporter()
+            const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
+            const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
+            /* try {
+                if (patient.User.email) {
+                    const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime);
+                    await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                }
+                if (doctor.User.email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctor(doctor.User.email, doctorLink, newSlot.id, startDateTime);
+                    await transporter.sendMail(mailOptionsDoctor);
+                }
+            } catch (mailErr) {
+                // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+
+            } */
+            /* if (patient.User.email) {
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
+                transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            }
+            if (doctor.User.email) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime)
+                transporter.sendMail(mailOptionsDoctor, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            } */
+            /* if (patient.User.phone) {
+                const date = new Date(startDateTime);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+        
+                const hours = String(date.getHours() + 3).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+                const formattedDateTime = `${day}.${month}.${year} ${hours}:${minutes}`;
+
+                const data = smsCenterApi.sendSmsMessage(patient.User.phone, `Ссылка для подключения ${patientLink}. Консультация начнётся в ${formattedDateTime}`)
+                const dataWhatsApp = smsCenterApi.sendWhatsAppMessage(patient.User.phone, `Ссылка для подключения ${patientLink}. Консультация начнётся в ${formattedDateTime}`)
+                console.log(data)
+                console.log(dataWhatsApp)
+                const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime)
+                transporter.sendMail(mailOptionsPatinet, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            } */
+            /* if (doctor.User.phone) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(doctor.User.email, doctorLink, startDateTime)
+                transporter.sendMail(mailOptionsDoctor, (error, info) => {
+                    if (error) {
+                        throw new Error(error)
+                    }
+                    console.log('Сообщение отправленно: %s', info.messageId);
+                    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                });
+            } */
+            res.status(200).json({doctorShortUrl, patientShortUrl, newSlot, newRoom, newPayment})
+        }
+        catch (e) {
+            if (doctorShortUrl)
+                doctorShortUrl.destroy();
+            if (patientShortUrl)
+                patientShortUrl.destroy();
+            if (newRoom)
+                newRoom.destroy();
+            if (newPayment)
+                newPayment.destroy();
+            if (newSlot)
+                newSlot.destroy();
+            console.log(e)
+            res.status(500).json(e.message)
+        }
+    }
+
     async editConsultation(req, res) {
         try {
             const { slotId, doctor, patient, startDateTime, duration, slotStatusId } = req.body;
