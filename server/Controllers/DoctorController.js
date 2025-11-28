@@ -2,7 +2,7 @@ const DoctorService = require('../Services/DoctorService')
 const ConsultationService = require('../Services/ConsultationService')
 const SchedulerService = require('../Services/SchedulerService')
 const PermissionService = require('../Services/PermissionService')
-
+const moment = require('moment-timezone')
 class DoctorController {
     async getConsultations(req, res) {
         try {
@@ -86,13 +86,17 @@ class DoctorController {
 
     async getDoctorList (req, res) {
         try {
-            const {dateStart} = req.query
+            let {dateStart} = req.query
+            dateStart = moment(dateStart).add(2, 'h').format('YYYY-MM-DD HH:mm:ss');
+            /* console.log(dateStart)
+            console.log(moment(dateStart).add(2, 'h').format('YYYY-MM-DDThh:mm:ss')) */
             const {medOrgId, serviceId} = req.query
-            const doctors = await DoctorService.getDoctorsWithPostsByMedOrgId(medOrgId)
+            const doctors = await DoctorService.getDoctorsWithPostsByMedOrgIdAndServiceId(medOrgId, serviceId)
             const wrappedDoctors = await Promise.all(
                 doctors.map(async (doc) => ({
                     doctor: doc,
-                    schedule: await SchedulerService.getDoctorScheduleDistinctDays(doc.id, dateStart, null, serviceId)
+                    schedule: await SchedulerService.getDoctorScheduleDistinctDays(doc.id, dateStart, null, serviceId),
+                    minPrice: await SchedulerService.getDoctorScheduleMinPrice(doc.id, dateStart, serviceId)
                 }))
             );
 
@@ -108,7 +112,7 @@ class DoctorController {
             const {id} = req.query
             const {dateStart} = req.query
             const doctor = await DoctorService.getDoctorWithPost(id)
-            const schedule = await SchedulerService.getDoctorScheduleDistinctDays(doctor.id, dateStart)
+            const schedule = await SchedulerService.getDoctorScheduleDistinctDays(doctor.id, moment(dateStart).add(2, 'h').format('YYYY-MM-DD HH:mm:ss'))
             const data = {
                 doctor: doctor,
                 schedule: schedule

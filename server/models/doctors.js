@@ -28,6 +28,14 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: 'permissionId',
         as: 'permissions'
       });
+
+      Doctors.belongsToMany(models.Services, {
+        through: 'DoctorServices',
+        foreignKey: 'doctorId',
+        otherKey: 'serviceId',
+        as: 'services'
+      });
+      
     }
   }
   Doctors.init({

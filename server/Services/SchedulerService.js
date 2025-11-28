@@ -1,6 +1,6 @@
 const { where, Op } = require('sequelize');
 const database = require('../models/index');
-const { fn, col } = require('sequelize');
+const { fn, col, literal } = require('sequelize');
 const moment = require('moment-timezone')
 class SchedulerService {
     async findOverlappingSchedules (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
@@ -239,6 +239,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 }) 
@@ -257,6 +261,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 })
@@ -275,6 +283,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 })
@@ -452,6 +464,7 @@ class SchedulerService {
     async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null, serviceId) {
         try {
             let scheduleWhere = { doctorId };
+            
             if (startDate && endDate) {
                 scheduleWhere.date = { [Op.between]: [startDate, endDate] };
             } else if (startDate) {
@@ -462,17 +475,15 @@ class SchedulerService {
             scheduleWhere.scheduleStatus = 1
             if (serviceId)
                 scheduleWhere.scheduleServiceTypeId = serviceId
-            /* const weekDays = await database["Schedule"].findAll({
-                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
-                include: [
-                    {
-                        model: database["WeekDays"],
-                        attributes: []
-                    }
-                ],
-                where: scheduleWhere,
-                raw: true
-            }); */
+            // время начала слота не раньше чем через 2 часа 
+            /* if (startDate) {
+                const twoHoursLater = new Date(new Date(startDate).getTime() + 2 * 60 * 60 * 1000);
+                const formatted = twoHoursLater.toISOString().slice(0, 19).replace('T', ' ');
+
+                scheduleWhere[Op.and] = [
+                    literal(`TIMESTAMP(CONCAT(date, ' ', scheduleStartTime)) >= '${formatted}'`)
+                ];
+            } */
             const weekDays = await database["Schedule"].findAll({
                 attributes: [
                     [fn('DISTINCT', col('date')), 'date'], // Уникальные даты
@@ -494,6 +505,35 @@ class SchedulerService {
             // Преобразуем в массив строк
             /* const result = weekDays.map(wd => wd.name); */
             return weekDays;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleMinPrice(doctorId, startDate, serviceId) {
+        try {
+            const replacements = { startDate, serviceId, doctorId };
+            const sql = `
+                SELECT MIN(sp.price) AS minPrice
+                from "Doctors" d 
+                join "Schedules" s on s."doctorId" = d.id 
+                join "SchedulePrices" sp on sp."scheduleId" = s.id 
+                WHERE s.date >= :startDate
+                    AND s."scheduleStatus" = 1
+                    AND s."scheduleServiceTypeId" = :serviceId
+                    AND d.id = :doctorId
+            `;
+
+            const [rows] = await database.sequelize.query(sql, { replacements, type: database.sequelize.QueryTypes.SELECT });
+            const minPrice = rows?.minprice ?? null;
+            
+            
+
+            // Преобразуем в массив строк
+            /* const result = weekDays.map(wd => wd.name); */
+            return minPrice;
         }
         catch (e) {
             console.log(e)
