@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import dayjs, { Dayjs } from "dayjs";
@@ -10,7 +10,6 @@ import Header from "@/components/Header";
 import { store } from "@/store";
 import { ScheduleSlot } from "@/types/consultaion";
 import Link from "next/link";
-
 import { TextField, MenuItem, Button } from "@mui/material";
 import Footer from "@/components/Footer";
 import Loader from "@/components/Loader";
@@ -18,6 +17,7 @@ import Loader from "@/components/Loader";
 import "dayjs/locale/ru";
 import { Child } from "@/types/child";
 import UserService from "@/services/user";
+import { ScheduleMainPage } from "@/types/schedule";
 
 dayjs.locale("ru");
 interface Consultation {
@@ -30,13 +30,16 @@ interface Consultation {
 const DoctorPage = () => {
     const params = useParams()
     const rawId = params?.id
+    const searchParams = useSearchParams();
     const id = Array.isArray(rawId) ? rawId[0] : rawId
+    const serviceId = searchParams?.get('serviceId');
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-    const [selectedTime, setSelectedTime] = useState<string>("");
+    const [selectedTime, setSelectedTime] = useState<ScheduleMainPage | null>(null);
+
     const [doctor, setDoctor] = useState<DoctorListItemResponse>();
     const [doctorIsLoading, setDoctorIsLoading] = useState(true);
-    const [availableTimes, setAvailableTimes] = useState<string[]>([]);
-    const [activeConsultations, setActiveConsultations] = useState<Consultation[]>([]);
+    const [availableTimes, setAvailableTimes] = useState<ScheduleMainPage[]>([]);
+    /* const [activeConsultations, setActiveConsultations] = useState<Consultation[]>([]); */
 
     const [selectedChild, setSelectedChild] = useState<number | "">("");
     const [children, setChildren] = useState<Child[]>([]);
@@ -59,7 +62,7 @@ const DoctorPage = () => {
   const fetchDoctor = async () => {
     try {
       if (id) {
-        const response = await main.getDoctor(parseInt(id), new Date());
+        const response = await main.getDoctor(parseInt(id), new Date(), serviceId ? parseInt(serviceId) : undefined);
         setDoctor(response.data);
         setDoctorIsLoading(false);
       }
@@ -74,39 +77,14 @@ const DoctorPage = () => {
       if (!id) return;
 
       // Получаем расписание
-      const response = await main.getDoctorSchedule(parseInt(id), new Date(date));
+      const response = await main.getDoctorSchedule(parseInt(id), new Date(date), serviceId ? parseInt(serviceId) : undefined);
       const schedule = response.data;
 
       // Получаем уже занятые консультации
-      const consultationsResponse = await main.getDoctorConsultations(parseInt(id), new Date(date));
-      setActiveConsultations(consultationsResponse.data[0]);
+      //const consultationsResponse = await main.getDoctorConsultations(parseInt(id), new Date(date));
+      //setActiveConsultations(consultationsResponse.data[0]);
 
-      const slots: string[] = [];
-
-      schedule.forEach((slot: ScheduleSlot) => {
-        let start = dayjs(`${date}T${slot.scheduleStartTime}`);
-        const end = dayjs(`${date}T${slot.scheduleEndTime}`);
-        const now = dayjs(); // текущее время
-        const plusTwoHours = now.add(2, 'h')
-
-        while (start.isBefore(end)) {
-          const formatted = start.format("HH:mm");
-
-          // Проверяем, есть ли консультация на этот слот
-          const isUnavailable = consultationsResponse.data[0].some((c: Consultation) => 
-            dayjs(c.slotStartDateTime).isSame(start, "minute") && c.slotStatusId !== 5
-          );
-
-          if (!isUnavailable && start.isAfter(plusTwoHours)) {
-            slots.push(formatted);
-          }
-
-          //Тут можно не фиксированоое время, а разбивку из таблицы schedule в БД
-          start = start.add(60, "minute"); // шаг 60 минут
-        }
-      });
-
-      setAvailableTimes(slots);
+      setAvailableTimes(schedule);
 
     } catch (e) {
       console.log(e);
@@ -123,7 +101,7 @@ const DoctorPage = () => {
   }; */
   const handleDateChange = (date: Dayjs | null) => {
     setSelectedDate(date);
-    setSelectedTime("");
+    setSelectedTime(null);
     if (date) {
       fetchDoctorSchedule(date.format("YYYY-MM-DD"));
     } else {
@@ -136,7 +114,7 @@ const DoctorPage = () => {
   const [loadingPrice, setLoadingPrice] = useState(false);
 
 
-  const handleSelectTime = async (event: React.ChangeEvent<HTMLInputElement>) => {
+ /*  const handleSelectTime = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const time = event.target.value;
     setSelectedTime(time);
     if (!doctor || !selectedDate) return;
@@ -156,19 +134,39 @@ const DoctorPage = () => {
       setLoadingPrice(false);
     }
 
-  };
+  }; */
+  /* const handleSelectTime = async () => {
+    if (!doctor || !selectedDate || !selectedTime) return;
+
+    try {
+      setLoadingPrice(true);
+      const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime.scheduleStartTime}`).toISOString();
+
+      const response = await main.getConsultationPrice(doctor.doctor.id, startDateTime);
+      setPrice(response.data.price);
+    } catch (e) {
+      console.error("Ошибка получения цены", e);
+      setPrice(null);
+    } finally {
+      setLoadingPrice(false);
+    }
+  }; */
+
+
 
   const handleBooking = async () => {
+    console.log(selectedTime)
     if (!doctor || !selectedDate || !selectedTime) return;
     try {
       if (store.user?.id) {
-        const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime}`).toISOString();
+        //const startDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime.scheduleStartTime}`).toISOString();
+        //const endDateTime = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${selectedTime.scheduleEndTime}`).toISOString();
+        //const duration = dayjs(endDateTime).diff(dayjs(startDateTime), 'minutes');
         setLoading(true)
-        const response = await main.createConsultation(
+        const response = await main.createConsultationV2(
           doctor.doctor.id,
           store.user?.personId,
-          startDateTime,
-          60,
+          selectedTime.id,
           selectedChild ? selectedChild : null
         );
         if (response.status === 200) {
@@ -259,6 +257,44 @@ const DoctorPage = () => {
         </div>
 
 
+        {parseInt(serviceId ? serviceId : '1') == 2 && 
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+              <div className="
+                  relative overflow-hidden rounded-2xl 
+                  bg-white 
+                  shadow-xl 
+                  border border-gray-200
+                  px-6 py-8 
+                  sm:px-10 sm:py-10
+                  mb-10
+              ">
+                  {/* Декоративный фон */}
+                  <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-100 rounded-full blur-2xl opacity-50"></div>
+                      <div className="absolute bottom-0 right-0 w-60 h-60 bg-purple-100 rounded-full blur-3xl opacity-40"></div>
+                  </div>
+                  <div className="relative">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                          Онлайн консультация для получения второго мнения
+                      </h2>
+                      <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-4">
+                          Вы можете открыли запись на короткую онлайн-консультацию.
+                          Такая консультация позволит вам получить независимое мнение другого специалиста,
+                          уточнить диагноз или обсудить рекомендации.
+                      </p>
+                      <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
+                          <span className="font-semibold text-gray-900">
+                              Важно:
+                          </span>{' '}
+                          все необходимые данные для проведения консультации должны быть заполнены
+                          <span className="font-semibold text-red-600"> не позднее чем за 3 часа </span>
+                          до её начала. Если данные не будут предоставлены вовремя — консультация может быть отменена.
+                      </p>
+                  </div>
+              </div>
+          </div>
+        }
+
         <div className="bg-white shadow rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Записаться на прием</h2>
 
@@ -312,25 +348,33 @@ const DoctorPage = () => {
 
           {selectedDate && (
             <TextField
-              sx={{marginTop: 2}}
+              sx={{ marginTop: 2 }}
               select
               label="Время"
-              value={selectedTime}
-              //onChange={(e) => setSelectedTime(e.target.value)}
-              onChange={handleSelectTime}
+              value={selectedTime?.id || ""} // используем id для value
+              onChange={(e) => {
+                const slot = availableTimes.find(slot => slot.id === Number(e.target.value));
+                setSelectedTime(slot || null);
+              }}
               fullWidth
             >
               {availableTimes.length > 0 ? (
-                availableTimes.map((time) => (
-                  <MenuItem key={time} value={time}>
-                    {time}
-                  </MenuItem>
-                ))
+                availableTimes.map((slot) => {
+                  const timeStartLabel = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${slot.scheduleStartTime}`).format("HH:mm");
+                  const timeEndLabel = dayjs(`${selectedDate.format("YYYY-MM-DD")}T${slot.scheduleEndTime}`).format("HH:mm");
+                  return (
+                    <MenuItem key={slot.id} value={slot.id} disabled={slot.isBusy || false}>
+                      {timeStartLabel} - {timeEndLabel} {(slot.slotId || slot.scheduleStatus == 2)  ? "(занято)" : ""}
+                    </MenuItem>
+                  );
+                })
               ) : (
                 <MenuItem disabled>Нет доступного времени</MenuItem>
               )}
             </TextField>
           )}
+
+
          
 
           {/* ====== ВЫБОР РЕБЁНКА ИЛИ ВХОД ====== */}
@@ -389,15 +433,26 @@ const DoctorPage = () => {
            
           {selectedTime && (
             <div className="mt-4">
-              {loadingPrice ? (
+              {
+                selectedTime?.SchedulePrices && selectedTime?.SchedulePrices.length > 0 ? (
+                  <p className="text-lg font-semibold text-gray-900">
+                    Цена: {selectedTime?.SchedulePrices[0]?.price} ₽
+                  </p>
+                )
+                :
+                (
+                  <p className="text-gray-500">Ошибка загрузки цены...</p>
+                )
+              }
+              {/* {selectedTime?.SchedulePrices && selectedTime?.SchedulePrices.length > 0 ? (
                 <p className="text-gray-500">Загрузка цены...</p>
               ) : price !== null ? (
                 <p className="text-lg font-semibold text-gray-900">
-                  Цена: {price} ₽
+                  Цена: {selectedTime?.SchedulePrices[0]?.price} ₽
                 </p>
               ) : (
                 <p className="text-gray-500">Выберите время, чтобы увидеть цену</p>
-              )}
+              )} */}
             </div>
           )}
 

@@ -25,6 +25,7 @@ router.get('/consultation', MainController.getConsultationById)
 router.get('/scheduler/date/:id', SchedulerController.getDoctorSchedulerDate)
 router.get('/consultations/active', PatientController.getConsultationsByDoctorId)
 router.post('/consultations/create', PatientController.createConsultation)
+router.post('/v2/consultations/create', PatientController.createConsultationV2)
 router.get('/consultation/url', PatientController.getConsultationUrl)
 router.post('/consultations/getPrice', PatientController.getConsultationPrice)
 

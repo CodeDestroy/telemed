@@ -111,8 +111,11 @@ class DoctorController {
         try {
             const {id} = req.query
             const {dateStart} = req.query
+            const {serviceId} = req.query
             const doctor = await DoctorService.getDoctorWithPost(id)
-            const schedule = await SchedulerService.getDoctorScheduleDistinctDays(doctor.id, moment(dateStart).add(2, 'h').format('YYYY-MM-DD HH:mm:ss'))
+            let schedule = []
+            schedule = await SchedulerService.getDoctorScheduleDistinctDays(doctor.id, moment(dateStart).add(2, 'h').format('YYYY-MM-DD HH:mm:ss'), null, serviceId)
+
             const data = {
                 doctor: doctor,
                 schedule: schedule

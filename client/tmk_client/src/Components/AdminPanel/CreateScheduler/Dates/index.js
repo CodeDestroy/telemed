@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import Header from '../../Header';
-import { Box, Button, Container, Grid, Typography, Modal, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, Container, Grid, Typography, Modal, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Form, Select, MenuItem } from '@mui/material';
 import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -22,7 +22,7 @@ import InputLabel from '@mui/material/InputLabel';
 
 // Определяем типы консультаций и соответствующие длительности
 const consultationTypes = [
-    { label: 'ТМК', durationOptions: ['30', '60'], serviceId: 1 },
+    { label: 'ТМК', durationOptions: ['25', '50'], serviceId: 1 },
     { label: 'Второе мнение', durationOptions: ['10', '15'], serviceId: 2 },
 ];
 
@@ -47,6 +47,7 @@ function CreateDateSchedule() {
     const [previousPrice, setPreviousPrice] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [editingSlot, setEditingSlot] = useState(null);
+    const [slotBreak, setSlotBreak] = useState(5);
 
     useEffect(() => {
         async function fetchDoctors() {
@@ -90,12 +91,16 @@ function CreateDateSchedule() {
             alert('Выберите врача');
             return;
         }
+        // Разбираем длительность слота и перерыв
+        const slotDurationMinutes = parseInt(modalData.slotDuration.split(' ')[0]);
+        const breakMinutes = slotBreak || 0;
     
         let totalSlots = [];
         for (let i = 0; i < modalData.slotsCount; i++) {
-            const currentStartTime = dayjs(modalData.startTime).add(i * parseInt(modalData.slotDuration.split(' ')[0]), 'minute');
-            const currentEndTime = currentStartTime.add(parseInt(modalData.slotDuration.split(' ')[0]), 'minute');
-        
+            // Для каждого слота прибавляем (длительность + перерыв) к начальному времени
+            const currentStartTime = dayjs(modalData.startTime).add(i * (slotDurationMinutes + breakMinutes), 'minute');
+            const currentEndTime = currentStartTime.add(slotDurationMinutes, 'minute');
+
             totalSlots.push({
                 date: modalData.date.format('YYYY-MM-DD'),
                 scheduleStartTime: currentStartTime.format('HH:mm'),
@@ -128,7 +133,7 @@ function CreateDateSchedule() {
                         slot.isFree,
                         slot.slotDuration,
                         1,
-                        consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId
+                        consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId,
                         
                     );
                 }));
@@ -204,11 +209,16 @@ function CreateDateSchedule() {
     };
 
     const calculateEndTime = () => {
-        if (!modalData.startTime || !modalData.slotDuration || !modalData.slotsCount) return '';
-        const startTime = dayjs(modalData.startTime);
-        const durationInMinutes = parseInt(modalData.slotDuration.split(' ')[0]);
-        const calculatedEndTime = startTime.add(durationInMinutes * modalData.slotsCount, 'minutes');
-        return calculatedEndTime.format('HH:mm');
+        if (!modalData.startTime || !modalData.slotDuration || !modalData.slotsCount) return "";
+
+        const start = dayjs(modalData.startTime);
+        const duration = parseInt(modalData.slotDuration.split(' ')[0]); // длительность слота в минутах
+        const breakMinutes = slotBreak || 0;
+
+        // Общая длительность = (длительность слота + перерыв) * количество слотов, но перерыв после последнего слота не нужен
+        const totalMinutes = modalData.slotsCount * (duration + breakMinutes) - breakMinutes;
+
+        return start.add(totalMinutes, "minute").format("HH:mm");
     };
 
     return (
@@ -245,7 +255,7 @@ function CreateDateSchedule() {
                                             <TableCell>Дата</TableCell>
                                             <TableCell>Время</TableCell>
                                             <TableCell>Цена</TableCell>
-                                            <TableCell>Бесплатно</TableCell>
+                                            <TableCell>Тип</TableCell>
                                             <TableCell>Действия</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -255,7 +265,7 @@ function CreateDateSchedule() {
                                                 <TableCell>{dayjs(slot.date).format('DD.MM.YYYY')}</TableCell>
                                                 <TableCell>{slot.scheduleStartTime.substring(0,5)} - {slot.scheduleEndTime.substring(0,5)}</TableCell>
                                                 <TableCell>{slot.SchedulePrices[0].price}</TableCell>
-                                                <TableCell>{slot.SchedulePrices[0].isFree ? 'Да' : 'Нет'}</TableCell>
+                                                <TableCell>{slot.Service?.serviceShortName ?? ''}</TableCell>
                                                 <TableCell>
                                                     {/* <IconButton onClick={() => handleEditSlot(slot)}><EditIcon /></IconButton> */}
                                                     <IconButton onClick={() => handleDeleteSlot(slot.id)}><DeleteIcon /></IconButton>
@@ -310,6 +320,24 @@ function CreateDateSchedule() {
                                 style={{ marginBottom: '8px', width: '100%' }}
                             />
                         }
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel id="break-label">Перерыв между слотами</InputLabel>
+
+                            <Select
+                                labelId="break-label"
+                                value={slotBreak}
+                                label="Перерыв между слотами"
+                                onChange={(e) => setSlotBreak(e.target.value)}
+                            >
+                                <MenuItem value={0}>0 минут</MenuItem>
+                                <MenuItem value={5}>5 минут</MenuItem>
+                                <MenuItem value={10}>10 минут</MenuItem>
+                                <MenuItem value={15}>15 минут</MenuItem>
+                                <MenuItem value={20}>20 минут</MenuItem>
+                            </Select>
+                        </FormControl>
+
+
 
                         <DatePicker 
                             label="Дата" 
@@ -327,16 +355,18 @@ function CreateDateSchedule() {
                             sx={{ mb: 2, width: '100%' }} 
                             minTime={dayjs('07:00:00', 'HH:mm:ss')}
                             maxTime={dayjs('23:00:00', 'HH:mm:ss')}
-                            minutesStep={30}
+                            minutesStep={10}
                             skipDisabled={true}
                         />
-                        {/* <TimePicker 
-                            label="Рассчитанное время конца" 
-                            disabled 
-                            value={calculateEndTime()}
-                            fullWidth 
-                            sx={{ mb: 2, width: '100%' }} 
-                        /> */}
+                        {/* Автоматический расчёт времени конца */}
+                        {modalData.startTime && modalData.slotDuration &&
+                            <TextField
+                                label="Время окончания приёма"
+                                value={calculateEndTime()}
+                                disabled
+                                sx={{ mb: 2, width: "100%" }}
+                            />
+                        }
                         <FormControl fullWidth sx={{ mb: 2, width: '100%' }}>
                             <InputLabel htmlFor="outlined-adornment-amount">Цена приема</InputLabel>
                             <OutlinedInput

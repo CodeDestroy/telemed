@@ -441,6 +441,22 @@ class AdminController {
             const transporter = await MailManager.getTransporter()
             const patientLink =  SERVER_DOMAIN + 'short/' + patientShortUrl;
             const doctorLink =  SERVER_DOMAIN + 'short/' + doctorShortUrl;
+            //Отключили отправку до оплаты
+            if (price.isFree) {
+                try {
+                    if (patient.User.email) {
+                        const mailOptionsPatinet = await MailManager.getMailOptionsTMKLinkV2(patient.User.email, patientUrl, newSlot.slotStartDateTime);
+                        await transporter.sendMail(mailOptionsPatinet); // возвращает Promise, если без callback
+                    }
+                    if (doctor.User.email) {
+                        const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctorV2(doctor.User.email, doctorUrl, newSlot.id, newSlot.slotStartDateTime);
+                        await transporter.sendMail(mailOptionsDoctor);
+                    }
+                } catch (mailErr) {
+                    // не откатываем транзакцию; логируем и сохраняем задачу на повтор
+                    console.error('Ошибка отправки почты, создам задачу на retry', mailErr);
+                }
+            }
             /* try {
                 if (patient.User.email) {
                     const mailOptionsPatinet = await MailManager.getMailOptionsTMKLink(patient.User.email, patientLink, startDateTime);

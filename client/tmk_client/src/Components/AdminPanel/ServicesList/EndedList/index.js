@@ -54,6 +54,7 @@ function EndedTMKPage() {
             doctor: `${item.dSecondName} ${item.dFirstName} ${item.dPatronomicName || ''}`.trim(),
             start: moment(item.slotStartDateTime).format('DD.MM.YYYY HH:mm'),
             end: moment(item.slotEndDateTime).format('DD.MM.YYYY HH:mm'),
+            
             sendCount: item.sendCount ?? 0, // добавили счётчик отправок
           }));
           array = array.sort((a, b) => {
@@ -88,6 +89,12 @@ function EndedTMKPage() {
       flex: 0.8,
       minWidth: 180,
       sortable: false
+    },
+    {
+      field: "serviceShortName",
+      headerName: "Тип конференции",
+      width: 150,
+      disableColumnSort: false,
     },
     {
       field: 'protocol',

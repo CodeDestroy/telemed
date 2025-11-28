@@ -354,6 +354,9 @@ class ConsultationService {
                         
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  s.id as "slot_id", 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -373,6 +376,7 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -486,6 +490,8 @@ class ConsultationService {
                         
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -505,6 +511,7 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -654,6 +661,8 @@ class ConsultationService {
             const currTime = (new Date(date).toISOString()).substring(0, 10);
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -673,6 +682,7 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 

@@ -245,11 +245,11 @@ function Home () {
                                                 {/* Левая часть: фото + ФИО */}
                                                 <div className="flex min-w-0 gap-x-4 sm:col-span-7">
                                                     <Image
-                                                    width={100}
-                                                    height={100}
-                                                    alt=""
-                                                    src={item.doctor.User?.avatar || ''}
-                                                    className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                                                        width={100}
+                                                        height={100}
+                                                        alt=""
+                                                        src={item.doctor.User?.avatar || ''}
+                                                        className="h-12 w-12 flex-none rounded-full bg-gray-50"
                                                     />
                                                     <div className="min-w-0 flex-auto">
                                                     <p className="text-sm font-semibold leading-6 text-gray-900">
@@ -287,7 +287,7 @@ function Home () {
                                                     {item.schedule.length > 0 ? item.schedule.map((scheduleItem, index) => (
                                                         <div
                                                             key={index}
-                                                            className="px-2 py-1 text-sm font-medium text-gray-800 bg-blue-100 border border-blue-300 rounded-md text-center min-w-[90px]"
+                                                            className="px-2 py-1 text-sm font-medium text-gray-800 bg-blue-100 border border-blue-300 rounded-md text-center min-w-[90px] content-center"
                                                         >
                                                             {scheduleItem.name} {dayjs(scheduleItem.date).format('DD.MM')}
                                                         </div>
@@ -302,20 +302,32 @@ function Home () {
                                                     }
                                                 </div>
 
-                                                {/* Правая колонка: действие */}
-                                                <div className="flex items-center justify-between sm:justify-end sm:col-span-2">
-                                                    <a
-                                                        onClick={() => {setLoading(true)}}
-                                                        href={`/doctor/${item.doctor.id}`}
-                                                        className="cursor-pointer text-sm leading-6 text-gray-900"
-                                                    >
-                                                        Записаться
-                                                    </a>
-                                                    <ChevronRightIcon
-                                                        aria-hidden="true"
-                                                        className="h-5 w-5 flex-none text-gray-400"
-                                                    />
+                                                {/* Правая колонка: цена + кнопка */}
+                                                <div className="flex flex-col items-center text-center justify-center sm:items-end sm:text-right sm:col-span-4">
+
+                                                    {/* Цена */}
+                                                    {item.minPrice && (
+                                                        <p className="text-md font-semibold text-indigo-600 mb-1">
+                                                            от {item.minPrice} ₽
+                                                        </p>
+                                                    )}
+
+                                                    {/* Кнопка записаться */}
+                                                    <div className="flex items-center">
+                                                        <a
+                                                            onClick={() => {setLoading(true)}}
+                                                            href={`/doctor/${item.doctor.id}?serviceId=1`}
+                                                            className="cursor-pointer text-sm leading-6 text-blue-600 font-medium hover:underline"
+                                                        >
+                                                            Записаться
+                                                        </a>
+                                                        <ChevronRightIcon
+                                                            aria-hidden="true"
+                                                            className="h-5 w-5 flex-none text-gray-400 ml-1"
+                                                        />
+                                                    </div>
                                                 </div>
+
                                             </li>
                                         )
                                     }

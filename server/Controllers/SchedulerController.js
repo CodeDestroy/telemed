@@ -135,18 +135,18 @@ class SchedulerController {
             const {id} = req.params
             const {date} = req.query
             const {dayid} = req.query
-            console.log(date, dayid)
+            const {serviceId} = req.query
             let schedule
             if (!dayid && !date) {
 
-                schedule = await SchedulerService.getDoctorSchedule(id)
+                schedule = await SchedulerService.getDoctorSchedule(id, serviceId)
             }
             else if (!dayid && date) {
-                schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
+                schedule = await SchedulerService.getDoctorScheduleByDate(id, date, serviceId)
             }
             else if (dayid && !date) {
 
-                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid, serviceId)
             }
             else {
                 throw new Error('Не указано ни дата, ни день недели.')

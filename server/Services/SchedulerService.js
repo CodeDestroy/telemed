@@ -151,7 +151,7 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleByDate (doctorId, date) {
+    async getDoctorScheduleByDate (doctorId, date, serviceId) {
         try {
             const doctorSchedule = await database["Schedule"].findAll({
                 where: {
@@ -161,12 +161,17 @@ class SchedulerService {
                     },
                     /* date: {[Op.ne]: null}, */
                     scheduleStatus: 1,
+                    scheduleServiceTypeId: serviceId ? serviceId : 1
 
                 },
                 include: [
                     { 
                         model: database["WeekDays"],
                         required: true ,
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
                     }
                 ],
             })
@@ -302,7 +307,7 @@ class SchedulerService {
         }
     }
 
-    async getDoctorSchedule (doctorId) {
+    async getDoctorSchedule (doctorId, serviceId) {
         try {
             const doctor = await database["Doctors"].findByPk(doctorId, {
                 include: [{
@@ -316,12 +321,17 @@ class SchedulerService {
                     schedule = await database["Schedule"].findAll({
                         where: {
                             doctorId,
-                            date: null
+                            date: null,
+                            scheduleServiceTypeId: serviceId ? serviceId : 1
                         },
                         include: [
                             { 
                                 model: database["WeekDays"],
                                 required: true 
+                            },
+                            {
+                                model: database["SchedulePrices"],
+                                required: true
                             }
                         ],
                         order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -333,12 +343,17 @@ class SchedulerService {
                             doctorId,
                             date: {
                                 [Op.ne]: null
-                            }
+                            },
+                            scheduleServiceTypeId: serviceId ? serviceId : 1
                         },
                         include: [
                             { 
                                 model: database["WeekDays"],
                                 required: true 
+                            },
+                            {
+                                model: database["SchedulePrices"],
+                                required: true
                             }
                         ],
                         order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -356,12 +371,13 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleByDay (doctorId, dayId) {
+    async getDoctorScheduleByDay (doctorId, dayId, serviceId) {
         try {
             const schedule = await database["Schedule"].findAll({
                 where: {
                     doctorId,
                     date: {[Op.eq]: null},
+                    scheduleServiceTypeId: serviceId ? serviceId : 1
                 },
                 include: [
                     { 
@@ -370,6 +386,10 @@ class SchedulerService {
                         where: {
                             id: dayId
                         }
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
                     }
                 ],
                 order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -552,6 +572,27 @@ class SchedulerService {
             return schedule
         }
         catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+
+    async getSchedulerBySlotId(slotId) {
+        try {
+            const schedule = await database["Schedule"].findOne({
+                where: {
+                    slotId
+                },
+                include: [
+                    { model: database["WeekDays"], required: false },
+                    { model: database['SchedulePrices'], required: true }
+                ],
+            });
+            return schedule
+        }
+        catch (e) {
+            
             console.log(e)
             throw e
         }
