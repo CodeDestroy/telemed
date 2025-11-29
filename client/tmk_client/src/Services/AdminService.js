@@ -79,6 +79,12 @@ export default class AdminService {
         return $api.post('/api/admin/consultations/edit', {slotId, doctor, patient, startDateTime, duration, slotStatusId});
     }
 
+    static async editSlotV2 (slotId, doctor, patient, scheduleId, slotStatusId) {
+        return $api.post('/api/admin/v2/consultations/edit', {slotId, doctor, patient, scheduleId, slotStatusId});
+    }
+
+    
+
     static async getSlotStatuses () {
         return $api.get('/api/admin/slotStatuses/all');
     }
@@ -99,4 +105,10 @@ export default class AdminService {
     static async checkPaymentStatusBySlot(slotId) {
         return $api.get('/api/payment/checkPaymentStatusBySlot', {params: {slotId}})
     }
+
+    
+    static async getSlotById(slotId) {
+        return $api.get('/api/patient/consultation', {params: {id: slotId}})
+    }
+
 }

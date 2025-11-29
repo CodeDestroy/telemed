@@ -89,9 +89,9 @@ const CreateSlotModal = (props) => {
 
     const handleSubmit = async () => {
         try {
-            const start = dayjs(`${props.item.date}T${props.item.scheduleStartTime}`);
+            /* const start = dayjs(`${props.item.date}T${props.item.scheduleStartTime}`);
             const end = dayjs(`${props.item.date}T${props.item.scheduleEndTime}`);
-            const durationInMinutes = end.diff(start, 'minute');
+            const durationInMinutes = end.diff(start, 'minute'); */
 
             /* {doctor, patient, scheduleId, slotStatusId} */
             const response = await AdminService.createSlotV2(

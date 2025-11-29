@@ -175,8 +175,6 @@ class SchedulerService {
                     }
                 ],
             })
-            console.log(doctorId, date, serviceId)
-            console.log(doctorSchedule)
             return doctorSchedule
         }
         catch (e) {
@@ -366,6 +364,28 @@ class SchedulerService {
 
             }
             return schedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleById(scheduleId) {
+        try {
+            const doctorSchedule = await database["Schedule"].findByPk(scheduleId, {
+                include: [
+                    { 
+                        model: database["WeekDays"],
+                        required: true ,
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
+                    }
+                ],
+            })
+            return doctorSchedule
         }
         catch (e) {
             console.log(e)

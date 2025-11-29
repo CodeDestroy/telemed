@@ -2,6 +2,7 @@ import React, {useEffect, useState, useContext} from 'react'
 import AdminService from '../../../../Services/AdminService';
 import SchedulerService from '../../../../Services/SchedulerService';
 
+import DoctorService from '../../../../Services/DoctorService';
 import Header from '../../Header';
 import CreateSlotModal from '../CreateSlotModal';
 import dayjs from 'dayjs';
@@ -214,10 +215,16 @@ function Index() {
         /* handleMenuClose(); */
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         // Реализуй логику удаления
-        console.log('Удалить:', selectedItem);
-        handleMenuClose();
+        try {
+            //Тут сделать отмену слота
+            handleMenuClose();
+        }
+        catch (e) {
+            console.log(e)
+        }
+        
     };
 
     useEffect(() => {
@@ -466,7 +473,7 @@ function Index() {
                         <EditIcon fontSize="small" /> Редактировать
                     </div>
 
-                    <div
+                    {/* <div
                         style={{
                             padding: '8px 16px',
                             cursor: 'pointer',
@@ -478,7 +485,7 @@ function Index() {
                         }}
                     >
                         Удалить
-                    </div>
+                    </div> */}
                 </div>
             )}
 

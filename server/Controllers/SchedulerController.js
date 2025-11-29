@@ -29,7 +29,6 @@ class SchedulerController {
 
                 // Создаем новый временной промежуток для врача
                 const newSchedule = await SchedulerService.createSchedule(doctorId, weekDay.id, startTime, endTime, scheduleStatus);
-                console.log(newSchedule)
                 console.log('createOrUpdateSchedule')
             }
             
@@ -166,30 +165,17 @@ class SchedulerController {
             const {endDate} = req.query
             const schedule = await SchedulerService.getDoctorScheduleBetweenDays(id, startDate, endDate)
             return res.status(200).json(schedule)
-            /* if (startDate && endDate) {
-                
-            }
-            else if (startDate && !endDate) {
+        }
+        catch (e) {
+            res.status(404).json({error: e.message})
+        }
+    }
 
-            }
-            else if (!startDate && endDate) {
-
-            }
-            if (!dayid && !date) {
-
-                schedule = await SchedulerService.getDoctorSchedule(id)
-            }
-            else if (!dayid && date) {
-                schedule = await SchedulerService.getDoctorScheduleByDate(id, date)
-            }
-            else if (dayid && !date) {
-
-                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid)
-            }
-            else {
-                throw new Error('Не указано ни дата, ни день недели.')
-            }
-            res.status(200).json(schedule) */
+    async getDoctorSchedulerById(req, res) {
+        try {
+            const {id} = req.params
+            const schedule = await SchedulerService.getDoctorScheduleById(id)
+            return res.status(200).json(schedule)
         }
         catch (e) {
             res.status(404).json({error: e.message})

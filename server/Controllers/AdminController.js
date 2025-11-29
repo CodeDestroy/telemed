@@ -422,6 +422,9 @@ class AdminController {
                 newPayment.paymentStatusId = 3
                 newSlot.slotStatusId = 3
             }
+            if (slotStatusId == 3) {
+                newPayment.paymentStatusId = 3
+            }
             await newPayment.save()
             await newSlot.save()
             schedule.slotId = newSlot.id;
@@ -615,6 +618,124 @@ class AdminController {
                 room.roomName = room.roomName + '_canceled_' + Date.now()
                 const payment = await PaymentService.getPaymentBySlotId(slotId);
                 payment.paymentStatusId = 5
+                await payment.save()
+                await room.save()
+            }
+            //Отключаем отправку тут, отпрапвляем теперь в случае оплаты
+            /* if (patient.User.email) {
+                const mailOptionsPatient = await MailManager.getMailOptionsTMKLink(
+                    patient.User.email,
+                    patientLink,
+                    startDateTime
+                );
+                transporter.sendMail(mailOptionsPatient);
+            }
+
+            if (doctor.User.email) {
+                const mailOptionsDoctor = await MailManager.getMailOptionsTMKLink(
+                    doctor.User.email,
+                    doctorLink,
+                    startDateTime
+                );
+                transporter.sendMail(mailOptionsDoctor);
+            } */
+
+            res.status(200).json({
+                doctorShortUrl,
+                patientShortUrl,
+                updatedSlot,
+                room
+            });
+        } catch (e) {
+            console.error(e);
+            res.status(500).json({ message: e.message });
+        }
+    }
+
+    
+    async editConsultationV2(req, res) {
+        try {
+            const { slotId, doctor, patient, scheduleId, slotStatusId } = req.body;
+            const oldSlot = await ConsultationService.getSlotById(slotId);
+            const oldDoctor = await DoctorService.getDoctor(oldSlot.doctorId);
+            const oldPatient = await PatientService.getPatient(oldSlot.patientId);
+            const oldSchedule = await SchedulerService.getSchedulerBySlotId(slotId)
+            const newSchedule = await SchedulerService.getSchedulerById(scheduleId)
+            // Обновляем слот
+
+            
+            const updatedSlot = await ConsultationService.updateSlotV2(slotId, 
+                doctor.id,
+                patient.id,
+                newSchedule.id,
+                slotStatusId
+            );
+
+            oldSchedule.scheduleStatus = 1
+            oldSchedule.slotId = null
+            await oldSchedule.save()
+            newSchedule.scheduleStatus = 2
+            newSchedule.slotId = slotId
+            await newSchedule.save()
+            console.log(oldSchedule)
+            console.log(newSchedule)
+
+
+            // Получаем комнату по слоту
+            const room = (await ConsultationService.getSlotById(slotId)).Room;
+            if (!room) return res.status(404).json({ message: "Комната не найдена" });
+
+            const roomName = room.roomName;
+            // Генерация ссылок и токенов
+            const doctorPayload = await ConsultationService.createPayloadDoctor(doctor.id, room.id);
+            const patientPayload = await ConsultationService.createPayloadPatient(patient.id, room.id);
+            const tokenDoctor = jwt.sign(doctorPayload, JITSI_SECRET);
+            const tokenPatient = jwt.sign(patientPayload, JITSI_SECRET);
+            const doctorUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenDoctor}`;
+            const patientUrl = `${CLIENT_URL}/room/${roomName}?token=${tokenPatient}`;
+
+            // Обновляем короткие ссылки url, userId, roomId, type = 'room'
+            const doctorShortUrl = await UrlManager.updateShort(doctorUrl, doctor.User.id, room.id, 'room', oldDoctor.User.id);
+            const patientShortUrl = await UrlManager.updateShort(patientUrl, patient.User.id, room.id, 'room', oldPatient.User.id);
+
+            // Отправляем почту, если надо
+            const transporter = await MailManager.getTransporter();
+            
+            const patientLink = SERVER_DOMAIN + 'short/' + patientShortUrl;
+            const doctorLink = SERVER_DOMAIN + 'short/' + doctorShortUrl;
+            if (slotStatusId == 3) {
+                const payment = await PaymentService.getPaymentBySlotId(slotId);
+                payment.paymentStatusId = 3
+                await payment.save()
+                if (patient.User.email) {
+                    const mailOptionsPatient = await MailManager.getMailOptionsTMKLinkV2(
+                        patient.User.email,
+                        patientUrl,
+                        updatedSlot.slotStartDateTime
+                    );
+                    transporter.sendMail(mailOptionsPatient);
+                }
+
+                if (doctor.User.email) {
+                    const mailOptionsDoctor = await MailManager.getMailOptionsTMKLinkDoctorV2(
+                        doctor.User.email,
+                        doctorUrl,
+                        slotId,
+                        updatedSlot.slotStartDateTime
+                    );
+                    transporter.sendMail(mailOptionsDoctor);
+                }
+            }
+            else if (slotStatusId == 5) {
+                room.roomName = room.roomName + '_canceled_' + Date.now()
+                const payment = await PaymentService.getPaymentBySlotId(slotId);
+                payment.paymentStatusId = 5
+                oldSchedule.scheduleStatus = 1
+                oldSchedule.slotId = null
+                await oldSchedule.save()
+                newSchedule.scheduleStatus = 1
+                newSchedule.slotId = null
+                await newSchedule.save()
                 await payment.save()
                 await room.save()
             }
