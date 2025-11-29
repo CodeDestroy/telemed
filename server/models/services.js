@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Services.hasMany(models.Slots, { foreignKey: 'serviceId' });
       Services.hasMany(models.Schedule, { foreignKey: 'scheduleServiceTypeId' });
+      Services.belongsToMany(models.Doctors, {
+        through: 'DoctorServices',
+        foreignKey: 'serviceId',
+        otherKey: 'doctorId',
+        as: 'doctorsWithService'
+      });
     }
   }
   Services.init({

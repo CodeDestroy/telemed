@@ -354,6 +354,9 @@ class ConsultationService {
                         
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  s.id as "slot_id", 
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -373,6 +376,7 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -486,6 +490,8 @@ class ConsultationService {
                         
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -505,11 +511,12 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
                     and s."doctorId" = :doctorId 
-                    and (r."ended" != true or r."ended" is null) `, 
+                    and (r."ended" != true or r."ended" is null) and s."slotStatusId" not in (4, 5)`, 
             {
                 replacements: { doctorId: doctorId}, 
                 raw: true
@@ -654,6 +661,8 @@ class ConsultationService {
             const currTime = (new Date(date).toISOString()).substring(0, 10);
             const slots = await database.sequelize.query(`
                 select s.id as "id" , s.id as "slot_id", 
+                    srv."serviceName" as "serviceName",
+                    srv."serviceShortName" as "serviceShortName",
                     p."firstName" as "pFirstName",  
                     p."firstName" as "pFirstName", 
                     p."secondName" as "pSecondName", 
@@ -673,6 +682,7 @@ class ConsultationService {
                 join "Urls" url2 on url2."userId" = p."userId" 
                 left join "Payments" pmt on pmt."slotId" = s.id
                 left join "PaymentStatuses" pmtst on pmtst.id = pmt."paymentStatusId"
+                join "Services" srv on srv.id = s."serviceId"
                 where 
                     url2."roomId" = r.id 
                     and url."roomId" = r.id 
@@ -935,6 +945,25 @@ class ConsultationService {
         }
     }
 
+    async createSlotV2 (doctorId, patientId, schedule, slotStatusId = null) {
+        try {
+            const newSlot = await database.models.Slots.create({
+                doctorId: doctorId, 
+                slotStartDateTime: moment(schedule.date + 'T' + schedule.scheduleStartTime).toDate(), 
+                slotEndDateTime: moment(schedule.date + 'T' + schedule.scheduleEndTime).toDate(), 
+                slotStatusId: slotStatusId == 1 ? 2 : slotStatusId,
+                serviceId: schedule.scheduleServiceTypeId ? schedule.scheduleServiceTypeId : 1, 
+                isBusy: true, 
+                patientId: patientId
+            })
+            return newSlot
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
     async updateSlot(slotId, doctorId, patientId, startDateTime, duration, slotStatusId = null) {
         try {
             const slot = await database.models.Slots.findByPk(slotId);
@@ -945,6 +974,31 @@ class ConsultationService {
             slot.patientId = patientId;
             slot.slotStartDateTime = moment(new Date(startDateTime)).toDate();
             slot.slotEndDateTime = moment(new Date(startDateTime)).add(duration, 'm').toDate();
+            slot.slotStatusId = slotStatusId == 1 ? 2 : slotStatusId;
+            slot.isBusy = true;
+
+            await slot.save();
+
+            return slot;
+        } catch (e) {
+            console.error('Ошибка при обновлении слота:', e);
+            throw e;
+        }
+    }
+
+    async updateSlotV2(slotId, doctorId, patientId, scheduleId, slotStatusId = null) {
+        try {
+            const slot = await database.models.Slots.findByPk(slotId);
+            const schedule = await database.models.Schedule.findByPk(scheduleId)
+            if (!slot) {
+                throw new Error(`Слот с ID ${slotId} не найден`);
+            }
+            slot.doctorId = doctorId;
+            slot.patientId = patientId;
+            /* slot.slotStartDateTime = moment(new Date(startDateTime)).toDate();
+            slot.slotEndDateTime = moment(new Date(startDateTime)).add(duration, 'm').toDate(); */
+            slot.slotStartDateTime = moment(schedule.date + 'T' + schedule.scheduleStartTime).toDate(), 
+            slot.slotEndDateTime = moment(schedule.date + 'T' + schedule.scheduleEndTime).toDate(), 
             slot.slotStatusId = slotStatusId == 1 ? 2 : slotStatusId;
             slot.isBusy = true;
 

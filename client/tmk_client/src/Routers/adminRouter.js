@@ -65,7 +65,7 @@ const adminRouter = createBrowserRouter([
     },
     {
       path: adminLocations.calendar,
-      element: <Schedule/>
+      element: <SlotList/>
     },
     {
       path: generalLocations.settings,

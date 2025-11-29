@@ -186,6 +186,7 @@ class ConferenceController {
             const { id } = req.params
             const {endTime} = req.body
             const tmk = await ConsultationService.getSlotById(id)
+            tmk.slotStatusId = 4;
             tmk.Room.ended = true
             tmk.Room.meetingEnd = endTime
             await tmk.Room.save()

@@ -1,5 +1,10 @@
 import WeekDay from "./weekDay";
-
+export interface SchedulePrice {
+    price: number | string,
+    isFree: boolean,
+    startDate: Date | null | string,
+    endDate: Date | null | string,
+}
 export interface ScheduleMainPage {
     WeekDay: WeekDay,
     date: string | null,
@@ -12,6 +17,8 @@ export interface ScheduleMainPage {
     scheduleStartTime: string,
     scheduleStatus: number,
     updatedAt: string,
+    slotId: number | null,
+    SchedulePrices: SchedulePrice[] | null
 }
 
 

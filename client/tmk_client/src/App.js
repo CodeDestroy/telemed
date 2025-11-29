@@ -57,6 +57,7 @@ function App() {
       /* console.log('try to login') */
       switch (store.user.accessLevel) {
         case 1: 
+          /* window.location.href = process.env.REACT_APP_PATIENT_CLIENT_URL */
           return (<RouterProvider router={mainRouter} />)
         case 2: 
           return (<RouterProvider router={doctorRouter} />)

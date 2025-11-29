@@ -129,7 +129,6 @@ const CreateSchedule = () => {
 
     useEffect(() => {
         async function fetchSchedule() {
-            console.log(store.user)
             if (store.user?.personId) {
                 const response = await DoctorService.getSchedule(store.user.personId);
                 const newSchedule = { ...schedule };
@@ -175,7 +174,6 @@ const CreateSchedule = () => {
     minDate.setMilliseconds(0);
 
     const maxDate = new Date();
-/*     maxDate.setDate(maxDate); */
     maxDate.setHours(21);
     maxDate.setMinutes(1);
     minDate.setSeconds(0);

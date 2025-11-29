@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx'
 import AuthService from '@/services/auth'
 import {User} from "@/types/user"
 import { AxiosError } from '@/types/errors'
-
+const doctorClient = process.env.NEXT_PUBLIC_CLIENT_URL
 export default class Store {
   user: User | null = null
   isAuth: boolean = false
@@ -33,8 +33,20 @@ export default class Store {
     this.setLoading(true)
     try {
       const response = await AuthService.login(login, password)
-
       if (response.status === 200) {
+        let tempUser = response.data.user;
+        if (tempUser.accessLevel > 1) {
+            this.setLoading(false)
+            const res = {
+                data: 'Запрещён вход для пациентов',
+                redirect: doctorClient,
+            }
+             
+            /* Тут сделать предупреждение */
+            /* window.location.href = doctorClient as string */
+            this.setError('Запрещён вход для пациентов')
+            return res
+        }
         this.setUser(response.data.user)
         localStorage.setItem('token', response.data.token)
         this.setAuth(true)
@@ -98,6 +110,18 @@ export default class Store {
     this.setLoading(true)
     try {
       const response = await AuthService.refresh()
+      let tempUser = response.data.user;
+        if (tempUser.accessLevel > 1) {
+            this.setLoading(false)
+            const res = {
+                data: 'Запрещён вход для пациентов',
+                redirect: doctorClient,
+            }
+            /* Тут сделать предупреждение */
+            /* window.location.href = doctorClient as string */
+            this.setError('Запрещён вход для пациентов')
+            return false
+      }
       localStorage.setItem('token', response.data.token)
       this.setUser(response.data.user)
       this.setAuth(true)

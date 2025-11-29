@@ -20,5 +20,8 @@ patient_client/node_modules
 patient_client/tmk_client
 patient_client/.env
 
-
 secret_key.txt
+./secret_key.txt
+.gigaide
+.idea
+

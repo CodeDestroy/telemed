@@ -4,6 +4,7 @@ import { ScheduleShort } from "./schedule";
 export default interface DoctorListItemResponse {
     doctor: Doctor,
     /* schedule: ScheduleMainPage[] */
-    schedule: ScheduleShort[]
+    schedule: ScheduleShort[],
+    minPrice: number | null
     
 }

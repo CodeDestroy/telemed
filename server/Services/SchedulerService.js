@@ -1,6 +1,6 @@
 const { where, Op } = require('sequelize');
 const database = require('../models/index');
-const { fn, col } = require('sequelize');
+const { fn, col, literal } = require('sequelize');
 const moment = require('moment-timezone')
 class SchedulerService {
     async findOverlappingSchedules (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
@@ -100,7 +100,7 @@ class SchedulerService {
         }
     }
 
-    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1) {
+    async createScheduleDate (doctorId, date, scheduleStartTime, scheduleEndTime, scheduleDay, scheduleStatus = 1, scheduleServiceTypeId = 1) {
         try {
             const newSchedule = await database["Schedule"].create({
                 doctorId,
@@ -109,6 +109,7 @@ class SchedulerService {
                 scheduleEndTime,
                 scheduleStatus,
                 scheduleDayId: scheduleDay,
+                scheduleServiceTypeId
             });
             return newSchedule
         }
@@ -150,7 +151,7 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleByDate (doctorId, date) {
+    async getDoctorScheduleByDate (doctorId, date, serviceId) {
         try {
             const doctorSchedule = await database["Schedule"].findAll({
                 where: {
@@ -160,12 +161,17 @@ class SchedulerService {
                     },
                     /* date: {[Op.ne]: null}, */
                     scheduleStatus: 1,
+                    scheduleServiceTypeId: serviceId ? serviceId : 1
 
                 },
                 include: [
                     { 
                         model: database["WeekDays"],
                         required: true ,
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
                     }
                 ],
             })
@@ -238,6 +244,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 }) 
@@ -256,6 +266,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 })
@@ -274,6 +288,10 @@ class SchedulerService {
                         {
                             model: database["SchedulePrices"],
                             required: true
+                        },
+                        {
+                            model: database['Services'],
+                            required: true,
                         }
                     ]
                 })
@@ -289,7 +307,7 @@ class SchedulerService {
         }
     }
 
-    async getDoctorSchedule (doctorId) {
+    async getDoctorSchedule (doctorId, serviceId) {
         try {
             const doctor = await database["Doctors"].findByPk(doctorId, {
                 include: [{
@@ -303,12 +321,17 @@ class SchedulerService {
                     schedule = await database["Schedule"].findAll({
                         where: {
                             doctorId,
-                            date: null
+                            date: null,
+                            scheduleServiceTypeId: serviceId ? serviceId : 1
                         },
                         include: [
                             { 
                                 model: database["WeekDays"],
                                 required: true 
+                            },
+                            {
+                                model: database["SchedulePrices"],
+                                required: true
                             }
                         ],
                         order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -320,12 +343,17 @@ class SchedulerService {
                             doctorId,
                             date: {
                                 [Op.ne]: null
-                            }
+                            },
+                            scheduleServiceTypeId: serviceId ? serviceId : 1
                         },
                         include: [
                             { 
                                 model: database["WeekDays"],
                                 required: true 
+                            },
+                            {
+                                model: database["SchedulePrices"],
+                                required: true
                             }
                         ],
                         order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -343,12 +371,35 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleByDay (doctorId, dayId) {
+    async getDoctorScheduleById(scheduleId) {
+        try {
+            const doctorSchedule = await database["Schedule"].findByPk(scheduleId, {
+                include: [
+                    { 
+                        model: database["WeekDays"],
+                        required: true ,
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
+                    }
+                ],
+            })
+            return doctorSchedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleByDay (doctorId, dayId, serviceId) {
         try {
             const schedule = await database["Schedule"].findAll({
                 where: {
                     doctorId,
                     date: {[Op.eq]: null},
+                    scheduleServiceTypeId: serviceId ? serviceId : 1
                 },
                 include: [
                     { 
@@ -357,6 +408,10 @@ class SchedulerService {
                         where: {
                             id: dayId
                         }
+                    },
+                    {
+                        model: database["SchedulePrices"],
+                        required: true
                     }
                 ],
                 order: [['scheduleDayId', 'ASC'], ['scheduleStartTime', 'ASC']]
@@ -448,9 +503,10 @@ class SchedulerService {
         }
     }
 
-    async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null) {
+    async getDoctorScheduleDistinctDays(doctorId, startDate = null, endDate = null, serviceId) {
         try {
             let scheduleWhere = { doctorId };
+            
             if (startDate && endDate) {
                 scheduleWhere.date = { [Op.between]: [startDate, endDate] };
             } else if (startDate) {
@@ -458,8 +514,23 @@ class SchedulerService {
             } else if (endDate) {
                 scheduleWhere.date = { [Op.lte]: endDate };
             }
-            /* const weekDays = await database["Schedule"].findAll({
-                attributes: [[fn('DISTINCT', col('WeekDay.name')), 'name'] ],
+            scheduleWhere.scheduleStatus = 1
+            if (serviceId)
+                scheduleWhere.scheduleServiceTypeId = serviceId
+            // время начала слота не раньше чем через 2 часа 
+            /* if (startDate) {
+                const twoHoursLater = new Date(new Date(startDate).getTime() + 2 * 60 * 60 * 1000);
+                const formatted = twoHoursLater.toISOString().slice(0, 19).replace('T', ' ');
+
+                scheduleWhere[Op.and] = [
+                    literal(`TIMESTAMP(CONCAT(date, ' ', scheduleStartTime)) >= '${formatted}'`)
+                ];
+            } */
+            const weekDays = await database["Schedule"].findAll({
+                attributes: [
+                    [fn('DISTINCT', col('date')), 'date'], // Уникальные даты
+                    [col('WeekDay.name'), 'name'],
+                ],
                 include: [
                     {
                         model: database["WeekDays"],
@@ -467,23 +538,7 @@ class SchedulerService {
                     }
                 ],
                 where: scheduleWhere,
-                raw: true
-            }); */
-            const weekDays = await database["Schedule"].findAll({
-                attributes: [
-                    [col('WeekDay.name'), 'name'],
-                    'date',
-                    'scheduleStartTime',
-                    'scheduleEndTime',
-                ],
-                include: [
-                    {
-                    model: database["WeekDays"],
-                    attributes: []
-                    }
-                ],
-                where: scheduleWhere,
-                group: ['WeekDay.name', 'Schedule.date', 'Schedule.scheduleStartTime', 'Schedule.scheduleEndTime'],
+                group: ['WeekDay.name', 'Schedule.date'],
                 /* order: [[database["WeekDays"], 'id', 'ASC']], */
                 order: [['date', 'ASC']],
                 raw: true
@@ -494,6 +549,72 @@ class SchedulerService {
             return weekDays;
         }
         catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getDoctorScheduleMinPrice(doctorId, startDate, serviceId) {
+        try {
+            const replacements = { startDate, serviceId, doctorId };
+            const sql = `
+                SELECT MIN(sp.price) AS minPrice
+                from "Doctors" d 
+                join "Schedules" s on s."doctorId" = d.id 
+                join "SchedulePrices" sp on sp."scheduleId" = s.id 
+                WHERE s.date >= :startDate
+                    AND s."scheduleStatus" = 1
+                    AND s."scheduleServiceTypeId" = :serviceId
+                    AND d.id = :doctorId
+            `;
+
+            const [rows] = await database.sequelize.query(sql, { replacements, type: database.sequelize.QueryTypes.SELECT });
+            const minPrice = rows?.minprice ?? null;
+            
+            
+
+            // Преобразуем в массив строк
+            /* const result = weekDays.map(wd => wd.name); */
+            return minPrice;
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async getSchedulerById(scheduleId) {
+        try {
+            const schedule = await database["Schedule"].findByPk(scheduleId, {
+                include: [
+                    { model: database["WeekDays"], required: false },
+                    { model: database['SchedulePrices'], required: true }
+                ],
+            });
+            return schedule
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+
+    async getSchedulerBySlotId(slotId) {
+        try {
+            const schedule = await database["Schedule"].findOne({
+                where: {
+                    slotId
+                },
+                include: [
+                    { model: database["WeekDays"], required: false },
+                    { model: database['SchedulePrices'], required: true }
+                ],
+            });
+            return schedule
+        }
+        catch (e) {
+            
             console.log(e)
             throw e
         }

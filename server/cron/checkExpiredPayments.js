@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 const database = require('../Database/setDatabase')
 const dayjs = require("dayjs");
+const SchedulerService = require("../Services/SchedulerService");
 
 const { Op } = require('sequelize')
 const checkExpiredPayments = () => {
@@ -13,7 +14,7 @@ const checkExpiredPayments = () => {
         where: {
           paymentStatusId: 1,
           createdAt: {
-            [Op.lt]: now.subtract(20, "minute").toDate(), // <-- теперь Op правильно
+            [Op.lt]: now.subtract(10, "minute").toDate(), // <-- теперь Op правильно
           },
         },
       });
@@ -21,12 +22,16 @@ const checkExpiredPayments = () => {
       if (expiredPayments.length > 0) {
         for (const payment of expiredPayments) {
           const slot = await database.models.Slots.findByPk(payment.slotId)
+          const schedule = await SchedulerService.getSchedulerBySlotId(slot.id)
           const room = await database.models.Rooms.findOne({
             where: {slotId: slot.id}
           })
           room.roomName = room.roomName + '_cancel_' + payment.id
           slot.slotStatusId = 5;
-          payment.paymentStatusId = 5; // Отмена оплаты
+          payment.paymentStatusId = 5; // Отмена оплатыschedule.slotId = null;
+          schedule.scheduleStatus = 1;
+          schedule.slotId = null;
+          await schedule.save()
           await room.save();
           await payment.save();
           await slot.save();

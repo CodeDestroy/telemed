@@ -64,6 +64,8 @@ const CreateSchedule = () => {
     const [theme, setTheme] = useState(defaultTheme);
 
     const [price, setPrice] = useState()
+    const [slotDuration, setSlotDuration] = useState(30)
+    const [slotsCount, setSlotsCount] = useState(1)
 
     // Открытие модального окна
     const handleOpenModal = () => setModalOpen(true);
@@ -87,7 +89,7 @@ const CreateSchedule = () => {
     const handleAddSlot = async () => {
         /* console.log(startTime, endTime, selectedDay, store.user.personId) */
         try {
-            const response = await DoctorService.createScheduler(store.user.personId, selectedDay, startTime, endTime)
+            const response = await DoctorService.createScheduler(store.user.personId, selectedDay, startTime, endTime, slotDuration, slotsCount)
             /* const response = {status: 201} */
             if (response.status == 201) {
                 if (startTime && endTime && selectedDay) {

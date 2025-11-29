@@ -5,31 +5,23 @@ import {
   Box,
   Typography,
   Autocomplete,
+  TextField,
   Button,
-  FormControlLabel,
-  Checkbox,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   DialogActions,
-  CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
-import { LocalizationProvider, DatePicker, TimePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { TextField } from "@mui/material"; // добавь в импорты в начале файла
-
-import {ru} from 'date-fns/locale/ru';
-import { blue, grey } from '@mui/material/colors';
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { ru } from "date-fns/locale";
+
 import AdminService from "../../../../Services/AdminService";
 import DoctorService from "../../../../Services/DoctorService";
-import SchedulerService from "../../../../Services/SchedulerService";
-import PatientCreateModal from "../../newSchedule/CreateSlotModal";
-import { Context } from "../../../../";
-const white = '#fff'
+import { Context } from "../../../..";
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -39,310 +31,206 @@ const modalStyle = {
   borderRadius: "0.75rem",
   boxShadow: 24,
   p: 4,
-  minWidth: 400,
-  maxWidth: 500,
+  minWidth: 450,
 };
 
+const slotStatuses = [
+  { value: 2, label: "Ждёт оплаты" },
+  { value: 3, label: "Оплачено" },
+];
+
+const consultationTypes = [
+  { value: 1, label: "ТМК" },
+  { value: 2, label: "Второе мнение" },
+];
+
 const CreateTmkModal = ({ open, onClose }) => {
-  const defaultTheme = createTheme({
-      palette: {
-        primary: {
-          main: blue[700],
-        },
-        secondary: {
-          main: grey[50],
-        },
-        background: {
-          default: white,
-        },
-      },
-  });
   const { store } = useContext(Context);
+
+  const doctorId = store.selectedProfile.id;
 
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [openNewPatient, setOpenNewPatient] = useState(false);
 
-  const [date, setDate] = useState(dayjs(new Date()));
-  const [timeStart, setTimeStart] = useState(null);
-  const [duration, setDuration] = useState(60);
-  const [cost, setCost] = useState("");
+  const [serviceId, setServiceId] = useState(1); // ← выбор типа консультации
 
-  const [isCustom, setIsCustom] = useState(false);
+  const [schedule, setSchedule] = useState([]);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
 
-  const [availableTimes, setAvailableTimes] = useState([]);
-  const [loadingTimes, setLoadingTimes] = useState(false);
-  const [error, setError] = useState("");
+  const [date, setDate] = useState(null);
+  const [status, setStatus] = useState(2);
 
-  // Загрузка пациентов
+  const [error, setError] = useState(null);
+
+  // Загружаем пациентов
   useEffect(() => {
     (async () => {
       const res = await AdminService.getPatients();
-      res.data.map(
+      res.data.forEach(
         (p) =>
-          (p.label = `${p.secondName} ${p.firstName} ${
-            p.patronomicName ?? ""
-          } (${p.snils})`)
+          (p.label = `${p.secondName} ${p.firstName} ${p.patronomicName ?? ""} (${p.snils})`)
       );
       setPatients(res.data);
     })();
   }, []);
 
-  // Получаем доступные интервалы для расписания врача
-  const fetchAvailableTimes = async (selectedDate) => {
-    if (isCustom) return;
+  // Загрузка расписания
+  const fetchSchedule = async (doctorId, serviceId, date) => {
+    if (!doctorId || !serviceId || !date) return;
+
     try {
-      setLoadingTimes(true);
-      setError("");
-      setAvailableTimes([]);
-
-      // ✅ Исправление №1 — нормализуем дату
-      const localDate = dayjs(selectedDate).format("YYYY-MM-DD");
-
-      // Получаем расписание и консультации
-      const scheduleRes = await SchedulerService.getDcotorScheduleDates(
-        store.selectedProfile.id,
-        localDate
-      );
-      const consultationsRes = await DoctorService.getConsultations(
-        store.selectedProfile.id,
-        localDate
+      const res = await DoctorService.getScheduleByDateV2(
+        doctorId,
+        dayjs(date).format("YYYY-MM-DD"),
+        serviceId
       );
 
+      const filtered = res.data.filter(
+        (s) => s.scheduleServiceTypeId === serviceId
+      );
 
-      const schedule = scheduleRes.data || [];
-      const consultations = consultationsRes.data[0] || [];
-
-      console.log(consultations)
-      const freeSlots = [];
-
-      schedule.forEach((s) => {
-        const start = dayjs(`${localDate}T${s.scheduleStartTime}`);
-        const end = dayjs(`${localDate}T${s.scheduleEndTime}`);
-
-        let cursor = start;
-
-        while (cursor.isBefore(end)) {
-          // конец текущего потенциального слота
-          const slotEnd = cursor.add(60, "minute");
-
-          // ✅ Исправление №2 — точная проверка пересечения интервалов
-          const isBusy = consultations.some((c) => {
-            
-            if (c.slotStatusId === 5) return false; // пропускаем отменённые
-            const cStart = dayjs(c.slotStartDateTime);
-            const cEnd = dayjs(c.slotEndDateTime).subtract(2, 'minute');
-            /* console.log(c)
-            console.log(cStart)
-            console.log(cEnd) */
-
-            // пересечение, если хотя бы частично пересекаются
-            return (
-              cursor.isBefore(cEnd) && slotEnd.isAfter(cStart)
-            );
-          });
-
-          if (!isBusy) {
-            freeSlots.push(cursor);
-          }
-
-          cursor = slotEnd;
-        }
-      });
-
-      setAvailableTimes(freeSlots);
+      setSchedule(filtered);
+      setSelectedScheduleId(null);
     } catch (e) {
       console.error(e);
-      setError("Ошибка при загрузке расписания");
-    } finally {
-      setLoadingTimes(false);
     }
   };
 
+  // При изменении serviceId → обновить расписание
+  useEffect(() => {
+    if (!date) return;
 
-  
+    setSchedule([]);
+    setSelectedScheduleId(null);
+
+    fetchSchedule(doctorId, serviceId, date);
+  }, [serviceId]);
+
+  // При изменении даты → обновить расписание
+  useEffect(() => {
+    if (!date) return;
+
+    fetchSchedule(doctorId, serviceId, date);
+  }, [date]);
 
   const handleSubmit = async () => {
+    if (!selectedPatient) return setError("Выберите пациента");
+    if (!selectedScheduleId) return setError("Выберите время");
+
     try {
-      setError("");
-
-      if (!selectedPatient) {
-        setError("Выберите пациента");
-        return;
-      }
-
-      if (!timeStart) {
-        setError("Выберите время начала");
-        return;
-      }
-      const start = dayjs(date)
-        .hour(dayjs(timeStart).hour())
-        .minute(dayjs(timeStart).minute());
-      const end = start.add(duration, "minute");
-
-      const res = await AdminService.createSlot(
-        store.selectedProfile,
+      const response = await AdminService.createSlotV2(
+        { id: doctorId },
         selectedPatient,
-        start,
-        duration,
-        2, 
-        isCustom,
-        cost
+        selectedScheduleId,
+        status
       );
 
-      if (res.status === 200) {
-        alert("Запись успешно создана");
+      if (response.status === 200) {
+        alert("Успешно");
         window.location.reload();
       } else {
-        setError("Не удалось создать запись");
+        setError("Ошибка при сохранении");
       }
-    } catch (err) {
-      console.error(err);
-      setError(err.response.data.message);
+    } catch (e) {
+      console.error(e);
+      setError("Ошибка при создании записи");
     }
   };
 
-  useEffect(() => { 
-    if (!isCustom && store.selectedProfile && date) fetchAvailableTimes(date); 
-  }, [date, isCustom]);
+  if (!open) return null;
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Modal open={open} onClose={onClose} closeAfterTransition>
-        <Fade in={open}>
-          <Box sx={modalStyle}>
-            <Typography variant="h5" mb={2}>
-              Запись на ТМК
+    <Modal open={open} onClose={onClose} closeAfterTransition>
+      <Fade in={open}>
+        <Box sx={modalStyle}>
+          {error && (
+            <Typography color="error" mb={2}>
+              {error}
             </Typography>
+          )}
 
-            {error && (
-              <Typography color="error" mb={2}>
-                {error}
-              </Typography>
-            )}
+          <Typography variant="h5" mb={2}>
+            Создать консультацию
+          </Typography>
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={isCustom}
-                  onChange={(e) => setIsCustom(e.target.checked)}
-                />
-              }
-              label="Вне расписания"
+          {/* Тип консультации */}
+          <FormControl fullWidth sx={{ mt: 1 }}>
+            <InputLabel>Тип консультации</InputLabel>
+            <Select
+              label="Тип консультации"
+              value={serviceId}
+              onChange={(e) => setServiceId(Number(e.target.value))}
+            >
+              {consultationTypes.map((s) => (
+                <MenuItem key={s.value} value={s.value}>
+                  {s.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Пациент */}
+          <Autocomplete
+            disablePortal
+            options={patients}
+            value={selectedPatient}
+            onChange={(e, val) => setSelectedPatient(val)}
+            getOptionLabel={(o) => o.label || ""}
+            renderInput={(params) => <TextField {...params} label="Пациент" />}
+            sx={{ mt: 2 }}
+          />
+
+          {/* Дата */}
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+            <DatePicker
+              label="Дата"
+              value={date}
+              onChange={(newValue) => setDate(newValue)}
+              sx={{ mt: 2, width: "100%" }}
             />
-            <ThemeProvider theme={defaultTheme}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-                {/* ✅ Выбор даты */}
-                <DatePicker
-                  label="Дата"
-                  value={date}
-                  onChange={(newDate) => setDate(newDate)}
-                  slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
-                />
+          </LocalizationProvider>
 
-                {/* ✅ Выбор времени */}
-                {isCustom ? (
-                  <TimePicker
-                    label="Выберите время начала"
-                    value={timeStart}
-                    onChange={(newTime) => setTimeStart(newTime)}
-                    slotProps={{ textField: { fullWidth: true, sx: { mt: 2 } } }}
-                    minutesStep={30}
-                    skipDisabled={true}
-                  />
-                ) : (
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <InputLabel>Время начала</InputLabel>
-                    <Select
-                      value={timeStart ? timeStart.format("HH:mm") : ""}
-                      label="Время начала"
-                      onChange={(e) =>
-                        setTimeStart(dayjs(`${dayjs(date).format("YYYY-MM-DD")}T${e.target.value}`))
-                      }
-                      disabled={loadingTimes || availableTimes.length === 0}
-                    >
-                      {loadingTimes ? (
-                        <MenuItem disabled>
-                          <CircularProgress size={20} />
-                        </MenuItem>
-                      ) : availableTimes.length > 0 ? (
-                        availableTimes.map((time) => (
-                          <MenuItem key={time} value={time.format("HH:mm")}>
-                            {time.format("HH:mm")}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled>Нет доступного времени</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                )}
-              </LocalizationProvider>
-            </ThemeProvider>
+          {/* Время */}
+          <TextField
+            select
+            label="Время"
+            value={selectedScheduleId || ""}
+            onChange={(e) => setSelectedScheduleId(Number(e.target.value))}
+            sx={{ mt: 2, width: "100%" }}
+          >
+            {schedule.map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.scheduleStartTime.slice(0, 5)} - {s.scheduleEndTime.slice(0, 5)} •{" "}
+                {s?.SchedulePrices?.[0]?.price ?? "?"}₽
+              </MenuItem>
+            ))}
+          </TextField>
 
-            {/* ✅ Длительность */}
-            <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>Длительность</InputLabel>
-              <Select
-                value={duration}
-                label="Длительность"
-                onChange={(e) => setDuration(Number(e.target.value))}
-              >
-                <MenuItem value={60}>60 минут</MenuItem>
-                <MenuItem value={30}>30 минут</MenuItem>
-              </Select>
-            </FormControl>
+          {/* Статус */}
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Статус</InputLabel>
+            <Select
+              value={status}
+              label="Статус"
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              {slotStatuses.map((s) => (
+                <MenuItem key={s.value} value={s.value}>
+                  {s.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-            {/* ✅ Пациент */}
-            <Autocomplete
-              disablePortal
-              options={patients}
-              value={selectedPatient}
-              onChange={(e, val) => setSelectedPatient(val)}
-              inputValue={inputValue}
-              onInputChange={(e, val) => setInputValue(val)}
-              renderInput={(params) => (
-                <TextField {...params} label="Пациент" sx={{ mt: 3 }} />
-              )}
-            />
-
-
-            <Typography sx={{ fontSize: "0.85rem", mt: 1 }}>
-              Нет нужного пациента?{" "}
-              <span
-                onClick={() => setOpenNewPatient(true)}
-                style={{ color: "#d30d15", cursor: "pointer" }}
-              >
-                Добавить
-              </span>
-            </Typography>
-            {isCustom && (
-              <TextField
-                fullWidth
-                label="Стоимость"
-                type="number"
-                value={cost}
-                onChange={(e) => setCost(e.target.value)}
-                sx={{ mt: 2 }}
-              />
-            )}
-
-            <DialogActions sx={{ mt: 3 }}>
-              <Button onClick={onClose}>Отмена</Button>
-              <Button onClick={handleSubmit} variant="contained">
-                Сохранить
-              </Button>
-            </DialogActions>
-          </Box>
-        </Fade>
-      </Modal>
-
-      <PatientCreateModal
-        show={openNewPatient}
-        onHide={() => setOpenNewPatient(false)}
-      />
-    </LocalizationProvider>
+          <DialogActions sx={{ mt: 3 }}>
+            <Button onClick={onClose}>Отмена</Button>
+            <Button variant="contained" onClick={handleSubmit}>
+              Сохранить
+            </Button>
+          </DialogActions>
+        </Box>
+      </Fade>
+    </Modal>
   );
 };
 

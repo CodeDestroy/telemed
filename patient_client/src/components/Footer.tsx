@@ -48,7 +48,12 @@ const Footer = () => {
                 <ul role="list" className="mt-6 space-y-4">
                   <li>
                     <Link href="/" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
-                      Главная
+                      Телемедицинские консультации
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/secondOpinion" onClick={() => setLoading(true)} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
+                      Второе мнение
                     </Link>
                   </li>
                   <li>

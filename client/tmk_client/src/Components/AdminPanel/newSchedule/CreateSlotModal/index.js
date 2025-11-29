@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-/* import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal'; */
 import Backdrop from '@mui/material/Backdrop';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -9,11 +7,12 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { BorderAllRounded } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import AdminService from '../../../../Services/AdminService';
 import PatientCreateModal from '../../Modals/Patients/Create';
 import { DialogActions } from '@mui/material';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -63,14 +62,16 @@ const CreateSlotModal = (props) => {
     const handleCloseNewPatient = () => {setOpenNewPatient(false);};
     const handleOpenNewPatient = () => {setOpenNewPatient(true);};
 
-    const handleSubmit = async () => {
+    const [slotStatus, setSlotStatus] = useState(2); // 1 = Ждёт оплаты
+
+    /* const handleSubmit = async () => {
         
         try {
             const datetimeStr = `${props.item.date}T${props.item.scheduleStartTime}`;
             const start = dayjs(`${props.item.date}T${props.item.scheduleStartTime}`);
             const end = dayjs(`${props.item.date}T${props.item.scheduleEndTime}`);
             const durationInMinutes = end.diff(start, 'minute');
-            const response = await AdminService.createSlot(props.doctor, selectedPatient, dayjs(datetimeStr), durationInMinutes)
+            const response = await AdminService.createSlot(props.doctor, selectedPatient, dayjs(datetimeStr), durationInMinutes, 2)
             if (response.status == 200) {
                 alert('Успешно')
                 window.location.reload();
@@ -84,7 +85,37 @@ const CreateSlotModal = (props) => {
             console.error("Ошибка при отправке данных:", error);
             setError("Произошла ошибка при отправке данных");
         }
+    } */
+
+    const handleSubmit = async () => {
+        try {
+            /* const start = dayjs(`${props.item.date}T${props.item.scheduleStartTime}`);
+            const end = dayjs(`${props.item.date}T${props.item.scheduleEndTime}`);
+            const durationInMinutes = end.diff(start, 'minute'); */
+
+            /* {doctor, patient, scheduleId, slotStatusId} */
+            const response = await AdminService.createSlotV2(
+                props.doctor, // врач
+                selectedPatient,          // пациент
+                props.item.id,            // scheduleId
+                slotStatus                // статус
+            );
+
+            if (response.status === 200) {
+                alert('Успешно');
+                window.location.reload();
+            } else if (response.status === 500) {
+                setError("Ошибка сервера: не удалось сохранить событие");
+            } else {
+                setError("Не удалось сохранить событие, попробуйте снова");
+            }
+
+        } catch (error) {
+            console.error("Ошибка при отправке данных:", error);
+            setError("Произошла ошибка при отправке данных");
+        }
     }
+
 
     if (props.open == true && props.item && props.doctor) {
         return (
@@ -130,6 +161,19 @@ const CreateSlotModal = (props) => {
                             Нет нужного пациента?
                             <a onClick={handleOpenNewPatient} style={{color: '#d30d15', cursor: 'pointer' }} rel="noopener noreferrer">Добавить</a>
                         </p>
+                        <FormControl fullWidth sx={{ mt: 2 }}>
+                            <InputLabel id="slot-status-label">Статус</InputLabel>
+                            <Select
+                                labelId="slot-status-label"
+                                value={slotStatus}
+                                label="Статус"
+                                onChange={(e) => setSlotStatus(e.target.value)}
+                            >
+                                <MenuItem value={2}>Ждёт оплаты</MenuItem>
+                                <MenuItem value={3}>Оплачено</MenuItem>
+                            </Select>
+                        </FormControl>
+
                         <DialogActions>
                             <Button onClick={props.onClose}>Отмена</Button>
                             <Button onClick={handleSubmit}>Сохранить</Button>

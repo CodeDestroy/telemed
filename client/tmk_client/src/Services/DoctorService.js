@@ -20,8 +20,8 @@ export default class DoctorService {
         return $api.get('/api/doctor/v2/consultations/ended', {params: {doctorId}})
     }
 
-    static async createScheduler (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime) {
-        return $api.post('/api/doctor/scheduler', {doctorId, scheduleDay, scheduleStartTime, scheduleEndTime})
+    static async createScheduler (doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, slotDuration, slotsCount) {
+        return $api.post('/api/doctor/scheduler', {doctorId, scheduleDay, scheduleStartTime, scheduleEndTime, slotDuration, slotsCount})
     }
 
     static async getSchedule (doctorId) {
@@ -30,10 +30,14 @@ export default class DoctorService {
     static async getScheduleByDate (doctorId, date) {
         return $api.get(`/api/doctor/scheduler/${doctorId}`, {params: {date: date}})
     }
-    static async getScheduleByDateV2 (doctorId, date) {
-        return $api.get(`/api/doctor/scheduler/date/${doctorId}`, {params: {date: date}})
+    static async getScheduleByDateV2 (doctorId, date, serviceId = 1) {
+        return $api.get(`/api/doctor/scheduler/date/${doctorId}`, {params: {date: date, serviceId}})
     }
     
+    static async getScheduleById (scheduleId) {
+        return $api.get(`/api/doctor/scheduler/byId/${scheduleId}`)
+    }
+
     static async getScheduleByDates (doctorId, startDate, endDate) {
         return $api.get(`/api/doctor/scheduler/${doctorId}`, {params: {startDate: startDate, endDate: endDate}})
     }
@@ -42,8 +46,8 @@ export default class DoctorService {
         return $api.post('/api/doctor/scheduler/delete', {id})
     }
     
-    static async addSchedule (doctorId, date, startTime, endTime, price, isFree) {
-        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime, price, isFree })
+    static async addSchedule (doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount = 1, serviceId) {
+        return $api.post('/api/doctor/scheduler/dates/add', {doctorId, date, startTime, endTime, price, isFree, slotDuration, slotsCount , serviceId})
     }
     static async updateSchedule (doctorId, slotId, date, startTime, endTime, price, isFree) {
         return $api.post(`/api/doctor/scheduler/dates/edit/${slotId}`, { doctorId, date, startTime, endTime, price, isFree })

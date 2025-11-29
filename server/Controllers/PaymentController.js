@@ -11,6 +11,7 @@ const MailManager = require("../Utils/MailManager");
 const PaymentService = require("../Services/PaymentService");
 const ApiError = require("../Errors/api-error");
 const yookassaApi = require("../Api/yookassaApi");
+const SchedulerService = require("../Services/SchedulerService");
 class PatientController {
 
     async yookassaWebhook(req, res) {
@@ -29,6 +30,7 @@ class PatientController {
             const patient = await PatientService.getPatient(slot.patientId)
             const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
             const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
+            const schedule = await SchedulerService.getSchedulerBySlotId(slot.id)
             const transporter = await MailManager.getTransporter()
             switch (notification.event) {
                 case "payment.waiting_for_capture":
@@ -81,6 +83,9 @@ class PatientController {
                     payment.paymentStatusId = 5; // Отмена оплаты
                     slot.slotStatusId = 5; // Помечаем слот как "Отменено"
                     slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
+                    schedule.slotId = null;
+                    schedule.scheduleStatus = 1;
+                    await schedule.save()
                     await slot.save()
                     await slot.Room.save()
                     console.log(`Платёж ${yookassaPayment.id} ушёл в ошибку`);
@@ -193,6 +198,7 @@ class PatientController {
             const patient = await PatientService.getPatient(slot.patientId)
             const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
             const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
+            const schedule = await SchedulerService.getSchedulerBySlotId(slot.id)
             const transporter = await MailManager.getTransporter()
             if (!payment) {
                 return res.status(404).json({ message: "Платёж не найден" });
@@ -246,6 +252,9 @@ class PatientController {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
                 slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
+                schedule.slotId = null;
+                schedule.scheduleStatus = 1;
+                await schedule.save()
                 await slot.save()
                 await slot.Room.save()
             } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {
@@ -287,6 +296,7 @@ class PatientController {
             const doctor = await DoctorService.getDoctor(slot.doctorId)
             const patient = await PatientService.getPatient(slot.patientId)
             const patientUrl = await UrlManager.getUrlBySlotId(slot.id, patient.userId)
+            const schedule = await SchedulerService.getSchedulerBySlotId(slot.id)
             const doctorUrl = await UrlManager.getUrlBySlotId(slot.id, doctor.userId)
             const transporter = await MailManager.getTransporter()
             if (!payment) {
@@ -340,6 +350,9 @@ class PatientController {
                 payment.paymentStatusId = 5; // Отмена оплаты
                 slot.slotStatusId = 5; // Помечаем слот как "Отменено"
                 slot.Room.roomName = slot.Room.roomName + '_cancel_' + payment.id + '_' + Date.now()
+                schedule.slotId = null;
+                schedule.scheduleStatus = 1;
+                await schedule.save()
                 await slot.save()
                 await slot.Room.save()
             } else if (yookassaPayment.status === "waiting_for_capture" || yookassaPayment.status === "pending") {

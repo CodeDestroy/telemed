@@ -71,10 +71,19 @@ export default class AdminService {
     static async createSlot (doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost) {
         return $api.post('/api/admin/consultations/create', {doctor, patient, startDateTime, duration, slotStatusId, isCustom, cost});
     }
+    static async createSlotV2 (doctor, patient, scheduleId, slotStatusId) {
+        return $api.post('/api/admin/v2/consultations/create', {doctor, patient, scheduleId, slotStatusId});
+    }
     //slotId, doctor, patient, startDateTime, duration, slotStatusId
     static async editSlot (slotId, doctor, patient, startDateTime, duration, slotStatusId) {
         return $api.post('/api/admin/consultations/edit', {slotId, doctor, patient, startDateTime, duration, slotStatusId});
     }
+
+    static async editSlotV2 (slotId, doctor, patient, scheduleId, slotStatusId) {
+        return $api.post('/api/admin/v2/consultations/edit', {slotId, doctor, patient, scheduleId, slotStatusId});
+    }
+
+    
 
     static async getSlotStatuses () {
         return $api.get('/api/admin/slotStatuses/all');
@@ -96,4 +105,10 @@ export default class AdminService {
     static async checkPaymentStatusBySlot(slotId) {
         return $api.get('/api/payment/checkPaymentStatusBySlot', {params: {slotId}})
     }
+
+    
+    static async getSlotById(slotId) {
+        return $api.get('/api/patient/consultation', {params: {id: slotId}})
+    }
+
 }

@@ -73,7 +73,13 @@ function Index() {
           </Box>
         );
       },
-      width: 200,
+      width:100,
+      disableColumnSort: false,
+    },
+    {
+      field: "serviceShortName",
+      headerName: "Тип конференции",
+      width: 150,
       disableColumnSort: false,
     },
     {
