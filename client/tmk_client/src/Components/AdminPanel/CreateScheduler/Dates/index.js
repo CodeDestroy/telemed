@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import Header from '../../Header';
-import { Box, Button, Container, Grid, Typography, Modal, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Form, Select, MenuItem } from '@mui/material';
+import { Box, Button, Container, Grid, Typography, Modal, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
@@ -9,7 +9,6 @@ import { Autocomplete } from '@mui/material';
 import { Context } from '../../../../';
 import DoctorService from '../../../../Services/DoctorService';
 import AdminService from '../../../../Services/AdminService';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import InputAdornment from '@mui/material/InputAdornment';
@@ -48,6 +47,22 @@ function CreateDateSchedule() {
     const [isEditing, setIsEditing] = useState(false);
     const [editingSlot, setEditingSlot] = useState(null);
     const [slotBreak, setSlotBreak] = useState(5);
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "info" // success | error | warning | info
+    });
+
+    const showSnackbar = (message, severity = "info") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
+
+
 
     useEffect(() => {
         async function fetchDoctors() {
@@ -123,21 +138,45 @@ function CreateDateSchedule() {
                 );
                 alert('Расписание обновлено');
             } else {
-                await Promise.all(totalSlots.map(async (slot) => {
-                    await DoctorService.addSchedule(
-                        selectedDoctor.id,
-                        slot.date,
-                        slot.scheduleStartTime,
-                        slot.scheduleEndTime,
-                        slot.price,
-                        slot.isFree,
-                        slot.slotDuration,
-                        1,
-                        consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId,
-                        
-                    );
-                }));
-                alert('Расписания успешно добавлены');
+                const successful = [];
+                const failed = [];
+
+                for (const slot of totalSlots) {
+                    try {
+                        await DoctorService.addSchedule(
+                            selectedDoctor.id,
+                            slot.date,
+                            slot.scheduleStartTime,
+                            slot.scheduleEndTime,
+                            slot.price,
+                            slot.isFree,
+                            slot.slotDuration,
+                            1,
+                            slot.serviceId
+                        );
+
+                        successful.push(`${slot.scheduleStartTime}-${slot.scheduleEndTime}`);
+                    } catch (e) {
+                        failed.push(`${slot.scheduleStartTime}-${slot.scheduleEndTime}`);
+                    }
+                }
+
+                let message = "";
+
+                if (successful.length > 0) {
+                    message += `Добавлены слоты:\n${successful.join('\n')}\n\n`;
+                }
+                if (failed.length > 0) {
+                    message += `Не добавлены (пересекаются по времени с другими слотами врача):\n${failed.join('\n')}`;
+                }
+
+                showSnackbar(message || "Нет добавленных слотов", failed.length > 0 ? "warning" : "success");
+
+                /* setModalOpen(false);
+                setIsEditing(false);
+                setEditingSlot(null); */
+                handleFetchSchedule();
+
             }
             setModalOpen(false);
             setIsEditing(false);
@@ -399,8 +438,24 @@ function CreateDateSchedule() {
                             />
                         </FormGroup>
                         <Button variant="contained" fullWidth onClick={handleAddSchedule}>{isEditing ? 'Сохранить' : 'Добавить'}</Button>
+                        
                     </Box>
+
                 </Modal>
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={5000}
+                    onClose={() => setSnackbar({...snackbar, open: false})}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert 
+                        onClose={() => setSnackbar({...snackbar, open: false})} 
+                        severity={snackbar.severity}
+                        sx={{ whiteSpace: 'pre-line' }} // важно! чтобы переносы строк работали
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
             </LocalizationProvider>
         </>
     );

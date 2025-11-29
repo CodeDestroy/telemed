@@ -175,6 +175,8 @@ class SchedulerService {
                     }
                 ],
             })
+            console.log(doctorId, date, serviceId)
+            console.log(doctorSchedule)
             return doctorSchedule
         }
         catch (e) {

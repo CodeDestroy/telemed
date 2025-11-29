@@ -2,14 +2,12 @@ import React, {useEffect, useState, useContext} from 'react'
 import AdminService from '../../../../Services/AdminService';
 import SchedulerService from '../../../../Services/SchedulerService';
 
-import DoctorService from '../../../../Services/DoctorService';
 import Header from '../../Header';
 import CreateSlotModal from '../CreateSlotModal';
 import dayjs from 'dayjs';
-import { Button, IconButton, Stack } from '@mui/material';
+import { Button, IconButton, Stack, Autocomplete, TextField } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Context } from '../../../../';
 import EditSlotModal from '../EditSlot';
 
@@ -23,10 +21,12 @@ function Index() {
     const [schedule, setSchedule] = useState(new Map())
     const [doctors, setDoctors] = useState([])
     const [scheduleLoaded, setScheduleLoaded] = useState(false)
-    const [reservedSlots, setReservedSlots] = useState([])
     const [splitedSchedule, setSplitedSchedule] = useState(null)
 
     const [startDate, setStartDate] = useState(new Date())
+    const [selectedServiceId, setSelectedServiceId] = useState("all");
+    const [selectedDoctorId, setSelectedDoctorId] = useState("all");
+
     /* const [endDate, setEndDate] = useState(new Date()) */
 
     const [showModal, setModalShow] = useState(false)
@@ -51,6 +51,24 @@ function Index() {
         setSelectedItem(null)
     }
 
+    const serviceTypes = React.useMemo(() => {
+        const allTypes = new Map();
+
+        for (const [, slots] of schedule) {
+            for (const s of slots) {
+                if (s.Service) {
+                    allTypes.set(s.Service.id, s.Service.serviceShortName);
+                }
+            }
+        }
+
+        return Array.from(allTypes.entries()).map(([id, name]) => ({
+            id,
+            name
+        }));
+    }, [schedule]);
+
+
     
 
     useEffect(() => {
@@ -59,9 +77,6 @@ function Index() {
             const newScheduleMap = new Map();
 
             Array.from(schedule.entries()).forEach(([doctor, schedule]) => {
-                //const slot = schedule
-                //const slots = splitScheduleBy30Min(schedule);
-                //const slots = splitScheduleBy60Min(schedule);
                 newScheduleMap.set(doctor, schedule);
             });
             setSplitedSchedule(newScheduleMap)
@@ -76,33 +91,6 @@ function Index() {
             alert('Ошибка загрузки врачей');
         }
     }
-
-    /* const handleFetchReservedSlots = async () => {
-        try {
-            const response = await AdminService.getConsultationsByDate(new Date());
-            setReservedSlots(response.data[0])
-        } catch (e) {
-            alert('Ошибка загрузки занятых слотов');
-        }
-    } */
-
-    /* const handleFetchSchedule = async () => {
-        try {
-            doctors.forEach(async (doctor) => {
-                try {
-                    const response = await SchedulerService.getDcotorSchedule(doctor.id, startDate, endDate);
-                    schedule.set(doctor, response.data);
-                    setScheduleLoaded(true)
-                } catch (e) {
-                    console.log(e)
-                }
-            })
-            
-        }
-        catch (e) {
-            console.log(e)
-        }
-    } */
 
     const handleFetchSchedule = async () => {
         try {
@@ -268,116 +256,99 @@ function Index() {
 
     const DoctorScheduleList = ({ scheduleMap }) => {
         const entries = Array.from(scheduleMap.entries());
-        
+
+        // Фильтр по врачу
+        const filteredEntries = entries.filter(([doctor]) =>
+            selectedDoctorId === "all" ? true : doctor.id === selectedDoctorId
+        );
+
         return (
             <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto' }}>
-                {entries.map(([doctor, schedule], i) => {
+                {filteredEntries.map(([doctor, schedule], i) => {
                     const fullName = `${doctor.firstName} ${doctor.patronomicName} ${doctor.secondName}`;
 
-                    const busy = [];
-                    const free = [];
-
-                    for (const slot of schedule) {
-                        if (slot.scheduleStatus != 1 || slot.slotId ) {
-                            busy.push(slot);
-                            console.log(slot)
-                        } else {
-                            free.push(slot);
+                    // группировка по serviceId
+                    const grouped = {};
+                    schedule.forEach(slot => {
+                        if (!slot.Service) return;
+                        if (!grouped[slot.Service.id]) {
+                            grouped[slot.Service.id] = {
+                                name: slot.Service.serviceShortName,
+                                slots: []
+                            };
                         }
-                    }
+                        grouped[slot.Service.id].slots.push(slot);
+                    });
+
+                    const serviceGroups = Object.entries(grouped)
+                        .sort((a, b) => a[0] - b[0]); // сортировка по id
+
                     return (
                         <div
-                            className="doctor-card"
                             key={i}
                             style={{
-                                minWidth: '280px',
-                                flexShrink: 0,
-                                background: '#f9f9f9',
-                                padding: '1rem',
+                                minWidth: '300px',
+                                background: '#fff',
                                 borderRadius: '10px',
-                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                                padding: '1rem',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
                             }}
-                            >
+                        >
                             <h2>{fullName}</h2>
-                            <div>
-                                <strong>Занято:</strong>
-                                {busy.length > 0 ? (
-                                    busy.map((item, index) => (
-                                    <Stack
-                                        key={`busy_${item.id}_${index}`}
-                                        direction="row"
-                                        alignItems="center"
-                                        spacing={1}
-                                        sx={{ mb: 1 }}
-                                    >
-                                        <Button variant="contained" className="fs-3">
-                                            {dayjs(item.scheduleStartTime).format('HH:mm')} - {dayjs(item.scheduleEndTime).format('HH:mm')}
-                                        </Button>
-                                        <IconButton 
-                                            onClick={(event) => handleMenuOpen(event, item)}
-                                        >
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                        {customMenu.open && (
-                                            <div
-                                                style={{
-                                                    position: 'fixed',
-                                                    top: customMenu.top,
-                                                    left: customMenu.left,
-                                                    background: '#fff',
-                                                    border: '1px solid #ccc',
-                                                    boxShadow: '0px 4px 10px rgba(0,0,0,0.1)',
-                                                    zIndex: 9999,
-                                                    padding: '8px',
-                                                    borderRadius: '4px',
-                                                }}
-                                                onMouseLeave={handleMenuClose}
-                                            >
-                                                <div
-                                                    onClick={() => handleEdit(customMenu.item)}
-                                                    style={{ cursor: 'pointer', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                                >
-                                                    <EditIcon fontSize="small"/>
-                                                    Редактировать
-                                                </div>
-                                                {/* <div
-                                                    onClick={() => handleDelete(customMenu.item)}
-                                                    style={{ cursor: 'pointer', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                                >
-                                                    <DeleteIcon fontSize="small" />
-                                                    Удалить
-                                                </div> */}
-                                            </div>
-                                        )}
 
-                                    </Stack>
-                                    ))
-                                ) : (
-                                    <div>Нет</div>
-                                )}
+                            {serviceGroups
+                                .filter(([serviceId]) =>
+                                    selectedServiceId === "all" ? true : Number(serviceId) === Number(selectedServiceId)
+                                )
+                                .map(([serviceId, group]) => (
+                                    <div key={serviceId} style={{ marginTop: "1rem" }}>
+                                        <h3>{group.name}</h3>
 
-                                
-                            </div>
-                            <div style={{ marginTop: '1rem' }}>
-                                <h3>Свободно:</h3>
-                                {free.length > 0 ? (
-                                    free.map((item, index) => (
-                                        <div key={'free_' + item.id+'_'+index}>
-                                            <Button onClick={() => {handleShowModal(item, doctor)}} className='fs-3'>
-                                                {item.scheduleStartTime.slice(0, 5)} - {item.scheduleEndTime.slice(0, 5)}
-                                            </Button>
+                                        {/* разделение на занято/свободно */}
+                                        <div>
+                                            <strong>Занято:</strong>
+                                            {group.slots.filter(s => s.scheduleStatus != 1 || s.slotId).length === 0
+                                                ? <div>Нет</div>
+                                                : group.slots
+                                                    .filter(s => s.scheduleStatus != 1 || s.slotId)
+                                                    .map(s => (
+                                                        <Stack key={s.id} direction="row" alignItems="center">
+                                                            <Button variant="contained">
+                                                                {s.scheduleStartTime.slice(0, 5)} - {s.scheduleEndTime.slice(0, 5)}
+                                                            </Button>
+                                                            <IconButton onClick={(e) => handleMenuOpen(e, s)}>
+                                                                <MoreVertIcon />
+                                                            </IconButton>
+                                                        </Stack>
+                                                    ))
+                                            }
                                         </div>
-                                    ))
-                                    ) : (
-                                    <div>Нет свободных слотов</div>
-                                )}
-                            </div>
+
+                                        <div style={{ marginTop: "0.5rem" }}>
+                                            <strong>Свободно:</strong>
+                                            {group.slots.filter(s => s.scheduleStatus == 1 && !s.slotId).length === 0
+                                                ? <div>Нет</div>
+                                                : group.slots
+                                                    .filter(s => s.scheduleStatus == 1 && !s.slotId)
+                                                    .map(s => (
+                                                        <Button
+                                                            key={s.id}
+                                                            onClick={() => handleShowModal(s, doctor)}
+                                                        >
+                                                            {s.scheduleStartTime.slice(0, 5)} - {s.scheduleEndTime.slice(0, 5)}
+                                                        </Button>
+                                                    ))
+                                            }
+                                        </div>
+                                    </div>
+                                ))}
                         </div>
                     );
                 })}
             </div>
         );
     };
+
       
     return (
         <>
@@ -406,6 +377,41 @@ function Index() {
                         <ArrowForwardIosIcon />
                     </IconButton>
                 </div>
+                <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+                    <Autocomplete
+                        sx={{ width: 250 }}
+                        options={[{ id: "all", label: "Все врачи" }, ...doctors.map(d => ({
+                            id: d.id,
+                            label: `${d.firstName} ${d.patronomicName} ${d.secondName}`
+                        }))]}
+                        value={
+                            selectedDoctorId === "all"
+                                ? { id: "all", label: "Все врачи" }
+                                : doctors.map(d => ({
+                                    id: d.id,
+                                    label: `${d.firstName} ${d.patronomicName} ${d.secondName}`
+                                })).find(d => d.id === selectedDoctorId)
+                        }
+                        onChange={(e, value) => setSelectedDoctorId(value?.id || "all")}
+                        renderInput={(params) => <TextField {...params} label="Врач" />}
+                    />
+
+                    <TextField
+                        select
+                        label="Тип приёма"
+                        sx={{ width: 250 }}
+                        value={selectedServiceId}
+                        onChange={(e) => setSelectedServiceId(e.target.value)}
+                        SelectProps={{ native: true }}
+                    >
+                        <option value="all">Все типы</option>
+                        {serviceTypes.map(t => (
+                            <option key={t.id} value={t.id}>
+                                {t.name}
+                            </option>
+                        ))}
+                    </TextField>
+                </div>
 
                 <div
                     className="doctors-wrapper"
@@ -429,6 +435,53 @@ function Index() {
                 <CreateSlotModal show={showModal} onHide={handleCloseModal} onClose={handleCloseModal} item={selectedItem} doctor={selectedDoctor} open={showModal}/>
                 <EditSlotModal show={showEditModal} onHide={handleEditCloseModal} onClose={handleEditCloseModal} item={selectedItem} open={showEditModal}/>
             </div>
+            {customMenu.open && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: customMenu.top,
+                        left: customMenu.left,
+                        background: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: 6,
+                        padding: '8px 0',
+                        zIndex: 9999,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    }}
+                    onMouseLeave={handleMenuClose}
+                >
+                    <div
+                        style={{
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}
+                        onClick={() => {
+                            handleEdit();
+                            handleMenuClose();
+                        }}
+                    >
+                        <EditIcon fontSize="small" /> Редактировать
+                    </div>
+
+                    <div
+                        style={{
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            color: 'red'
+                        }}
+                        onClick={() => {
+                            handleDelete();
+                            handleMenuClose();
+                        }}
+                    >
+                        Удалить
+                    </div>
+                </div>
+            )}
+
         </>
     )
 }

@@ -139,14 +139,14 @@ class SchedulerController {
             let schedule
             if (!dayid && !date) {
 
-                schedule = await SchedulerService.getDoctorSchedule(id, serviceId)
+                schedule = await SchedulerService.getDoctorSchedule(id, parseInt(serviceId))
             }
             else if (!dayid && date) {
-                schedule = await SchedulerService.getDoctorScheduleByDate(id, date, serviceId)
+                schedule = await SchedulerService.getDoctorScheduleByDate(id, date, parseInt(serviceId))
             }
             else if (dayid && !date) {
 
-                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid, serviceId)
+                schedule = await SchedulerService.getDoctorScheduleByDay(id, dayid, parseInt(serviceId))
             }
             else {
                 throw new Error('Не указано ни дата, ни день недели.')
@@ -252,11 +252,13 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
                 const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(
                     doctorId,
                     date,
-                    currentStart.toDate(),
-                    currentEnd.toDate()
+                    moment(currentStart).format('DD.MM.YYYY hh:mm'),
+                    moment(currentEnd).format('DD.MM.YYYY hh:mm')
                 );
 
-                if (overlappingSchedules && overlappingSchedules.length > 0) {
+
+
+                if (overlappingSchedules) {
                     return res.status(400).json({
                         error: 'Временной промежуток пересекается с существующим расписанием.'
                     });

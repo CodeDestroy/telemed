@@ -30,8 +30,8 @@ export default class DoctorService {
     static async getScheduleByDate (doctorId, date) {
         return $api.get(`/api/doctor/scheduler/${doctorId}`, {params: {date: date}})
     }
-    static async getScheduleByDateV2 (doctorId, date) {
-        return $api.get(`/api/doctor/scheduler/date/${doctorId}`, {params: {date: date}})
+    static async getScheduleByDateV2 (doctorId, date, serviceId = 1) {
+        return $api.get(`/api/doctor/scheduler/date/${doctorId}`, {params: {date: date, serviceId}})
     }
     
     static async getScheduleByDates (doctorId, startDate, endDate) {

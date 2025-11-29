@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import Header from '../../Header';
 import {
     Box, Button, Container, Grid, Typography, Modal, TextField,
-    IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem
+    IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, Snackbar, Alert
 } from '@mui/material';
 
 import { DatePicker, TimePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -56,6 +56,21 @@ function CreateDateScheduleDoctor() {
     const [isEditing, setIsEditing] = useState(false);
     const [editingSlot, setEditingSlot] = useState(null);
 
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "info"
+    });
+
+    const showSnackbar = (message, severity = "info") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
+
+
     const handleFetchSchedule = async () => {
         if (!doctorId) return;
 
@@ -73,71 +88,93 @@ function CreateDateScheduleDoctor() {
 
     const handleAddSchedule = async () => {
         if (!modalData.date || !modalData.startTime || !modalData.consultationType || !modalData.slotDuration) {
-            alert("Заполните все обязательные поля");
+            showSnackbar("Заполните все обязательные поля", "warning");
             return;
         }
 
         const slotDurationMinutes = parseInt(modalData.slotDuration.split(' ')[0]);
         const breakMinutes = slotBreak || 0;
-    
+
         let totalSlots = [];
         for (let i = 0; i < modalData.slotsCount; i++) {
-            // Для каждого слота прибавляем (длительность + перерыв) к начальному времени
-            const currentStartTime = dayjs(modalData.startTime).add(i * (slotDurationMinutes + breakMinutes), 'minute');
-            const currentEndTime = currentStartTime.add(slotDurationMinutes, 'minute');
+            const currentStartTime = dayjs(modalData.startTime)
+                .add(i * (slotDurationMinutes + breakMinutes), "minute");
+            const currentEndTime = currentStartTime.add(slotDurationMinutes, "minute");
 
             totalSlots.push({
-                date: modalData.date.format('YYYY-MM-DD'),
-                scheduleStartTime: currentStartTime.format('HH:mm'),
-                scheduleEndTime: currentEndTime.format('HH:mm'),
+                date: modalData.date.format("YYYY-MM-DD"),
+                scheduleStartTime: currentStartTime.format("HH:mm"),
+                scheduleEndTime: currentEndTime.format("HH:mm"),
                 price: modalData.price,
                 isFree: modalData.isFree,
                 slotDuration: modalData.slotDuration,
-                serviceId: consultationTypes.find(type => type.label === modalData.consultationType)?.serviceId
+                serviceId: consultationTypes.find(t => t.label === modalData.consultationType)?.serviceId
             });
         }
 
         try {
-            // Редактирование одного слота
+            // Редактирование
             if (isEditing && editingSlot) {
                 await DoctorService.updateSchedule(
                     doctorId,
                     editingSlot.id,
-                    modalData.date.add(3, 'h'),
+                    modalData.date.add(3, "h"),
                     modalData.startTime.format("HH:mm"),
                     modalData.endTime.format("HH:mm"),
                     modalData.price,
                     modalData.isFree
                 );
-            } 
+
+                showSnackbar("Слот обновлён", "success");
+            }
             // Добавление нескольких слотов
             else {
+                const successful = [];
+                const failed = [];
+
                 for (const slot of totalSlots) {
-                    console.log(slot)
-                    await DoctorService.addSchedule(
-                        doctorId,
-                        slot.date,
-                        slot.scheduleStartTime,
-                        slot.scheduleEndTime,
-                        slot.price,
-                        slot.isFree,
-                        slot.slotDuration,
-                        1,
-                        slot.serviceId
-                    );
+                    try {
+                        await DoctorService.addSchedule(
+                            doctorId,
+                            slot.date,
+                            slot.scheduleStartTime,
+                            slot.scheduleEndTime,
+                            slot.price,
+                            slot.isFree,
+                            slot.slotDuration,
+                            1,
+                            slot.serviceId
+                        );
+                        successful.push(`${slot.scheduleStartTime}-${slot.scheduleEndTime}`);
+                    } catch (e) {
+                        failed.push(`${slot.scheduleStartTime}-${slot.scheduleEndTime}`);
+                    }
                 }
+
+                let message = "";
+
+                if (successful.length > 0)
+                    message += `Добавлены слоты:\n${successful.join("\n")}\n\n`;
+
+                if (failed.length > 0)
+                    message += `Не добавлены (пересечение / ошибка):\n${failed.join("\n")}`;
+
+                showSnackbar(
+                    message || "Нет добавленных слотов",
+                    failed.length > 0 ? "warning" : "success"
+                );
             }
 
-            alert("Сохранено!");
             setModalOpen(false);
             setIsEditing(false);
             setEditingSlot(null);
             handleFetchSchedule();
 
         } catch (e) {
-            alert("Ошибка сохранения: " + (e.response?.data?.error || e.message));
+            showSnackbar("Ошибка сохранения", "error");
         }
     };
+
 
     const handleEditSlot = (slot) => {
         setModalData({
@@ -373,6 +410,21 @@ function CreateDateScheduleDoctor() {
 
                     </Box>
                 </Modal>
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={5000}
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                >
+                    <Alert
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                        severity={snackbar.severity}
+                        sx={{ whiteSpace: "pre-line" }}
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
+
             </LocalizationProvider>
         </>
     );
