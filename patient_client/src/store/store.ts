@@ -34,7 +34,7 @@ export default class Store {
     try {
       const response = await AuthService.login(login, password)
       if (response.status === 200) {
-        let tempUser = response.data.user;
+        const tempUser = response.data.user;
         if (tempUser.accessLevel > 1) {
             this.setLoading(false)
             const res = {
@@ -110,7 +110,7 @@ export default class Store {
     this.setLoading(true)
     try {
       const response = await AuthService.refresh()
-      let tempUser = response.data.user;
+      const tempUser = response.data.user;
         if (tempUser.accessLevel > 1) {
             this.setLoading(false)
             const res = {
