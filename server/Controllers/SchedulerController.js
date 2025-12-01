@@ -228,18 +228,17 @@ http://localhost:8080/api/doctor/scheduler/4?startDate=Fri,+28+Feb+2025+21:00:00
             const inputStartTime = moment(`${inputDate.toISOString().split('T')[0]}T${startTime}`, 'YYYY-MM-DDTHH:mm').toDate();
             const inputSlotDuration = parseInt(slotDuration, 10); // Парсим duration в число минут
             const totalSlots = parseInt(slotsCount, 10);          // Общее количество слотов
-
+            
             // Основной цикл создания расписания
             for (let i = 0; i < totalSlots; i++) {
                 const currentStart = moment(inputStartTime).add(i * inputSlotDuration, 'minutes');
                 const currentEnd = moment(currentStart).add(inputSlotDuration, 'minutes');
-
                 // Проверка на пересечения
                 const overlappingSchedules = await SchedulerService.findOverlappingSchedulesDates(
                     doctorId,
                     date,
-                    moment(currentStart).format('DD.MM.YYYY hh:mm'),
-                    moment(currentEnd).format('DD.MM.YYYY hh:mm')
+                    currentStart.format('YYYY-MM-DD HH:mm'),
+                    currentEnd.format('YYYY-MM-DD HH:mm')
                 );
 
 
