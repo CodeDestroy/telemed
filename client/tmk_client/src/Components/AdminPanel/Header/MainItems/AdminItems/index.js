@@ -16,7 +16,7 @@ function AdminItems() {
     };
 
     const handleSlotsManagement = () => {
-        window.location.href = adminLocations.slotsManagement;
+        window.location.href = adminLocations.slots;
     }
 
     const handleCalendarManagement = () => {
@@ -42,12 +42,12 @@ function AdminItems() {
             <MenuItem onClick={handleScheduleManagement}>
                 <Typography textAlign="center">Управление расписанием</Typography>
             </MenuItem>
-            {/* <MenuItem onClick={handleSlotsManagement}>
+            <MenuItem onClick={handleSlotsManagement}>
                 <Typography textAlign="center">Управление слотами</Typography>
-            </MenuItem> */}
+            </MenuItem>
 
             <MenuItem onClick={handleCalendarManagement}>
-                <Typography textAlign="center">Управление слотами</Typography>
+                <Typography textAlign="center">Календарь</Typography>
             </MenuItem>
         </>
     );

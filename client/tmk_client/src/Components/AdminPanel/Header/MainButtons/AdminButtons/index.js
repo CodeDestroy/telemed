@@ -16,7 +16,7 @@ function AdminButtons() {
     };
 
     const handleSlotsManagement = () => {
-        window.location.href = adminLocations.slotsManagement;
+        window.location.href = adminLocations.slots;
     }
 
     const handleCalendarManagement = () => {
@@ -52,17 +52,17 @@ function AdminButtons() {
             >
                 Управление расписанием
             </Button>
-            {/* <Button
+            <Button
                 onClick={handleSlotsManagement}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
                 Управление слотами
-            </Button> */}
+            </Button>
             <Button
                 onClick={handleCalendarManagement}
                 sx={{ my: 2, color: 'white', display: 'block' }}
             >
-                Управление слотами
+                Календарь
             </Button>
         </>
     );

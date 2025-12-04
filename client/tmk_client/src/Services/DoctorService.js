@@ -85,5 +85,10 @@ export default class DoctorService {
         });
     }
 
+
+    static getMkbDiagnoses(params) {
+        return $api.get('/api/mkb', {params})
+    }
+
     
 }

@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
+        //Описание диагноза
         description: {
             type: DataTypes.TEXT,
             allowNull: true,
@@ -38,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         recommendations: {
             type: DataTypes.TEXT,
             allowNull: true,
-        }
+        },
     }, {
         sequelize,
         modelName: 'Protocol',

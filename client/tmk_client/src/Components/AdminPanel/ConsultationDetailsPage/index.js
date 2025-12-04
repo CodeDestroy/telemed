@@ -29,7 +29,7 @@ import DoctorService from "../../../Services/DoctorService";
 import moment from "moment-timezone";
 import { Context } from "../../../";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-
+import DiagnosisSelector from '../Modals/DiagnosisSelector'
 
 const statusColor = (status) => {
   const code = (status || "").toLowerCase();
@@ -58,6 +58,13 @@ export default function ConsultationDetailsPage() {
   const [ending, setEnding] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
+  const [complaints, setComplaints] = useState(details?.PatientConsultationInfo?.complaints || "");
+  const [recommendations, setRecommendations] = useState(details?.PatientConsultationInfo?.recommendations || "");
+
+
+  const [diagnosisModalOpen, setDiagnosisModalOpen] = useState(false);
+  const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
+  const [diagnosisDescription, setDiagnosisDescription] = useState("");
 
   useEffect(() => {
     if (slotId) {
@@ -287,8 +294,89 @@ export default function ConsultationDetailsPage() {
           </Box>
 
           {/* --- Протокол --- */}
+          
           <Box mt={4}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="subtitle1">Диагноз</Typography>
+            <Box display="flex" gap={1} alignItems="center">
+              <TextField
+                value={selectedDiagnosis ? `${selectedDiagnosis.code} — ${selectedDiagnosis.name}` : ""}
+                placeholder="Выберите диагноз"
+                fullWidth
+                onClick={() => setDiagnosisModalOpen(true)}
+                InputProps={{ readOnly: true }}
+              />
+              <Button variant="outlined" onClick={() => setDiagnosisModalOpen(true)}>
+                Выбрать
+              </Button>
+            </Box>
+
+            <Typography variant="subtitle1" mt={2}>Описание диагноза</Typography>
+            <Box display="flex" gap={1} alignItems="center">
+              <TextareaAutosize
+                style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+                className='w-100'
+                value={diagnosisDescription}
+                fullWidth
+                onChange={(e) => setDiagnosisDescription(e.target.value)}
+                multiline
+                minRows={2}
+                maxRows={25}
+                fullWidth
+                placeholder="Введите описание диагноза..."
+              />
+              <Tooltip title="Скопировать из выбранного диагноза">
+                <IconButton
+                  onClick={() => setDiagnosisDescription(selectedDiagnosis?.full_name || selectedDiagnosis?.name || "")}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <DiagnosisSelector
+              open={diagnosisModalOpen}
+              onClose={() => setDiagnosisModalOpen(false)}
+              onSelect={(diag) => {
+                setSelectedDiagnosis(diag);
+                /* setDiagnosisDescription(diag.full_name || diag.name); */
+                setDiagnosisModalOpen(false);
+              }}
+            />
+          </Box>
+
+          <Box mt={4}>
+            <Typography variant="subtitle1">Жалобы</Typography>
+            <TextareaAutosize
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              className='w-100'
+              fullWidth
+              value={complaints}
+              onChange={(e) => setComplaints(e.target.value)}
+              multiline
+              minRows={2}
+              maxRows={25}
+              fullWidth
+              placeholder="Введите жалобы..."
+            />
+          </Box>
+
+          <Box mt={2}>
+            <Typography variant="subtitle1">Рекомендации</Typography>
+            <TextareaAutosize
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              className='w-100'
+              value={recommendations}
+              onChange={(e) => setRecommendations(e.target.value)}
+              multiline
+              minRows={6}
+              maxRows={25}
+              fullWidth
+              placeholder="Введите рекомендации и/или лечение..."
+            />
+          </Box>
+
+          <Box mt={4}>
+            {/* <Typography variant="h6" gutterBottom>
               Протокол консультации
             </Typography>
             <TextareaAutosize
@@ -301,7 +389,7 @@ export default function ConsultationDetailsPage() {
               maxRows={25}
               fullWidth
               placeholder="Введите протокол консультации..."
-            />
+            /> */}
             <Box mt={2} display="flex" gap={2} flexWrap="wrap">
               <Button variant="outlined" onClick={handleSaveProtocol} disabled={saving}>
                 {saving ? "Сохранение..." : "Сохранить"}
@@ -327,6 +415,8 @@ export default function ConsultationDetailsPage() {
               </Typography>
             </Box>
           </Box>
+
+
 
           {/* --- Завершение консультации --- */}
           {!details?.Room?.ended  && !details?.meetengEnd && (

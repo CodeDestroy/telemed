@@ -37,9 +37,19 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
+        parent_code: {
+            type: DataTypes.STRING(20),
+            allowNull: true,
+        },
+        full_name: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        }
+
     }, {
         sequelize,
         modelName: 'mkbDiagnosis',
+        timestamps: false, 
     });
 
     return mkbDiagnosis;

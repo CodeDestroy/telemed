@@ -35,10 +35,10 @@ const adminRouter = createBrowserRouter([
       path: adminLocations.createConsultation,
       element: <CreateSlot/>,
     },
-    {
+    /* {
       path: adminLocations.slotsManagement,
       element: <AllSlots/>
-    },
+    }, */
     {
       path: adminLocations.patientManagement,
       element: <PatientList/>
@@ -64,8 +64,12 @@ const adminRouter = createBrowserRouter([
       element: <DoctorCreate/>
     },
     {
-      path: adminLocations.calendar,
+      path: adminLocations.slots,
       element: <SlotList/>
+    },
+    {
+      path: adminLocations.calendar,
+      element: <Schedule/>
     },
     {
       path: generalLocations.settings,
