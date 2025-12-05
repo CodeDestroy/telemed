@@ -299,6 +299,7 @@ export default function ConsultationDetailsPage() {
             <Typography variant="subtitle1">Диагноз</Typography>
             <Box display="flex" gap={1} alignItems="center">
               <TextField
+                style={{fontSize: '1rem'}}
                 value={selectedDiagnosis ? `${selectedDiagnosis.code} — ${selectedDiagnosis.name}` : ""}
                 placeholder="Выберите диагноз"
                 fullWidth
@@ -313,7 +314,7 @@ export default function ConsultationDetailsPage() {
             <Typography variant="subtitle1" mt={2}>Описание диагноза</Typography>
             <Box display="flex" gap={1} alignItems="center">
               <TextareaAutosize
-                style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+                style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem', fontSize: '1rem'}}
                 className='w-100'
                 value={diagnosisDescription}
                 fullWidth
@@ -321,7 +322,6 @@ export default function ConsultationDetailsPage() {
                 multiline
                 minRows={2}
                 maxRows={25}
-                fullWidth
                 placeholder="Введите описание диагноза..."
               />
               <Tooltip title="Скопировать из выбранного диагноза">
@@ -347,7 +347,7 @@ export default function ConsultationDetailsPage() {
           <Box mt={4}>
             <Typography variant="subtitle1">Жалобы</Typography>
             <TextareaAutosize
-              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem', fontSize: '1rem'}}
               className='w-100'
               fullWidth
               value={complaints}
@@ -355,7 +355,6 @@ export default function ConsultationDetailsPage() {
               multiline
               minRows={2}
               maxRows={25}
-              fullWidth
               placeholder="Введите жалобы..."
             />
           </Box>
@@ -363,7 +362,7 @@ export default function ConsultationDetailsPage() {
           <Box mt={2}>
             <Typography variant="subtitle1">Рекомендации</Typography>
             <TextareaAutosize
-              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
+              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem', fontSize: '1rem'}}
               className='w-100'
               value={recommendations}
               onChange={(e) => setRecommendations(e.target.value)}

@@ -38,13 +38,13 @@ export default class Store {
         if (tempUser.accessLevel > 1) {
             this.setLoading(false)
             const res = {
-                data: 'Запрещён вход для пациентов',
+                data: 'Запрещён вход не для пациентов',
                 redirect: doctorClient,
             }
              
             /* Тут сделать предупреждение */
             /* window.location.href = doctorClient as string */
-            this.setError('Запрещён вход для пациентов')
+            this.setError('Запрещён вход не для пациентов')
             return res
         }
         this.setUser(response.data.user)
@@ -114,12 +114,12 @@ export default class Store {
         if (tempUser.accessLevel > 1) {
             this.setLoading(false)
             const res = {
-                data: 'Запрещён вход для пациентов',
+                data: 'Запрещён вход не для пациентов',
                 redirect: doctorClient,
             }
             /* Тут сделать предупреждение */
             /* window.location.href = doctorClient as string */
-            this.setError('Запрещён вход для пациентов')
+            this.setError('Запрещён вход не для пациентов')
             return false
       }
       localStorage.setItem('token', response.data.token)
