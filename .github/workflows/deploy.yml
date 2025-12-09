@@ -1,0 +1,52 @@
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - production
+
+env:
+  RELEASE_BASE: ${{ secrets.DEPLOY_PATH }}    # /home/loginparol0/telemed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Ensure known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create release dir on remote
+        id: release
+        run: |
+          TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
+          echo "release=$TIMESTAMP"
+          echo "RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/releases/$TIMESTAMP" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: RSYNC project to remote release dir
+        run: |
+          RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/releases/${{ steps.release.outputs.RELEASE_DIR##*/ }}
+          echo "Will rsync to $RELEASE_DIR"
+          # создаём папку
+          ssh -o StrictHostKeyChecking=no -p ${REMOTE_PORT:-22} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "mkdir -p $RELEASE_DIR"
+          # rsync (исключаем node_modules и build)
+          rsync -avz --delete --exclude node_modules --exclude '**/node_modules' --exclude .git --exclude .github --exclude /var/www/clinicode.ru ./ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$RELEASE_DIR/
+        env:
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+
+      - name: Run remote deploy script
+        run: |
+          RELEASE_DIR=${{ secrets.DEPLOY_PATH }}/releases/${{ steps.release.outputs.RELEASE_DIR##*/ }}
+          ssh -o StrictHostKeyChecking=no -p ${REMOTE_PORT:-22} ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} "bash ${{ secrets.DEPLOY_PATH }}/shared/deploy.sh $RELEASE_DIR"
+        env:
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
