@@ -16,7 +16,7 @@
   },
   "production": {
     "username": "postgres",
-    "password": "postgres",
+    "password": "postgresAdmin001122",
     "database": "tmk",
     "host": "127.0.0.1",
     "dialect": "postgres",
