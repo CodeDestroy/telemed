@@ -6,8 +6,8 @@ const { app, HTTP_PORT, HOST, HTTPS_PORT } = require(".");
 const { httpSocket, httpsSocket } = require("./Sockets/mainSocket");
 
 // Пути к сертификатам (для production)
-const SSL_KEY_PATH = "/etc/letsencrypt/live/clinicode.ru/privkey.pem";
-const SSL_CERT_PATH = "/etc/letsencrypt/live/clinicode.ru/fullchain.pem";
+const SSL_KEY_PATH = "/home/loginparol0/certs/privkey.pem";
+const SSL_CERT_PATH = "/home/loginparol0/certs/fullchain.pem";
 
 const start = async () => {
   try {
