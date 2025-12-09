@@ -11,18 +11,20 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up SSH key
-        uses: webfactory/ssh-agent@v0
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: Ensure known_hosts
+      - name: Start ssh-agent and add private key
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
+          eval "$(ssh-agent -s)"
           mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-add ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
       - name: Create release dir on remote
@@ -35,7 +37,7 @@ jobs:
 
       - name: RSYNC project to remote release dir
         run: |
-          RELEASE_DIR=${{ steps.release.outputs.release_dir }}
+          RELEASE_DIR="${{ steps.release.outputs.release_dir }}"
           echo "Will rsync to $RELEASE_DIR"
 
           ssh -o StrictHostKeyChecking=no -p ${REMOTE_PORT:-22} \
@@ -55,7 +57,7 @@ jobs:
 
       - name: Run remote deploy script
         run: |
-          RELEASE_DIR=${{ steps.release.outputs.release_dir }}
+          RELEASE_DIR="${{ steps.release.outputs.release_dir }}"
           ssh -o StrictHostKeyChecking=no -p ${REMOTE_PORT:-22} \
             ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
             "bash ${{ secrets.DEPLOY_PATH }}/shared/deploy.sh $RELEASE_DIR"
