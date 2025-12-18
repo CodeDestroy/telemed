@@ -749,7 +749,12 @@ class ConsultationService {
                             {
                                 model: database.models.Child,
                                 required: false
+                            },
+                            {
+                                model: database.models.Protocol,
+                                required: false
                             }
+                        
                         ]
 
                     },
@@ -823,7 +828,13 @@ class ConsultationService {
                 include: [
                     {
                         model: database.models.Rooms,
-                        required: false
+                        required: false,
+                        include: [
+                            {
+                                model: database.models.Protocol,
+                                required: false
+                            }
+                        ]
                     },
                     {
                         model: database.models.Patients,
@@ -844,6 +855,38 @@ class ConsultationService {
             throw e
         }
     }
+
+    async getProtocolByRoomId(roomId) {
+        try {
+            const protocol = await database.models.Protocol.findOne({
+                where: {
+                    roomId: roomId
+                }
+            })
+
+            return protocol
+
+        }
+        catch (e) {
+            console.log(e)
+            throw e
+        }
+    }
+
+    async upsertByRoomId(roomId, payload) {
+        const [protocol, created] =
+        await database.models.Protocol.findOrCreate({
+            where: { room_id: roomId },
+            defaults: payload,
+        });
+
+        if (!created) {
+            await protocol.update(payload);
+        }
+
+        return protocol;
+    }
+    
 
     //Слот по названию комнаты
     async getSlotByRoomName (roomName) {

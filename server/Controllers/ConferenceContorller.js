@@ -108,13 +108,76 @@ class ConferenceController {
         try {
             const {roomId} = req.body
             const {protocol} = req.body
-            
+             if (!roomId || !protocol) {
+                return res.status(400).json({ error: 'roomId и protocol обязательны' });
+            }
             const tmk = await ConsultationService.getSlotByRoomId(roomId)
-           
-            tmk.Room.protocol = protocol
+            if (!tmk || !tmk.Room) {
+                return res.status(404).json({ error: 'Комната не найдена' });
+            }
 
-            tmk.Room.save()
-            res.status(200).json(tmk)
+            const {
+                complaints,
+                anamnesisDisease,
+                anamnesisLife,
+                vaccination,
+                allergy,
+                epidAnamnesis,
+                objectiveData,
+                goal,
+                additionalData,
+                treatmentBefore,
+                diagnosticHypothesis,
+                examPlan,
+                generalRecommendations,
+                treatmentRecommendations,
+                followUp,
+                mkb,
+            } = protocol;
+
+            const payload = {
+                room_id: tmk.Room.id,
+
+                complaints,
+                anamnesis_disease: anamnesisDisease,
+                anamnesis_life: anamnesisLife,
+                vaccination,
+                allergy_anamnesis: allergy,
+                epid_anamnesis: epidAnamnesis,
+                objective_data: objectiveData,
+                goal,
+                additional_data: additionalData,
+                treatment_before: treatmentBefore,
+
+                // Диагностическая гипотеза
+                description: diagnosticHypothesis,
+
+                examination_plan: examPlan,
+
+                // Общие рекомендации
+                recommendations: generalRecommendations,
+
+                // Рекомендации по лечению
+                treatment_recommendations: treatmentRecommendations,
+
+                follow_up: followUp,
+
+                mkb_diagnosis_id: mkb || 1,
+            };
+            const protocolInstance = await ConsultationService.upsertByRoomId(roomId, payload)
+            /* const [protocolInstance] =
+            await db.ConsultationProtocol.findOrCreate({
+                where: { room_id: tmk.Room.id },
+                defaults: payload,
+            }); */
+
+            /* if (protocolInstance) {
+                await protocolInstance.update(payload);
+            } */
+            //tmk.Room.protocol = protocol
+
+            //tmk.Room.save()
+            res.status(200).json(protocolInstance)
         }
         catch (e) {
             res.status(404).json({error: e.message})
