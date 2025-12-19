@@ -54,7 +54,6 @@ const LoginPage = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
-        console.log(phone, password)
         try {
         
             setLoading(true)
@@ -72,7 +71,6 @@ const LoginPage = () => {
                 setError('Ошибка авторизации')
             }
 
-            console.log(res)
         } catch (err: unknown) {
             setLoading(false)
             if (err instanceof Error) {
