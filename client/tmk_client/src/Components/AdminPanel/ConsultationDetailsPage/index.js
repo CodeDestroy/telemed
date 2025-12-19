@@ -19,73 +19,130 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextareaAutosize
 } from "@mui/material";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { useParams, useNavigate } from "react-router-dom";
+import moment from "moment-timezone";
+
 import AdminHeader from "../Header";
 import DoctorService from "../../../Services/DoctorService";
-import moment from "moment-timezone";
+import DiagnosisSelector from "../Modals/DiagnosisSelector";
 import { Context } from "../../../";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
+/* ---------------- helpers ---------------- */
 
 const statusColor = (status) => {
   const code = (status || "").toLowerCase();
-  if (code.includes("оплачено") || code.includes("успешно")) return "success";
-  if (code.includes("ожид") || code.includes("pending")) return "warning";
-  if (code.includes("ошибка") || code.includes("отмен")) return "error";
+  if (code.includes("успеш")) return "success";
+  if (code.includes("ожид")) return "warning";
+  if (code.includes("ошиб") || code.includes("отмен")) return "error";
   return "default";
 };
+
+const Field = ({ title, value, onChange, rows = 3 }) => (
+  <Box mt={2}>
+    <Typography variant="subtitle1">{title}</Typography>
+    <TextareaAutosize
+      className="w-100"
+      minRows={rows}
+      maxRows={25}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={{
+        borderColor: "#d9d9d9",
+        padding: "0.5rem",
+        borderRadius: "0.25rem",
+        fontSize: "1rem",
+        width: "100%",
+      }}
+    />
+  </Box>
+);
+
+/* ---------------- component ---------------- */
 
 export default function ConsultationDetailsPage() {
   const { id: slotId } = useParams();
   const navigate = useNavigate();
   const { store } = useContext(Context);
+
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [protocol, setProtocol] = useState("");
-  /* const [sendingCount, setSendingCount] = useState(0); */
+
+  
+  const isEnded = details?.Room?.ended || details?.meetengEnd;
+
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
-  // Новые состояния для завершения консультации
+  /* ---------- завершение консультации ---------- */
   const [endDialogOpen, setEndDialogOpen] = useState(false);
   const [endTime, setEndTime] = useState(moment().format("YYYY-MM-DDTHH:mm"));
   const [ending, setEnding] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
+  /* ---------- протокол (НОВАЯ ФОРМА) ---------- */
+
+  const [complaints, setComplaints] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.complaints : '');
+  const [anamnesisDisease, setAnamnesisDisease] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.anamnesis_disease : '');
+  const [anamnesisLife, setAnamnesisLife] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.anamnesis_life : '');
+  const [vaccination, setVaccination] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.vaccination : '');
+  const [allergy, setAllergy] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.allergy_anamnesis : '');
+  const [epidAnamnesis, setEpidAnamnesis] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.epid_anamnesis : '');
+  const [objectiveData, setObjectiveData] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.objective_data : '');
+  const [goal, setGoal] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.goal : '');
+  const [additionalData, setAdditionalData] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.additional_data : '');
+  const [treatmentBefore, setTreatmentBefore] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.treatment_before : '');
+
+  const [diagnosticHypothesis, setDiagnosticHypothesis] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.description : '');
+  const [examPlan, setExamPlan] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.examination_plan : '');
+  const [generalRecommendations, setGeneralRecommendations] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.recommendations : '');
+  const [treatmentRecommendations, setTreatmentRecommendations] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.treatment_recommendations : '');
+  const [followUp, setFollowUp] = useState(details?.Room?.Protocol ? details?.Room?.Protocol.follow_up : '');
+
+  /* ---------- МКБ ---------- */
+  const [diagnosisModalOpen, setDiagnosisModalOpen] = useState(false);
+  const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
+
+  /* ---------- загрузка ---------- */
 
   useEffect(() => {
-    if (slotId) {
-      setLoading(true);
-      DoctorService.getConsultationBySlotId(slotId)
-        .then((res) => {
-          setDetails(res.data);
-          setProtocol(res.data?.Room?.protocol || "");
-        })
-        .catch(() => setDetails({ error: "Ошибка загрузки данных" }))
-        .finally(() => setLoading(false));
-    }
+    DoctorService.getConsultationBySlotId(slotId)
+      .then((res) => setDetails(res.data))
+      .catch(() => setDetails({ error: "Ошибка загрузки данных" }))
+      .finally(() => setLoading(false));
   }, [slotId]);
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  /* ---------- действия ---------- */
 
   const handleSaveProtocol = async () => {
     setSaving(true);
     try {
-      await DoctorService.setProtocol(details.Room.id, protocol)
-      // пример вызова бэка: await DoctorService.updateProtocol(slotId, protocol);
+      await DoctorService.setProtocol(details.Room.id, {
+        complaints,
+        anamnesisDisease,
+        anamnesisLife,
+        vaccination,
+        allergy,
+        epidAnamnesis,
+        objectiveData,
+        goal,
+        additionalData,
+        treatmentBefore,
+        diagnosticHypothesis,
+        examPlan,
+        generalRecommendations,
+        treatmentRecommendations,
+        followUp,
+        mkb: selectedDiagnosis?.id || null,
+      });
       setSnackbar({ open: true, message: "Протокол сохранён", severity: "success" });
     } catch {
-      setSnackbar({ open: true, message: "Ошибка при сохранении", severity: "error" });
+      setSnackbar({ open: true, message: "Ошибка сохранения", severity: "error" });
     } finally {
       setSaving(false);
     }
@@ -94,81 +151,75 @@ export default function ConsultationDetailsPage() {
   const handleSendProtocol = async () => {
     setSending(true);
     try {
-      // пример вызова бэка: await DoctorService.sendProtocol(slotId);
       await DoctorService.sendProtocol(details.Room.id);
-      details.Room.sendCount++
-      /* setSendingCount((prev) => prev + 1); */
-      setSnackbar({ open: true, message: "Протокол отправлен пациенту", severity: "success" });
+      details.Room.sendCount++;
+      setSnackbar({ open: true, message: "Протокол отправлен", severity: "success" });
     } catch {
-      setSnackbar({ open: true, message: "Ошибка при отправке", severity: "error" });
+      setSnackbar({ open: true, message: "Ошибка отправки", severity: "error" });
     } finally {
       setSending(false);
     }
   };
 
-  const handleEndConsultation = () => {
-    // Открываем модальное окно для выбора времени
-    setEndTime(moment().format("YYYY-MM-DDTHH:mm"));
-    setEndDialogOpen(true);
-  };
-
-  const handleConfirmEnd = async () => {
-    setEnding(true);
-    try {
-      // Пример вызова:
-      const response = await DoctorService.endConsultation(slotId, endTime)
-      if (response.status == 200) {
-        window.location.reload();
-      }
-      // await DoctorService.endConsultation(slotId, { endTime });
-      setSnackbar({
-        open: true,
-        message: `Консультация завершена (${moment(endTime).format("HH:mm DD.MM.YYYY")})`,
-        severity: "success",
-      });
-      setEndDialogOpen(false);
-      // Обновим данные локально
-      setDetails((prev) => ({
-        ...prev,
-        meetengEnd: endTime,
-      }));
-    } catch {
-      setSnackbar({ open: true, message: "Ошибка при завершении", severity: "error" });
-    } finally {
-      setEnding(false);
-    }
-  };
   const handleDownloadProtocol = async () => {
     setDownloading(true);
     try {
       const response = await DoctorService.downloadProtocol(details.id);
       const blob = new Blob([response.data], { type: "application/pdf" });
-      //const blob = new Blob([response.data], { type: "type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'," });
-      const url = window.URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute(
-        "download",
-        `Протокол_${details.Patient.secondName}_${moment(details.slotStartDateTime).format("DD.MM.YYYY")}.pdf`
-      );
-      document.body.appendChild(link);
+      link.download = `Протокол_${details.Patient.secondName}_${moment(details.slotStartDateTime).format("DD.MM.YYYY")}.pdf`;
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      setSnackbar({ open: true, message: "Протокол успешно скачан", severity: "success" });
-    } catch (error) {
-      setSnackbar({ open: true, message: "Ошибка при скачивании PDF", severity: "error" });
+      URL.revokeObjectURL(url);
+    } catch {
+      setSnackbar({ open: true, message: "Ошибка скачивания PDF", severity: "error" });
     } finally {
       setDownloading(false);
     }
   };
 
+  const handleConfirmEnd = async () => {
+    setEnding(true);
+    try {
+      await DoctorService.endConsultation(slotId, endTime);
+      window.location.reload();
+    } catch {
+      setSnackbar({ open: true, message: "Ошибка завершения", severity: "error" });
+    } finally {
+      setEnding(false);
+    }
+  };
+
+  useEffect(() => {
+    if (details?.Room?.Protocol) {
+      setComplaints(details?.Room?.Protocol.complaints);
+      setAnamnesisDisease(details?.Room?.Protocol.anamnesis_disease);
+      setAnamnesisLife(details?.Room?.Protocol.anamnesis_life);
+      setVaccination(details?.Room?.Protocol.vaccination);
+      setAllergy(details?.Room?.Protocol.allergy_anamnesis);
+      setEpidAnamnesis(details?.Room?.Protocol.epid_anamnesis);
+      setObjectiveData(details?.Room?.Protocol.objective_data);
+      setGoal(details?.Room?.Protocol.goal);
+      setAdditionalData(details?.Room?.Protocol.additional_data);
+      setTreatmentBefore(details?.Room?.Protocol.treatment_before);
+
+      setDiagnosticHypothesis(details?.Room?.Protocol.description);
+      setExamPlan(details?.Room?.Protocol.examination_plan);
+      setGeneralRecommendations(details?.Room?.Protocol.recommendations);
+      setTreatmentRecommendations(details?.Room?.Protocol.treatment_recommendations);
+      setFollowUp(details?.Room?.Protocol.follow_up);
+      setSelectedDiagnosis({id: details?.Room?.Protocol.mkb_diagnosis_id})
+    }
+  }, [details])
+
+  /* ---------- render ---------- */
 
   if (loading) {
     return (
       <>
         <AdminHeader />
-        <Box display="flex" justifyContent="center" alignItems="center" height="70vh">
+        <Box display="flex" justifyContent="center" mt={10}>
           <CircularProgress />
         </Box>
       </>
@@ -180,232 +231,138 @@ export default function ConsultationDetailsPage() {
       <>
         <AdminHeader />
         <Box p={4}>
-          <Typography color="error">{details?.error || "Данные не найдены"}</Typography>
-          <Button sx={{ mt: 2 }} variant="outlined" onClick={() => navigate(-1)}>
-            Назад
-          </Button>
+          <Typography color="error">Ошибка загрузки</Typography>
         </Box>
       </>
     );
   }
 
-  const isPaymentSuccessful = (details?.Payment?.PaymentStatus?.description || "")
-    .toLowerCase()
-    .includes("успешно");
-
-  const consultationStart = moment(details?.slotStartDateTime);
-  const now = moment();
-  const minutesToStart = consultationStart.diff(now, "minutes");
-  const canShowJoin = isPaymentSuccessful && minutesToStart <= 20;
-
-  let doctorUrl = null;
-  let patientUrl = null;
-
-  if (details?.Room?.Urls?.length) {
-    for (const u of details.Room.Urls) {
-      if (u.userId === store.user.id) doctorUrl = u.originalUrl;
-      else patientUrl = process.env.REACT_APP_SERVER_URL + "/short/" + u.shortUrl;
-    }
-  }
-
   return (
     <>
       <AdminHeader />
-      <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: "900px", mx: "auto" }}>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          variant="outlined"
-          sx={{ mb: 3 }}
-          onClick={() => navigate(-1)}
-        >
+
+      <Box sx={{ p: 4, maxWidth: 900, mx: "auto" }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
           Назад
         </Button>
 
-        <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 3 }}>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            Консультация {moment(details.slotStartDateTime).format("DD.MM.YYYY HH:mm")} –{" "}
-            {moment(details.slotEndDateTime).format("HH:mm")}
+        <Paper sx={{ p: 4, mt: 2 }}>
+          {/* --------- ШАПКА --------- */}
+          <Typography variant="h5" fontWeight={600}>
+            Онлайн консультация педиатра
           </Typography>
 
-          <Box mt={2}>
-            <Typography variant="subtitle1">
-              <b>Пациент:</b> {details.Patient.secondName} {details.Patient.firstName}{" "}
-              {details.Patient.patronomicName}
-            </Typography>
+          <Typography mt={1}>
+            <b>Пациент:</b> {details.Patient.secondName} {details.Patient.firstName}
+          </Typography>
+          <Typography>
+            <b>Врач:</b> {details.Doctor.secondName} {details.Doctor.firstName}
+          </Typography>
+          <Typography>
+            <b>Дата:</b>{" "}
+            {moment(details.slotStartDateTime).format("DD.MM.YYYY HH:mm")}
+          </Typography>
 
-            <Typography variant="subtitle1">
-              <b>Врач:</b> {details.Doctor.secondName} {details.Doctor.firstName}{" "}
-              {details.Doctor.patronomicName}
-            </Typography>
+          <Chip
+            sx={{ mt: 1 }}
+            size="small"
+            label={details.Payment.PaymentStatus.description}
+            color={statusColor(details.Payment.PaymentStatus.description)}
+          />
 
-            <Typography variant="body2" mt={1}>
-              <b>Дата и время:</b> {moment(details.slotStartDateTime).format("DD.MM.YYYY HH:mm")} –{" "}
-              {moment(details.slotEndDateTime).format("HH:mm")}
-            </Typography>
-
-            <Typography variant="body2" mt={1}>
-              <b>Статус оплаты:</b>{" "}
-              <Chip
-                label={details.Payment.PaymentStatus.description || "—"}
-                color={statusColor(details.Payment.PaymentStatus.description)}
-                size="small"
-              />
-            </Typography>
-          </Box>
-
-          {/* --- Подключение --- */}
-          <Box mt={3}>
-            {canShowJoin && doctorUrl && !details.Room.ended ? (
-              <Box mb={2}>
-                <Button variant="contained" color="primary" href={doctorUrl} target="_blank">
-                  Подключиться к консультации
-                </Button>
-              </Box>
-            ) : ( !details.Room.ended ?
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Кнопка подключения появится за 20 минут до начала консультации
-              </Typography>
-              :
-              <Typography variant="body2" color="text.secondary" mb={2}>
-                Консультация завершена
-              </Typography>
-            )}
-
-            {patientUrl && !details.Room.ended && (
-              <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
-                <Typography variant="body2">Ссылка для пациента:</Typography>
-                <Link href={patientUrl} target="_blank" underline="hover" variant="body2">
-                  {patientUrl}
-                </Link>
-                <Tooltip title={copied ? "Скопировано!" : "Скопировать"}>
-                  <IconButton size="small" onClick={() => handleCopy(patientUrl)}>
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-          </Box>
-
-          {/* --- Протокол --- */}
-          <Box mt={4}>
-            <Typography variant="h6" gutterBottom>
-              Протокол консультации
-            </Typography>
-            <TextareaAutosize
-              style={{ borderColor: '#d9d9d9', padding: '0.5rem', borderRadius: '0.25rem'}}
-              className='w-100'
-              value={protocol}
-              onChange={(e) => setProtocol(e.target.value)}
-              multiline
-              minRows={6}
-              maxRows={25}
-              fullWidth
-              placeholder="Введите протокол консультации..."
+          <Box mt={1}>
+            <Chip
+              size="small"
+              label={isEnded ? "Консультация завершена" : "Консультация активна"}
+              color={isEnded ? "default" : "success"}
             />
-            <Box mt={2} display="flex" gap={2} flexWrap="wrap">
-              <Button variant="outlined" onClick={handleSaveProtocol} disabled={saving}>
-                {saving ? "Сохранение..." : "Сохранить"}
+          </Box>
+
+
+          {/* --------- ФОРМА ПРОТОКОЛА --------- */}
+
+          <Field title="Жалобы" value={complaints} onChange={setComplaints} />
+          <Field title="Анамнез заболевания" value={anamnesisDisease} onChange={setAnamnesisDisease} />
+          <Field title="Анамнез жизни" value={anamnesisLife} onChange={setAnamnesisLife} />
+          <Field title="Вакцинация" value={vaccination} onChange={setVaccination} />
+          <Field title="Аллергологический анамнез" value={allergy} onChange={setAllergy} />
+          <Field title="Эпидемиологический анамнез" value={epidAnamnesis} onChange={setEpidAnamnesis} />
+          <Field title="Объективные данные (рост, вес)" value={objectiveData} onChange={setObjectiveData} />
+          <Field title="Цель обращения" value={goal} onChange={setGoal} />
+          <Field title="Дополнительные данные" value={additionalData} onChange={setAdditionalData} />
+          <Field title="Лечение до консультации" value={treatmentBefore} onChange={setTreatmentBefore} />
+
+          {/* ---- Диагностическая гипотеза ---- */}
+          <Box mt={3}>
+            <Typography variant="subtitle1">
+              Диагностическая гипотеза (синдромальный диагноз)
+            </Typography>
+
+            <Box display="flex" gap={1}>
+              <TextareaAutosize
+                className="w-100"
+                minRows={3}
+                value={diagnosticHypothesis}
+                onChange={(e) => setDiagnosticHypothesis(e.target.value)}
+                style={{
+                  borderColor: "#d9d9d9",
+                  padding: "0.5rem",
+                  borderRadius: "0.25rem",
+                  fontSize: "1rem",
+                  width: "100%",
+                }}
+              />
+              <Button variant="outlined" onClick={() => setDiagnosisModalOpen(true)}>
+                МКБ
               </Button>
-              <Button variant="contained" color="primary" onClick={handleSendProtocol} disabled={sending}>
-                {sending ? "Отправка..." : "Отправить"}
-              </Button>
-              <Tooltip title="Скачать PDF протокол">
-                <span>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<PictureAsPdfIcon />}
-                    onClick={handleDownloadProtocol}
-                    disabled={downloading}
-                  >
-                    {downloading ? "Загрузка..." : "Скачать PDF"}
-                  </Button>
-                </span>
-              </Tooltip>
-              <Typography variant="body2" color="text.secondary" alignSelf="center">
-                Отправлено раз: {details.Room.sendCount ? details.Room.sendCount : 0}
-              </Typography>
             </Box>
           </Box>
 
-          {/* --- Завершение консультации --- */}
-          {!details?.Room?.ended  && !details?.meetengEnd && (
-            <Box mt={4}>
-              <Button variant="contained" color="error" onClick={handleEndConsultation}>
-                Завершить консультацию
-              </Button>
-            </Box>
-          )}
+          <Field title="План обследования" value={examPlan} onChange={setExamPlan} />
+          <Field title="Общие рекомендации" value={generalRecommendations} onChange={setGeneralRecommendations} />
+          <Field title="Рекомендации по лечению" value={treatmentRecommendations} onChange={setTreatmentRecommendations} />
+          <Field title="Явка" value={followUp} onChange={setFollowUp} />
 
-          {/* --- Данные, заполненные пациентом --- */}
-          {details.PatientConsultationInfo && (
-            <Box mt={4}>
-              <Typography variant="h6" gutterBottom>
-                Данные от пациента
-              </Typography>
-
-              <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: "#f9f9f9" }}>
-                <Box mb={2}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Жалобы
-                  </Typography>
-                  <Typography variant="body1">
-                    {details.PatientConsultationInfo.complaints || "Не заполнено"}
-                  </Typography>
-                </Box>
-
-                <Box mb={2}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Ранее установленный диагноз
-                  </Typography>
-                  <Typography variant="body1">
-                    {details.PatientConsultationInfo.diagnosis || "Не заполнено"}
-                  </Typography>
-                </Box>
-
-                <Box mb={2}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Анамнез
-                  </Typography>
-                  <Typography variant="body1">
-                    {details.PatientConsultationInfo.anamnesis || "Не заполнено"}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Комментарии пациента
-                  </Typography>
-                  <Typography variant="body1">
-                    {details.PatientConsultationInfo.comments || "Не заполнено"}
-                  </Typography>
-                </Box>
-              </Paper>
-            </Box>
-          )}
-
-
-          {/* --- Файлы --- */}
+          {/* --------- КНОПКИ --------- */}
+          <Box mt={4} display="flex" gap={2} flexWrap="wrap">
+            <Button onClick={handleSaveProtocol} disabled={saving}>
+              Сохранить
+            </Button>
+            <Button variant="contained" onClick={handleSendProtocol} disabled={sending}>
+              Отправить
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<PictureAsPdfIcon />}
+              onClick={handleDownloadProtocol}
+              disabled={downloading}
+            >
+              PDF
+            </Button>
+          </Box>
+          {/* --------- ПРИКРЕПЛЁННЫЕ ФАЙЛЫ --------- */}
           <Box mt={4}>
             <Typography variant="subtitle1" fontWeight={500}>
               Прикреплённые файлы:
             </Typography>
-            {details.Attachments && details.Attachments.length > 0 ? (
+
+            {details && details.Attachments && details.Attachments.length > 0 ? (
               <List dense>
-                {details.Attachments.map((f) => (
-                  <ListItem key={f.id} sx={{ pl: 0 }}>
+                {details.Attachments.map((file) => (
+                  <ListItem key={file.id} sx={{ pl: 0 }}>
                     <ListItemText
                       primary={
                         <Link
                           href={
-                            f.url.startsWith("http")
-                              ? f.url
-                              : `${process.env.REACT_APP_SERVER_URL}${f.url}`
+                            file.url.startsWith("http")
+                              ? file.url
+                              : `${process.env.REACT_APP_SERVER_URL}${file.url}`
                           }
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {f.originalname || f.filename}
+                          {file.originalname || file.filename}
                         </Link>
                       }
                     />
@@ -421,13 +378,25 @@ export default function ConsultationDetailsPage() {
         </Paper>
       </Box>
 
-      {/* Диалог выбора времени завершения */}
-      <Dialog open={endDialogOpen} onClose={() => setEndDialogOpen(false)} fullWidth maxWidth="xs">
+      {/* --------- МКБ --------- */}
+      <DiagnosisSelector
+        open={diagnosisModalOpen}
+        onClose={() => setDiagnosisModalOpen(false)}
+        onSelect={(diag) => {
+          setSelectedDiagnosis(diag);
+          setDiagnosticHypothesis((prev) =>
+            prev
+              ? `${prev}\n${diag.code} — ${diag.name}`
+              : `${diag.code} — ${diag.name}`
+          );
+          setDiagnosisModalOpen(false);
+        }}
+      />
+
+      {/* --------- ЗАВЕРШЕНИЕ --------- */}
+      <Dialog open={endDialogOpen} onClose={() => setEndDialogOpen(false)}>
         <DialogTitle>Завершить консультацию</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" mb={2}>
-            Укажите фактическое время завершения консультации:
-          </Typography>
           <TextField
             type="datetime-local"
             fullWidth
@@ -437,18 +406,15 @@ export default function ConsultationDetailsPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEndDialogOpen(false)}>Отмена</Button>
-          <Button
-            onClick={handleConfirmEnd}
-            variant="contained"
-            color="error"
-            disabled={ending}
-          >
-            {ending ? "Завершение..." : "Подтвердить"}
+          <Button color="error" onClick={handleConfirmEnd} disabled={ending}>
+            Подтвердить
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Уведомления */}
+      
+
+      {/* --------- SNACKBAR --------- */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}

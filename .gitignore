@@ -25,3 +25,5 @@ secret_key.txt
 .gigaide
 .idea
 
+temp/
+temp/*
