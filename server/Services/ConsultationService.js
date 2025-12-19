@@ -760,7 +760,13 @@ class ConsultationService {
                     },
                     {
                         model: database.models.Patients,
-                        required: false
+                        required: false,
+                        include: [
+                            {
+                                model: database.models.Users,
+                                required: true
+                            }
+                        ]
                     },
                     {
                         model: database.models.Attachments,
@@ -1206,15 +1212,70 @@ class ConsultationService {
     async generateProtocolPdf(consultation) {
         try {
             // 1. Загружаем шаблон
-            const templatePath = path.resolve(__dirname, '../public/templates/protocol_template.docx');
+            const templatePath = path.resolve(__dirname, '../public/templates/protocol_template_ZR.docx');
             const content = fs.readFileSync(templatePath, 'binary');
 
             // 2. Готовим шаблон docx
             const zip = new PizZip(content);
             const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-
-            // 3. Подготавливаем данные для подстановки
+            const now = moment(new Date())
+            const dateTime = consultation.slotStartDateTime
+                    ? new Date(consultation.slotStartDateTime).toLocaleString('ru-RU')
+                    : ''
+            const patient_FIO = consultation.Room?.Child
+                    ? `${consultation.Room.Child.lastName} ${consultation.Room.Child.firstName} ${consultation.Room.Child.patronymicName || ''}`
+                    : `${consultation.Patient.secondName} ${consultation.Patient.firstName} ${consultation.Patient.patronomicName || ''}`
+            const patient_birth_date = consultation.Room.Child?.birthDate ? new Date(consultation.Room.Child.birthDate).toLocaleDateString('ru-RU') : 
+                                        consultation.Patient.birthDate ? new Date(consultation.Patient.birthDate).toLocaleDateString('ru-RU') : ''
+            const patient_years = consultation.Room.Child?.birthDate ? now.diff(moment(consultation.Room.Child.birthDate), 'years') : now.diff(moment(consultation.Patient.birthDate), 'years')
+            const user_FIO = `${consultation.Patient.secondName} ${consultation.Patient.firstName} ${consultation.Patient.patronomicName || ''}`
+            const user_phone = consultation.Patient.User.phone ? consultation.Patient.User.phone : ''
+            const doctor_FIO = `${consultation.Doctor.secondName} ${consultation.Doctor.firstName} ${consultation.Doctor.patronomicName || ''}`
+            const doctor_spetiality = consultation.Doctor.Posts.map(p => p.postName).join(', ') || ''
+            const complaints = consultation.Room.Protocol.complaints || ''
+            const anamnesis_disease = consultation.Room.Protocol.anamnesis_disease || ''
+            const anamnesis_life = consultation.Room.Protocol.anamnesis_life || ''
+            const vaccination = consultation.Room.Protocol.vaccination || ''
+            const allergy_anamnesis = consultation.Room.Protocol.allergy_anamnesis || ''
+            const epid_anamnesis = consultation.Room.Protocol.epid_anamnesis || ''
+            const objective_data = consultation.Room.Protocol.objective_data || ''
+            const goal = consultation.Room.Protocol.goal || ''
+            const additional_data = consultation.Room.Protocol.additional_data || ''
+            const treatment_before = consultation.Room.Protocol.treatment_before || ''
+            const examination_plan = consultation.Room.Protocol.examination_plan || ''
+            const treatment_recommendations = consultation.Room.Protocol.treatment_recommendations || ''
+            const follow_up = consultation.Room.Protocol.follow_up || ''
+            const description = consultation.Room.Protocol.description || ''
+            const recommendations = consultation.Room.Protocol.recommendations || ''
+            
             const data = {
+                dateTime,
+                patient_FIO,
+                patient_birth_date,
+                patient_years,
+                user_FIO,
+                user_phone,
+                doctor_FIO,
+                doctor_spetiality,
+                complaints,
+                anamnesis_disease,
+                anamnesis_life,
+                vaccination,
+                allergy_anamnesis,
+                epid_anamnesis,
+                objective_data,
+                goal,
+                additional_data,
+                treatment_before,
+                examination_plan,
+                treatment_recommendations,
+                follow_up,
+                description,
+                recommendations,
+
+            }    
+            // 3. Подготавливаем данные для подстановки
+            /* const data = {
                 DoctorFIO: consultation.Doctor
                     ? `${consultation.Doctor.secondName} ${consultation.Doctor.firstName} ${consultation.Doctor.patronomicName || ''}`
                     : '',
@@ -1228,7 +1289,7 @@ class ConsultationService {
                 MKB: '',
                 Complaints: '',
                 Recommendations: consultation.Room?.protocol || '',
-            };
+            }; */
 
             // 4. Рендерим шаблон
             try {

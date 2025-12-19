@@ -77,13 +77,8 @@ export default function DiagnosisSelector({ open, onClose, onSelect }) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Выберите диагноз</DialogTitle>
-      <DialogContent
-        dividers
-        style={{ maxHeight: "60vh", overflowY: "auto" }}
-        onScroll={handleScroll}
-        ref={listRef}
-      >
+      <DialogTitle>
+        Выберите диагноз
         <TextField
           fullWidth
           placeholder="Поиск..."
@@ -91,6 +86,14 @@ export default function DiagnosisSelector({ open, onClose, onSelect }) {
           onChange={handleSearchChange}
           sx={{ mb: 2 }}
         />
+      </DialogTitle>
+      <DialogContent
+        dividers
+        style={{ maxHeight: "60vh", overflowY: "auto" }}
+        onScroll={handleScroll}
+        ref={listRef}
+      >
+        
         {diagnosisList.length === 0 && !loading && (
           <Typography variant="body2" color="text.secondary">
             Диагнозы не найдены
